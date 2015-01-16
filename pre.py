@@ -90,3 +90,9 @@ if do_train:
     postags = set(t for ts in tags for t in ts)
     postable = sorted([(t, pos_level1(t), pos_level2(t), pos_level3(t)) for t in postags], key=lambda x:x[1:])
     dump(model_name + '.postable', postable)
+
+posmap = dict( (t[0],t) for line in open('train.postable') for t in [line.strip().split()] )
+
+dump(model_name + '.tags1', ([posmap[t][1] for t in ts] for ts in tags))
+dump(model_name + '.tags2', ([posmap[t][2] for t in ts] for ts in tags))
+dump(model_name + '.tags3', ([posmap[t][3] for t in ts] for ts in tags))

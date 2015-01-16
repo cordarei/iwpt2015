@@ -93,7 +93,7 @@ def feature_format(name, value):
 
 #+name: global_pos_features
 #+BEGIN_SRC python :noweb-ref features
-def global_pos_features(tags, boundary, postable):
+def global_pos_features(tags, tags1, tags2, tags3, boundary, postable):
     fs = set()
 
     def mkfeats_helper(vals, lbl):
@@ -117,8 +117,8 @@ def global_pos_features(tags, boundary, postable):
     fs.update(mkfeats(left_tags, 'level0_raw', 'left'))
     fs.update(mkfeats(right_tags, 'level0_raw', 'right'))
     #level 1
-    left_l1 = uniq(postable[t][1] for t in left_tags)
-    right_l1 = uniq(postable[t][1] for t in right_tags)
+    left_l1 = uniq(tags1[:boundary])
+    right_l1 = uniq(tags1[boundary:])
     # slim
     fs.update(mkfeats(uniq(slim(left_l1)), 'level1_slim', 'left'))
     fs.update(mkfeats(uniq(slim(right_l1)), 'level1_slim', 'right'))
@@ -126,8 +126,8 @@ def global_pos_features(tags, boundary, postable):
     fs.update(mkfeats(full(left_l1), 'level1_full', 'left'))
     fs.update(mkfeats(full(right_l1), 'level1_full', 'right'))
     #level 2
-    left_l2 = uniq(postable[t][2] for t in left_tags)
-    right_l2 = uniq(postable[t][2] for t in right_tags)
+    left_l2 = uniq(tags2[:boundary])
+    right_l2 = uniq(tags2[boundary:])
     # slim
     fs.update(mkfeats(uniq(slim(left_l2)), 'level2_slim', 'left'))
     fs.update(mkfeats(uniq(slim(right_l2)), 'level2_slim', 'right'))
@@ -135,8 +135,8 @@ def global_pos_features(tags, boundary, postable):
     fs.update(mkfeats(full(left_l2), 'level2_full', 'left'))
     fs.update(mkfeats(full(right_l2), 'level2_full', 'right'))
     #level 3
-    left_l3 = uniq(postable[t][3] for t in left_tags)
-    right_l3 = uniq(postable[t][3] for t in right_tags)
+    left_l3 = uniq(tags3[:boundary])
+    right_l3 = uniq(tags3[boundary:])
     # slim
     fs.update(mkfeats(uniq(slim(left_l3)), 'level3_slim', 'left'))
     fs.update(mkfeats(uniq(slim(right_l3)), 'level3_slim', 'right'))
@@ -166,6 +166,9 @@ postable_name = (trained_model_name or model_name) + '.postable'
 
 
 tags = [[t for t in line.strip().split()] for line in open(model_name + '.tags')]
+tags1 = [[t for t in line.strip().split()] for line in open(model_name + '.tags1')]
+tags2 = [[t for t in line.strip().split()] for line in open(model_name + '.tags2')]
+tags3 = [[t for t in line.strip().split()] for line in open(model_name + '.tags3')]
 boundaries = [[int(b) for b in line.strip().split()] for line in open(model_name + '.boundaries')]
 postable = dict( (t[0], t) for line in open(postable_name) for t in [line.strip().split()] )
 
@@ -177,9 +180,9 @@ feature_ids = (
 
 datafile = open(model_name + '.dat', 'w')
 
-for ts, bs in zip(tags, boundaries):
+for ts,t1s,t2s,t3s, bs in zip(tags, tags1, tags2, tags3, boundaries):
     for i in range(1, len(ts) - 1):
-        fs = global_pos_features(ts, i, postable)
+        fs = global_pos_features(ts, t1s, t2s, t3s, i, postable)
         print(format_instance(fs, feature_ids, 1 if i in bs else -1), file=datafile)
 
 datafile.close()
