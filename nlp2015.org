@@ -278,3 +278,16 @@ dump('constraints.default', make_constraints(lengths, [o[0] for o in outputs]))
 dump('constraints.precision', make_constraints(lengths, [filter_prec(*o) for o in outputs]))
 dump('constraints.recall', make_constraints(lengths, [filter_rec(*o) for o in outputs]))
 #+END_SRC
+
+** Run Stanford parser
+
+#+BEGIN_SRC sh :tangle test-parser.sh
+#!/bin/sh
+
+DIR=$(dirname $0)
+MAIN=edu.stanford.nlp.parser.lexparser.LexicalizedParser
+MEM=-mx3g
+TB=$1
+
+parallel 'java $MEM -cp $DIR/corenlp.jar $MAIN -test $TB -indConstMinSentLen {1} -independentConstraintsFile {2} -loadFromTextFile grammar.txt >log-min{1}-{2}' ::: 0 20 30 40 1000 ::: constraints.default constraints.precision constraints.recall test.boundaries
+#+END_SRC
