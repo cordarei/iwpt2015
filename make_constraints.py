@@ -63,3 +63,20 @@ print("Higher Precision (score > {}):".format(PREC_THRESH))
 print("Acc:{0:.2f} Prec:{1:.2f} Rec:{2:.2f} F1:{3:.2f}".format(*evaluate(answers, (filter_prec(*o) for o in outputs))))
 print("Higher Recall (score > {}):".format(REC_THRESH))
 print("Acc:{0:.2f} Prec:{1:.2f} Rec:{2:.2f} F1:{3:.2f}".format(*evaluate(answers, (filter_rec(*o) for o in outputs))))
+
+
+def make_constraints(lengths, outs):
+    for l in lengths:
+        os = outs[:l-1]
+        outs = outs[l-1:]
+        bs = [b for b,o in zip(range(1,l), os) if o == 1] + [l]
+        yield bs
+
+def dump(fname, data):
+    with open(fname, 'w') as f:
+        for row in data:
+            print(' '.join(str(c) for c in row), file=f)
+
+dump('constraints.default', make_constraints(lengths, [o[0] for o in outputs]))
+dump('constraints.precision', make_constraints(lengths, [filter_prec(*o) for o in outputs]))
+dump('constraints.recall', make_constraints(lengths, [filter_rec(*o) for o in outputs]))
