@@ -129,8 +129,10 @@ feature_ids = (
 
 datafile = open(model_name + '.dat', 'w')
 
+snum = -1
 for ts,t1s,t2s,t3s, bs in zip(tags, tags1, tags2, tags3, boundaries):
-    for i in range(1, len(ts) - 1):
+    snum += 1
+    for i in range(1, len(ts)):
         fs = global_pos_features(ts, t1s, t2s, t3s, i, postable)
         print(format_instance(fs, feature_ids, 1 if i in bs else -1), file=datafile)
 
