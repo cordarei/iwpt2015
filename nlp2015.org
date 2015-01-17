@@ -2,6 +2,38 @@
 #+author: Joseph Irwin
 #+property: header-args :noweb yes
 
+* Paper
+
+** Introduction
+
+** Independence Constraints
+
+Given a sentence $s = w_1 w_2 \dots w_n$ and a context-free derivation
+(parse tree) $t$, $w_i$ and $w_{i+1}$ are *independent* if every node
+in $t$ that dominates both $w_i$ and $w_{i+1}$ also dominates $w_1$
+and $w_n$. Furthermore, if $w_i$ and $w_{i+1}$ are independent, then
+$\forall j,k$ s.t. $j \leq i$ and $k > i$, $w_j$ and $w_k$ are
+independent.
+
+** Classifying Independent Span Boundaries
+
+*** Experiments
+
+*** Results
+
+** Parsing With Independence Constraints
+
+*** Experiments
+
+*** Results
+
+** Conclusions
+
+The current pipelined approach is not ideal in two ways: 1) because of
+the CKY binarization, the parser still performs a large amount of
+unnecessary work, and 2) the classifier is unable to access useful
+information created by the parser as it processes short spans at the
+bottom of the parse forest.
 
 * Experiments
 
