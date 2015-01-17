@@ -18,6 +18,25 @@ def ngrams(seq, n=2):
 
 def feature_format(name, value):
     return '{name}:<{value}>'.format(name=name, value=value)
+def local_pos_features(tags, tags1, tags2, tags3, boundary, postable):
+    WINDOW_SIZE = 3
+    fs = set()
+    mkname = lambda l: 'local_pos_{0}_{1}'.format(*l)
+    mkval = lambda vs: '_'.join(vs)
+    def mkfeats_helper(vals, lbl):
+        return (feature_format(mkname(lbl), mkval(v)) for v in vals)
+    left_tags = tags[:boundary]
+    right_tags = tags[boundary:]
+    for i in range(1, WINDOW_SIZE + 1):
+        if len(left_tags) == i:
+            fs.add(feature_format('local_pos_all_left', mkval(left_tags)))
+        elif len(left_tags) > i:
+            fs.add(feature_format('local_pos_suffix_left', mkval(left_tags[-i:])))
+        if len(right_tags) == i:
+            fs.add(feature_format('local_pos_all_right', mkval(right_tags)))
+        elif len(right_tags) > i:
+            fs.add(feature_format('local_pos_prefix_right', mkval(right_tags[:i])))
+    return fs
 def global_pos_features(tags, tags1, tags2, tags3, boundary, postable):
     fs = set()
 
@@ -134,6 +153,7 @@ for ts,t1s,t2s,t3s, bs in zip(tags, tags1, tags2, tags3, boundaries):
     snum += 1
     for i in range(1, len(ts)):
         fs = global_pos_features(ts, t1s, t2s, t3s, i, postable)
+        fs.update(local_pos_features(ts, t1s, t2s, t3s, i, postable))
         print(format_instance(fs, feature_ids, 1 if i in bs else -1), file=datafile)
 
 datafile.close()

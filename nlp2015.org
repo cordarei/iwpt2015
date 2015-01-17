@@ -6,6 +6,25 @@
 
 ** Introduction
 
+CFG parsers are used in many natural language applications. It is
+desirable that parsing take as little time as possible. However, exact
+parsing algorithms require O(n^3) time. Although chart parsing can
+greatly reduce the average cost, the CKY algorithm is still widely
+used, perhaps because of ease of implementation or because an
+exhaustive parse is desired. A CKY pass is often employed as a
+pre-parse step to provide input to another parsing algorithm.
+
+...
+
+We propose a type of top-down constraint we call *independence
+constraints* which can be easily integrated into a CKY algorithm.
+These constraints can greatly reduce the computation done by the
+algorithm, by only exploring trees with satisfy the constraints. We
+demonstrate a classifier which is able to accurately assign
+constraints to a sentence using only surface features. When integrated
+into a CKY parser, these constraints offer a way to trade off accuracy
+for speed.
+
 ** Independence Constraints
 
 Given a sentence $s = w_1 w_2 \dots w_n$ and a context-free derivation
@@ -98,7 +117,7 @@ def format_instance(feats, featdict, label):
     )
 #+END_SRC
 
-*** TODO POS Features [0/1]
+*** COMMENT TODO POS Features [0/1]
 
 - [ ] explain POS feature templates
   
@@ -121,6 +140,28 @@ def ngrams(seq, n=2):
 
 def feature_format(name, value):
     return '{name}:<{value}>'.format(name=name, value=value)
+#+END_SRC
+
+#+BEGIN_SRC python :noweb-ref features
+def local_pos_features(tags, tags1, tags2, tags3, boundary, postable):
+    WINDOW_SIZE = 3
+    fs = set()
+    mkname = lambda l: 'local_pos_{0}_{1}'.format(*l)
+    mkval = lambda vs: '_'.join(vs)
+    def mkfeats_helper(vals, lbl):
+        return (feature_format(mkname(lbl), mkval(v)) for v in vals)
+    left_tags = tags[:boundary]
+    right_tags = tags[boundary:]
+    for i in range(1, WINDOW_SIZE + 1):
+        if len(left_tags) == i:
+            fs.add(feature_format('local_pos_all_left', mkval(left_tags)))
+        elif len(left_tags) > i:
+            fs.add(feature_format('local_pos_suffix_left', mkval(left_tags[-i:])))
+        if len(right_tags) == i:
+            fs.add(feature_format('local_pos_all_right', mkval(right_tags)))
+        elif len(right_tags) > i:
+            fs.add(feature_format('local_pos_prefix_right', mkval(right_tags[:i])))
+    return fs
 #+END_SRC
 
 #+name: global_pos_features
@@ -217,6 +258,7 @@ for ts,t1s,t2s,t3s, bs in zip(tags, tags1, tags2, tags3, boundaries):
     snum += 1
     for i in range(1, len(ts)):
         fs = global_pos_features(ts, t1s, t2s, t3s, i, postable)
+        fs.update(local_pos_features(ts, t1s, t2s, t3s, i, postable))
         print(format_instance(fs, feature_ids, 1 if i in bs else -1), file=datafile)
 
 datafile.close()
