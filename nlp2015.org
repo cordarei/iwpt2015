@@ -14,12 +14,15 @@ used, perhaps because of ease of implementation or because an
 exhaustive parse is desired. A CKY pass is often employed as a
 pre-parse step to provide input to another parsing algorithm.
 
+Reducing the amount of work needed by a CKY parser is thus an active
+area of research.
+
 ...
 
 We propose a type of top-down constraint we call *independence
 constraints* which can be easily integrated into a CKY algorithm.
 These constraints can greatly reduce the computation done by the
-algorithm, by only exploring trees with satisfy the constraints. We
+algorithm, by only exploring trees which satisfy the constraints. We
 demonstrate a classifier which is able to accurately assign
 constraints to a sentence using only surface features. When integrated
 into a CKY parser, these constraints offer a way to trade off accuracy
@@ -35,6 +38,11 @@ $\forall j,k$ s.t. $j \leq i$ and $k > i$, $w_j$ and $w_k$ are
 independent.
 
 ** Classifying Independent Span Boundaries
+
+We trained a binary classifier to decide whether two consecutive words
+are independent.
+
+*** Features
 
 *** Experiments
 
