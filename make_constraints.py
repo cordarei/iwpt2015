@@ -19,6 +19,7 @@ import sys
 
 PREC_THRESH = 0.75
 REC_THRESH = 0.8
+MAX_PREC_THRESH = 0.95
 
 model_name = sys.argv[1]
 output_name = sys.argv[2]
@@ -27,8 +28,8 @@ lengths = [int(line.strip().split()[-1]) for line in open(model_name + '.boundar
 answers = [int(line.strip().split()[0]) for line in open(model_name + '.dat')]
 outputs = [(int(row[0]), float(row[1])) for line in open(output_name) for row in [line.strip().split()]]
 
-def filter_prec(label, score):
-    if label == 1 and score > PREC_THRESH:
+def filter_prec(label, score, thresh=PREC_THRESH):
+    if label == 1 and score > thresh:
         return 1
     else:
         return -1
@@ -38,6 +39,10 @@ def filter_rec(label, score):
         return -1
     else:
         return 1
+
+def f_beta(p, r, beta=1.0):
+    b2 = beta*beta
+    return (1.0 + b2) * p * r / (b2*p + r)
 
 def evaluate(ans, out):
     tp, tn, fp, fn = 0,0,0,0
@@ -53,16 +58,21 @@ def evaluate(ans, out):
     acc = float(tp + tn) / sum((tp,tn,fp,fn))
     prec = float(tp) / (tp + fp)
     rec = float(tp) / (tp + fn)
-    f1 = 2 * prec * rec / (prec + rec)
-    return (acc, prec, rec, f1)
+    # f1 = 2 * prec * rec / (prec + rec)
+    f1 = f_beta(prec, rec, 1.0)
+    f05 = f_beta(prec, rec, 0.5)
+    return (acc*100, prec*100, rec*100, f1*100, f05*100, tp, fp, fn, tn)
 
 
+fmt = "Acc:{0:.2f} Prec:{1:.2f} Rec:{2:.2f} F1:{3:.2f} F.5:{4:.2f} ({5} {6} {7} {8})"
 print("System Output:")
-print("Acc:{0:.2f} Prec:{1:.2f} Rec:{2:.2f} F1:{3:.2f}".format(*evaluate(answers, (o[0] for o in outputs))))
+print(fmt.format(*evaluate(answers, (o[0] for o in outputs))))
 print("Higher Precision (score > {}):".format(PREC_THRESH))
-print("Acc:{0:.2f} Prec:{1:.2f} Rec:{2:.2f} F1:{3:.2f}".format(*evaluate(answers, (filter_prec(*o) for o in outputs))))
+print(fmt.format(*evaluate(answers, (filter_prec(*o) for o in outputs))))
+print("Maximum Precision (score > {}):".format(MAX_PREC_THRESH))
+print(fmt.format(*evaluate(answers, (filter_prec(*o, thresh=MAX_PREC_THRESH) for o in outputs))))
 print("Higher Recall (score > {}):".format(REC_THRESH))
-print("Acc:{0:.2f} Prec:{1:.2f} Rec:{2:.2f} F1:{3:.2f}".format(*evaluate(answers, (filter_rec(*o) for o in outputs))))
+print(fmt.format(*evaluate(answers, (filter_rec(*o) for o in outputs))))
 
 
 def make_constraints(lengths, outs):
@@ -79,4 +89,5 @@ def dump(fname, data):
 
 dump('constraints.default', make_constraints(lengths, [o[0] for o in outputs]))
 dump('constraints.precision', make_constraints(lengths, [filter_prec(*o) for o in outputs]))
+dump('constraints.maxprec', make_constraints(lengths, [filter_prec(*o, thresh=MAX_PREC_THRESH) for o in outputs]))
 dump('constraints.recall', make_constraints(lengths, [filter_rec(*o) for o in outputs]))
