@@ -87,7 +87,8 @@ def dump(fname, data):
         for row in data:
             print(' '.join(str(c) for c in row), file=f)
 
-dump('constraints.default', make_constraints(lengths, [o[0] for o in outputs]))
-dump('constraints.precision', make_constraints(lengths, [filter_prec(*o) for o in outputs]))
-dump('constraints.maxprec', make_constraints(lengths, [filter_prec(*o, thresh=MAX_PREC_THRESH) for o in outputs]))
-dump('constraints.recall', make_constraints(lengths, [filter_rec(*o) for o in outputs]))
+if '-D' not in sys.argv:
+    dump('constraints.default', make_constraints(lengths, [o[0] for o in outputs]))
+    dump('constraints.precision', make_constraints(lengths, [filter_prec(*o) for o in outputs]))
+    dump('constraints.maxprec', make_constraints(lengths, [filter_prec(*o, thresh=MAX_PREC_THRESH) for o in outputs]))
+    dump('constraints.recall', make_constraints(lengths, [filter_rec(*o) for o in outputs]))
