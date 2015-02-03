@@ -152,7 +152,8 @@ snum = -1
 for ts,t1s,t2s,t3s, bs in zip(tags, tags1, tags2, tags3, boundaries):
     snum += 1
     for i in range(1, len(ts)):
-        fs = global_pos_features(ts, t1s, t2s, t3s, i, postable)
+        fs = set()
+        fs.update(global_pos_features(ts, t1s, t2s, t3s, i, postable))
         fs.update(local_pos_features(ts, t1s, t2s, t3s, i, postable))
         print(format_instance(fs, feature_ids, 1 if i in bs else -1), file=datafile)
 
