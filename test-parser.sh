@@ -7,7 +7,7 @@ TB=$1
 SENT_LENS='0 20 30 40 1000'
 CONSTRAINTS='constraints.default constraints.precision constraints.recall constraints.maxprec test.boundaries'
 
-parallel -j4 --results log echo java $MEM -cp $DIR/corenlp.jar $MAIN -test $TB -indConstMinSentLen {1} -independentConstraintsFile {2} -loadFromTextFile grammar.txt ::: $SENT_LENS ::: $CONSTRAINTS >/dev/null 2>/dev/null
+parallel -j4 --results log java $MEM -cp $DIR/corenlp.jar $MAIN -test $TB -indConstMinSentLen {1} -independentConstraintsFile {2} -loadFromTextFile grammar.txt ::: $SENT_LENS ::: $CONSTRAINTS >/dev/null 2>/dev/null
 
 print_total_rules() {
     awk '/Total rules/ {total += $4} END {print total}' < $1 | tr -d '\n'
