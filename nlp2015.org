@@ -125,7 +125,7 @@ def format_instance(feats, featdict, label):
     )
 #+END_SRC
 
-*** COMMENT TODO POS Features [0/1]
+*** TODO POS Features [0/1]
 
 - [ ] explain POS feature templates
   
