@@ -25,6 +25,10 @@ print_f1() {
     cat $1 | grep 'pcfg' | grep summary | grep 'F1: [0-9][0-9.]*' -o | sed 's/F1: //' | tr -d ' \n'
 }
 
+print_failed() {
+  cat $1 | grep 'Parse failed' | wc -l | tr -d ' \n'
+}
+
 print_parser_results() {
     parser_output="log/1/$1/2/$2/stderr"
     echo -n '| '
@@ -39,6 +43,8 @@ print_parser_results() {
     print_total_traversals $parser_output
     echo -n ' | '
     print_f1 $parser_output
+    echo -n ' | '
+    print_failed $parser_output
     echo ' |'
 }
 
