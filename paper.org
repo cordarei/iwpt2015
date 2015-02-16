@@ -12,9 +12,7 @@
 
 # file:paper.pdf
 
-* Paper
-
-** Introduction
+* Introduction
 
 CFG parsers are used in many natural language applications. It is
 desirable that parsing take as little time as possible. However, exact
@@ -38,7 +36,7 @@ constraints to a sentence using only surface features. When integrated
 into a CKY parser, these constraints offer a way to trade off accuracy
 for speed.
 
-** Independence Constraints
+* Independence Constraints
 
 Given a sentence $s = w_1 w_2 \dots w_n$ and a context-free derivation
 (parse tree) $t$, $w_i$ and $w_{i+1}$ are *independent* if every node
@@ -47,39 +45,39 @@ and $w_n$. Furthermore, if $w_i$ and $w_{i+1}$ are independent, then
 $\forall j,k$ s.t. $j \leq i$ and $k > i$, $w_j$ and $w_k$ are
 independent.
 
-** Classifying Independent Span Boundaries
+* Classifying Independent Span Boundaries
 
 We trained a binary classifier to decide whether two consecutive words
 are independent.
 
-*** Features
+** Features
 
-**** Local Features
+*** Local Features
 
-***** Left
+**** Left
 - $t_{k-1}$
 - $t_{k-2},t_{k-1}$
 - $t_{k-3},t_{k-2},t_{k-1}$
 
-***** Right
+**** Right
 - $t_{k}$
 - $t_{k},t_{k+1}$
 - $t_{k},t_{k+1},t_{k+2}$
 
-**** Global Features
+*** Global Features
 
 Below, $t^{l}_{i}$ is the $i$ th POS tag in the $l$-level POS tag sequence.
 
-***** Left
+**** Left
 - $t^l_{i}$ for $1 \le i < k - 1$, $l \in {0,1,2,3}$
 - $t^l_{i},t^l_{i+1}$ for $1 \le i < k - 2$, $l \in {0,1,2,3}$
 - $t^l_{i},t^l_{i+1},t^l_{i+2}$ for $1 \le i < k - 3$, $l \in {0,1,2,3}$
-***** Right
+**** Right
 - $t^l_{i}$ for $k \le i < n - 1$, $l \in {0,1,2,3}$
 - $t^l_{i},t^l_{i+1}$ for $k \le i < n - 2$, $l \in {0,1,2,3}$
 - $t^l_{i},t^l_{i+1},t^l_{i+2}$ for $k \le i < n - 3$, $l \in {0,1,2,3}$
 
-***** POS Levels
+**** POS Levels
 
 #+BEGIN_LaTeX
 %{\tiny
@@ -115,9 +113,9 @@ Below, $t^{l}_{i}$ is the $i$ th POS tag in the $l$-level POS tag sequence.
 %}
 #+END_LaTeX
 
-*** Experiments
+** Experiments
 
-*** Feature Evaluation
+** Feature Evaluation
 
 #+BEGIN_LaTeX
 \resizebox{9cm}{!}{
@@ -219,9 +217,9 @@ Below, $t^{l}_{i}$ is the $i$ th POS tag in the $l$-level POS tag sequence.
 }
 #+END_LaTeX
 
-*** Results
+** Results
 
-**** Linear Kernel
+*** Linear Kernel
 
 #+BEGIN_LaTeX
 \resizebox{12cm}{!}{
@@ -239,7 +237,7 @@ Below, $t^{l}_{i}$ is the $i$ th POS tag in the $l$-level POS tag sequence.
 }
 #+END_LaTeX
 
-**** Linear Kernel (2)
+*** Linear Kernel (2)
 
 #+BEGIN_LaTeX
 \resizebox{12cm}{!}{
@@ -258,7 +256,7 @@ Below, $t^{l}_{i}$ is the $i$ th POS tag in the $l$-level POS tag sequence.
 #+END_LaTeX
 
 
-**** Polynomial (d=3) Kernel
+*** Polynomial (d=3) Kernel
 
 #+BEGIN_LaTeX
 \resizebox{12cm}{!}{
@@ -276,13 +274,13 @@ Below, $t^{l}_{i}$ is the $i$ th POS tag in the $l$-level POS tag sequence.
 }
 #+END_LaTeX
 
-** Parsing With Independence Constraints
+* Parsing With Independence Constraints
 
-*** Experiments
+** Experiments
 
-*** Results
+** Results
 
-**** Linear Classifier
+*** Linear Classifier
 
 Features: $p$, $P_{0}$, $P_{1}$
 
@@ -324,7 +322,7 @@ Features: $p$, $P_{0}$, $P_{1}$
 }
 #+END_LaTeX
 
-**** Polynomial (d=3) Kernel
+*** Polynomial (d=3) Kernel
 
 Features: All
 
@@ -366,7 +364,7 @@ Features: All
 }
 #+END_LaTeX
 
-** Conclusions
+* Conclusions
 
 The current pipelined approach is not ideal in two ways: 1) because of
 the CKY binarization, the parser still performs a large amount of
