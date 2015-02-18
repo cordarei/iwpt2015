@@ -364,10 +364,38 @@ Features: All
 }
 #+END_LaTeX
 
+
 * Conclusions
 
-The current pipelined approach is not ideal in two ways: 1) because of
-the CKY binarization, the parser still performs a large amount of
-unnecessary work, and 2) the classifier is unable to access useful
-information created by the parser as it processes short spans at the
-bottom of the parse forest.
+We have proposed an *independence* property of words in a sentence
+derived from a parse tree, and shown how to use this property to
+create top-down constraints which can be used to reduce the
+computation done by the CKY algorithm. Then we demonstrated two
+classifiers for identifying boundaries between independent words given
+a sentence with only surface features, a linear classifier which is
+fast but less accurate, and a classifier with a polynomial kernel
+which is much more accurate but very slow. We then showed that a
+commonly-used CFG parser can be made faster by using the output of
+these classifiers to create top-down constraints at the cost of some
+accuracy, which can be traded-off by varying the confidence threshold
+of the classifier results.
+
+Although the loss of accuracy when using the linear classifier is
+currently too large to be practical, the performance of the kernel
+classifier indicates that there is room for improvement by manually
+adding conjunctive features to the linear classifier. Features based
+on words as well as POS tags may also be beneficial. However, the
+current approach has several weaknesses which should be addressed by
+future research.
+
+First, the top-down nature of the independence constraints does not
+make a natural fit with the bottom-up CKY algorithm.
+
+Second, the pipelined nature of the classifier means that it only has
+access to POS tags and in particular is not able to make use of
+information generated as the parser processes lower-level spans.
+
+Third, the current classifier combines instances from different
+syntactic structures into a single model. It is possible that training
+multiple models on different types of sentences would result in a
+better classifier.
