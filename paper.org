@@ -11,379 +11,100 @@
 
 #+BEGIN_LaTeX
 \begin{abstract}
-Lorum ipsum blah blah blah.
+We propose a novel property of words in a sentence, derived from a
+context-free derivation, and show how this property can be used to
+reduce the computation done by the CKY algorithm. We demonstrate a
+classifier which can be used to identify boundaries between
+independent words in a sentence using only surface features, and show
+that it can be used to speed up a CFG parser.
 \end{abstract}
 #+END_LaTeX
 
 * Introduction
 
-CFG parsers are used in many natural language applications. It is
-desirable that parsing take as little time as possible. However, exact
-parsing algorithms require \BigO{n^3} time. Although chart parsing can
-greatly reduce the average cost, the CKY algorithm is still widely
-used, perhaps because of ease of implementation or because an
-exhaustive parse is desired. A CKY pass is often employed as a
-pre-parse step to provide input to another parsing algorithm.
-
-Reducing the amount of work needed by a CKY parser is thus an active
-area of research.
-
-...
-
-We propose a type of top-down constraint we call *independence
-constraints* which can be easily integrated into a CKY algorithm.
-These constraints can greatly reduce the computation done by the
-algorithm, by only exploring trees which satisfy the constraints. We
-demonstrate a classifier which is able to accurately assign
-constraints to a sentence using only surface features. When integrated
-into a CKY parser, these constraints offer a way to trade off accuracy
-for speed.
-
+- CFG parsing is widely used
+- CKY algorithm is common
+- there is constant research into approximate and partial parsing
+- there is research into using classifiers to constrain CKY parser
+- we propose a novel type of constraint, demonstrate a classifier to
+  create these constraints, and show a speedup in a CFG parser
 
 * Independence Constraints
 
-Given a sentence $s = w_1 w_2 \dots w_n$ and a context-free derivation
-(parse tree) $t$, $w_i$ and $w_{i+1}$ are *independent* if every node
-in $t$ that dominates both $w_i$ and $w_{i+1}$ also dominates $w_1$
-and $w_n$. Furthermore, if $w_i$ and $w_{i+1}$ are independent, then
-$\forall j,k$ s.t. $j \leq i$ and $k > i$, $w_j$ and $w_k$ are
-independent.
+- we define a property called *independence* which holds between two
+  words in a sentence given a context-free derivation (parse tree) for
+  that sentence
+- conceptually, if two words are *independent* then a CKY parser
+  doesn't have to consider any spans over those words until the very
+  last cell in the chart
 
+** Classifying Independent Span Boundaries
+- in order to be useful, we need to be able to identify which words
+  are independent using information which doesn't require a parser
+- we can create a binary classifier using only POS features which decides
+  whether any two consecutive words in a sentence are independent or not
+- in order to control the tradeoff between speed and accuracy, a
+  classifier that outputs a probability is desirable
+- from previous unpublished work, we found that transforming the POS
+  sequence and using the transformed sequence to create additional
+  features can improve this type of classifier, so we propose features
+  created from several *POS levels*
+- features: local and global
+  - local: left 1,2,3 tags, right 1,2,3 tags
+  - global: left 1-,2-,3-grams, right 1-,2-,3-grams for POS levels
+  - POS levels: level 0, 1, 2, 3
+  
+** Parsing With Independence Constraints
+- alterations to the CKY algorithm
+  - check constraint inside inner loop; or
+  - loop between constraints first, then fill in cells which cross constraints
+  - the difference is (likely) small compared to the work inside the
+    loop(s)
+- expected work saved (we can consider two ideal scenarios)
+  - with one constraint at N/K
+  - K constraints N/K words apart
 
 * Classifying Independent Span Boundaries
-
-We trained a binary classifier to decide whether two consecutive words
-are independent.
-
-** Features
-
-*** Local Features
-
-**** Left
-- $t_{k-1}$
-- $t_{k-2},t_{k-1}$
-- $t_{k-3},t_{k-2},t_{k-1}$
-
-**** Right
-- $t_{k}$
-- $t_{k},t_{k+1}$
-- $t_{k},t_{k+1},t_{k+2}$
-
-*** Global Features
-
-Below, $t^{l}_{i}$ is the $i$ th POS tag in the $l$-level POS tag sequence.
-
-**** Left
-- $t^l_{i}$ for $1 \le i < k - 1$, $l \in {0,1,2,3}$
-- $t^l_{i},t^l_{i+1}$ for $1 \le i < k - 2$, $l \in {0,1,2,3}$
-- $t^l_{i},t^l_{i+1},t^l_{i+2}$ for $1 \le i < k - 3$, $l \in {0,1,2,3}$
-**** Right
-- $t^l_{i}$ for $k \le i < n - 1$, $l \in {0,1,2,3}$
-- $t^l_{i},t^l_{i+1}$ for $k \le i < n - 2$, $l \in {0,1,2,3}$
-- $t^l_{i},t^l_{i+1},t^l_{i+2}$ for $k \le i < n - 3$, $l \in {0,1,2,3}$
-
-**** POS Levels
-
-#+BEGIN_LaTeX
-\begin{table*}[tbp]
-\tiny
-#+END_LaTeX
-
-#+attr_latex: :center nil
-| Lvl0 | Lvl1 | Lvl2 | Lvl3 |   | Lvl0  | Lvl1 | Lvl2 | Lvl3 |
-|------+------+------+------+---+-------+------+------+------|
-| NN   | N    | N    | N    |   | CD    | X    | X    | #    |
-| NNP  | N    | N    | N    |   | -LRB- | X    | X    | B    |
-| NNPS | N    | N    | N    |   | -RRB- | X    | X    | B    |
-| NNS  | N    | N    | N    |   | DT    | X    | X    | D    |
-| PRP  | N    | N    | N    |   | PDT   | X    | X    | D    |
-| VB   | V    | V    | V    |   | PRP$  | X    | X    | D    |
-| VBD  | V    | V    | V    |   | WP$   | X    | X    | D    |
-| VBG  | V    | V    | V    |   | JJ    | X    | X    | J    |
-| VBN  | V    | V    | V    |   | JJR   | X    | X    | J    |
-| VBP  | V    | V    | V    |   | JJS   | X    | X    | J    |
-| VBZ  | V    | V    | V    |   | -RQ-  | X    | X    | Q    |
-| ,    | X    | ,    | ,    |   | -LQ-  | X    | X    | Q    |
-| .    | X    | .    | .    |   | RB    | X    | X    | R    |
-| :    | X    | :    | :    |   | RBR   | X    | X    | R    |
-| CC   | X    | C    | C    |   | RBS   | X    | X    | R    |
-| IN   | X    | I    | I    |   | EX    | X    | X    | X    |
-| RP   | X    | I    | I    |   | FW    | X    | X    | X    |
-| TO   | X    | T    | T    |   | LS    | X    | X    | X    |
-| WDT  | X    | W    | W    |   | MD    | X    | X    | X    |
-| WP   | X    | W    | W    |   | POS   | X    | X    | X    |
-| WRB  | X    | W    | W    |   | SYM   | X    | X    | X    |
-| #    | X    | X    | #    |   | UH    | X    | X    | X    |
-| $    | X    | X    | #    |   |       |      |      |      |
-
-#+BEGIN_LaTeX
-\end{table*}
-#+END_LaTeX
-
-** Experiments
-
-** Feature Evaluation
-
-#+BEGIN_LaTeX
-\begin{table*}[tbp]
-\resizebox{9cm}{!}{
-#+END_LaTeX
-
-#+attr_latex: :center nil
-| Features                     | #feats |               |   Acc |  Prec |   Rec | F_{1} | F_{0.5} |   TP |   FP |   FN |    TN |
-|------------------------------+--------+---------------+-------+-------+-------+-------+---------+------+------+------+-------|
-| P_{0}                        |  33167 | default       | 87.16 | 51.69 | 83.98 | 63.99 |   55.99 | 4383 | 4097 |  836 | 29101 |
-| P_{0}                        |  33167 | precision     | 91.64 | 85.68 | 46.22 | 60.04 |   73.18 | 2412 |  403 | 2807 | 32795 |
-| P_{0}                        |  33167 | max precision | 90.23 | 94.20 | 29.89 | 45.38 |   65.86 | 1560 |   96 | 3659 | 33102 |
-| P_{0}                        |  33167 | recall        | 87.16 | 51.69 | 83.98 | 63.99 |   55.99 | 4383 | 4097 |  836 | 29101 |
-| p                            |  37001 | default       | 93.71 | 80.73 | 70.49 | 75.27 |   78.45 | 3679 |  878 | 1540 | 32320 |
-| p                            |  37001 | precision     | 92.88 | 89.13 | 54.21 | 67.41 |   78.96 | 2829 |  345 | 2390 | 32853 |
-| p                            |  37001 | max precision | 90.19 | 95.26 | 29.24 | 44.74 |   65.62 | 1526 |   76 | 3693 | 33122 |
-| p                            |  37001 | recall        | 91.85 | 65.78 | 83.39 | 73.54 |   68.68 | 4352 | 2264 |  867 | 30934 |
-| p,P_{0},P_{1},P_{2},P_{3}    |  82417 | default       | 95.35 | 86.89 | 77.49 | 81.92 |   84.83 | 4044 |  610 | 1175 | 32588 |
-| p,P_{0},P_{1},P_{2},P_{3}    |  82417 | precision     | 94.82 | 90.35 | 69.27 | 78.42 |   85.17 | 3615 |  386 | 1604 | 32812 |
-| p,P_{0},P_{1},P_{2},P_{3}    |  82417 | max precision | 91.79 | 95.11 | 41.71 | 57.99 |   75.72 | 2177 |  112 | 3042 | 33086 |
-| p,P_{0},P_{1},P_{2},P_{3}    |  82417 | recall        | 93.74 | 71.51 | 89.69 | 79.58 |   74.53 | 4681 | 1865 |  538 | 31333 |
-| p,P_{0},P_{1f},P_{2f},P_{3f} |  76830 | default       | 95.06 | 89.36 | 72.26 | 79.90 |   85.32 | 3771 |  449 | 1448 | 32749 |
-| p,P_{0},P_{1f},P_{2f},P_{3f} |  76830 | precision     | 94.87 | 90.44 | 69.63 | 78.68 |   85.34 | 3634 |  384 | 1585 | 32814 |
-| p,P_{0},P_{1f},P_{2f},P_{3f} |  76830 | max precision | 91.99 | 95.57 | 43.04 | 59.35 |   76.82 | 2246 |  104 | 2973 | 33094 |
-| p,P_{0},P_{1f},P_{2f},P_{3f} |  76830 | recall        | 93.61 | 71.00 | 89.50 | 79.18 |   74.06 | 4671 | 1908 |  548 | 31290 |
-| p,P_{0},P_{1s},P_{2s},P_{3s} |  75755 | default       | 95.21 | 88.17 | 74.80 | 80.94 |   85.12 | 3904 |  524 | 1315 | 32674 |
-| p,P_{0},P_{1s},P_{2s},P_{3s} |  75755 | precision     | 94.84 | 89.85 | 69.92 | 78.64 |   85.01 | 3649 |  412 | 1570 | 32786 |
-| p,P_{0},P_{1s},P_{2s},P_{3s} |  75755 | max precision | 91.99 | 95.26 | 43.17 | 59.41 |   76.74 | 2253 |  112 | 2966 | 33086 |
-| p,P_{0},P_{1s},P_{2s},P_{3s} |  75755 | recall        | 93.53 | 70.66 | 89.60 | 79.01 |   73.77 | 4676 | 1942 |  543 | 31256 |
-| p,P_{0}                      |  70168 | default       | 95.21 | 87.38 | 75.65 | 81.09 |   84.75 | 3948 |  570 | 1271 | 32628 |
-| p,P_{0}                      |  70168 | precision     | 94.81 | 89.84 | 69.65 | 78.47 |   84.92 | 3635 |  411 | 1584 | 32787 |
-| p,P_{0}                      |  70168 | max precision | 92.48 | 94.95 | 47.15 | 63.01 |   78.94 | 2461 |  131 | 2758 | 33067 |
-| p,P_{0}                      |  70168 | recall        | 93.23 | 69.49 | 89.38 | 78.19 |   72.73 | 4665 | 2048 |  554 | 31150 |
-| p,P_{0},P_{1}                |  70222 | default       | 95.48 | 88.95 | 76.16 | 82.06 |   86.06 | 3975 |  494 | 1244 | 32704 |
-| p,P_{0},P_{1}                |  70222 | precision     | 95.18 | 90.42 | 72.20 | 80.29 |   86.08 | 3768 |  399 | 1451 | 32799 |
-| p,P_{0},P_{1}                |  70222 | max precision | 92.52 | 95.57 | 47.14 | 63.13 |   79.28 | 2460 |  114 | 2759 | 33084 |
-| p,P_{0},P_{1}                |  70222 | recall        | 93.84 | 71.73 | 90.25 | 79.93 |   74.80 | 4710 | 1856 |  509 | 31342 |
-| p,P_{0},P_{1f}               |  70210 | default       | 95.39 | 89.25 | 75.11 | 81.57 |   86.01 | 3920 |  472 | 1299 | 32726 |
-| p,P_{0},P_{1f}               |  70210 | precision     | 95.11 | 90.38 | 71.64 | 79.93 |   85.89 | 3739 |  398 | 1480 | 32800 |
-| p,P_{0},P_{1f}               |  70210 | max precision | 92.51 | 95.49 | 47.06 | 63.05 |   79.19 | 2456 |  116 | 2763 | 33082 |
-| p,P_{0},P_{1f}               |  70210 | recall        | 93.73 | 71.30 | 90.19 | 79.64 |   74.41 | 4707 | 1895 |  512 | 31303 |
-| p,P_{0},P_{1s}               |  70180 | default       | 95.33 | 88.79 | 75.13 | 81.39 |   85.67 | 3921 |  495 | 1298 | 32703 |
-| p,P_{0},P_{1s}               |  70180 | precision     | 95.03 | 90.50 | 70.84 | 79.47 |   85.74 | 3697 |  388 | 1522 | 32810 |
-| p,P_{0},P_{1s}               |  70180 | max precision | 92.64 | 94.76 | 48.53 | 64.19 |   79.60 | 2533 |  140 | 2686 | 33058 |
-| p,P_{0},P_{1s}               |  70180 | recall        | 93.64 | 71.04 | 89.73 | 79.30 |   74.13 | 4683 | 1909 |  536 | 31289 |
-| p,P_{0},P_{2}                |  72503 | default       | 95.09 | 88.28 | 73.60 | 80.27 |   84.89 | 3841 |  510 | 1378 | 32688 |
-| p,P_{0},P_{2}                |  72503 | precision     | 94.73 | 89.95 | 68.94 | 78.06 |   84.78 | 3598 |  402 | 1621 | 32796 |
-| p,P_{0},P_{2}                |  72503 | max precision | 91.76 | 95.08 | 41.50 | 57.78 |   75.57 | 2166 |  112 | 3053 | 33086 |
-| p,P_{0},P_{2}                |  72503 | recall        | 93.70 | 71.19 | 90.07 | 79.53 |   74.31 | 4701 | 1902 |  518 | 31296 |
-| p,P_{0},P_{3}                |  80028 | default       | 94.84 | 88.81 | 70.99 | 78.91 |   84.56 | 3705 |  467 | 1514 | 32731 |
-| p,P_{0},P_{3}                |  80028 | precision     | 94.69 | 89.71 | 68.81 | 77.88 |   84.57 | 3591 |  412 | 1628 | 32786 |
-| p,P_{0},P_{3}                |  80028 | max precision | 91.83 | 95.49 | 41.83 | 58.17 |   75.99 | 2183 |  103 | 3036 | 33095 |
-| p,P_{0},P_{3}                |  80028 | recall        | 93.19 | 69.44 | 89.12 | 78.06 |   72.65 | 4651 | 2047 |  568 | 31151 |
-| p,P_{1}                      |  37055 | default       | 94.81 | 78.38 | 85.38 | 81.73 |   79.69 | 4456 | 1229 |  763 | 31969 |
-| p,P_{1}                      |  37055 | precision     | 94.11 | 88.78 | 64.86 | 74.96 |   82.68 | 3385 |  428 | 1834 | 32770 |
-| p,P_{1}                      |  37055 | max precision | 91.74 | 92.94 | 42.40 | 58.24 |   75.05 | 2213 |  168 | 3006 | 33030 |
-| p,P_{1}                      |  37055 | recall        | 94.01 | 72.33 | 90.57 | 80.43 |   75.37 | 4727 | 1808 |  492 | 31390 |
-| p,P_{1f}                     |  37043 | default       | 94.68 | 78.37 | 84.06 | 81.11 |   79.44 | 4387 | 1211 |  832 | 31987 |
-| p,P_{1f}                     |  37043 | precision     | 93.93 | 88.69 | 63.38 | 73.93 |   82.13 | 3308 |  422 | 1911 | 32776 |
-| p,P_{1f}                     |  37043 | max precision | 91.89 | 93.65 | 43.25 | 59.17 |   75.95 | 2257 |  153 | 2962 | 33045 |
-| p,P_{1f}                     |  37043 | recall        | 93.79 | 71.73 | 89.65 | 79.70 |   74.72 | 4679 | 1844 |  540 | 31354 |
-| p,P_{1s}                     |  37013 | default       | 94.08 | 84.50 | 69.13 | 76.05 |   80.90 | 3608 |  662 | 1611 | 32536 |
-| p,P_{1s}                     |  37013 | precision     | 93.47 | 88.97 | 59.32 | 71.18 |   80.88 | 3096 |  384 | 2123 | 32814 |
-| p,P_{1s}                     |  37013 | max precision | 92.04 | 94.96 | 43.72 | 59.88 |   76.93 | 2282 |  121 | 2937 | 33077 |
-| p,P_{1s}                     |  37013 | recall        | 93.20 | 69.98 | 87.47 | 77.76 |   72.90 | 4565 | 1958 |  654 | 31240 |
-| p,P_{1},P_{2}                |  39390 | default       | 95.27 | 80.99 | 85.21 | 83.04 |   81.80 | 4447 | 1044 |  772 | 32154 |
-| p,P_{1},P_{2}                |  39390 | precision     | 94.72 | 90.56 | 68.21 | 77.81 |   84.99 | 3560 |  371 | 1659 | 32827 |
-| p,P_{1},P_{2}                |  39390 | max precision | 91.48 | 93.91 | 39.85 | 55.96 |   73.87 | 2080 |  135 | 3139 | 33063 |
-| p,P_{1},P_{2}                |  39390 | recall        | 94.22 | 73.43 | 90.06 | 80.90 |   76.24 | 4700 | 1701 |  519 | 31497 |
-| p,P_{1s},P_{3s}              |  41553 | default       | 95.44 | 89.05 | 75.74 | 81.86 |   86.03 | 3953 |  486 | 1266 | 32712 |
-| p,P_{1s},P_{3s}              |  41553 | precision     | 94.99 | 91.65 | 69.44 | 79.01 |   86.14 | 3624 |  330 | 1595 | 32868 |
-| p,P_{1s},P_{3s}              |  41553 | max precision | 92.10 | 95.80 | 43.74 | 60.06 |   77.38 | 2283 |  100 | 2936 | 33098 |
-| p,P_{1s},P_{3s}              |  41553 | recall        | 94.28 | 73.82 | 89.65 | 80.97 |   76.53 | 4679 | 1659 |  540 | 31539 |
-| p,P_{2}                      |  39336 | default       | 95.34 | 84.25 | 80.76 | 82.47 |   83.53 | 4215 |  788 | 1004 | 32410 |
-| p,P_{2}                      |  39336 | precision     | 94.58 | 90.58 | 67.04 | 77.05 |   84.64 | 3499 |  364 | 1720 | 32834 |
-| p,P_{2}                      |  39336 | max precision | 91.51 | 94.33 | 39.87 | 56.05 |   74.09 | 2081 |  125 | 3138 | 33073 |
-| p,P_{2}                      |  39336 | recall        | 94.02 | 72.64 | 89.77 | 80.30 |   75.52 | 4685 | 1765 |  534 | 31433 |
-| p,P_{2f}                     |  38301 | default       | 95.35 | 83.79 | 81.59 | 82.67 |   83.34 | 4258 |  824 |  961 | 32374 |
-| p,P_{2f}                     |  38301 | precision     | 94.58 | 90.94 | 66.74 | 76.98 |   84.79 | 3483 |  347 | 1736 | 32851 |
-| p,P_{2f}                     |  38301 | max precision | 91.48 | 94.35 | 39.64 | 55.83 |   73.94 | 2069 |  124 | 3150 | 33074 |
-| p,P_{2f}                     |  38301 | recall        | 94.07 | 72.98 | 89.46 | 80.38 |   75.77 | 4669 | 1729 |  550 | 31469 |
-| p,P_{2s}                     |  38036 | default       | 95.43 | 89.04 | 75.65 | 81.80 |   85.99 | 3948 |  486 | 1271 | 32712 |
-| p,P_{2s}                     |  38036 | precision     | 94.93 | 91.21 | 69.40 | 78.82 |   85.82 | 3622 |  349 | 1597 | 32849 |
-| p,P_{2s}                     |  38036 | max precision | 91.97 | 94.99 | 43.19 | 59.38 |   76.61 | 2254 |  119 | 2965 | 33079 |
-| p,P_{2s}                     |  38036 | recall        | 93.85 | 71.98 | 89.65 | 79.85 |   74.94 | 4679 | 1821 |  540 | 31377 |
-| p,P_{3}                      |  46861 | default       | 95.04 | 89.47 | 71.95 | 79.76 |   85.31 | 3755 |  442 | 1464 | 32756 |
-| p,P_{3}                      |  46861 | precision     | 94.60 | 91.15 | 66.70 | 77.03 |   84.92 | 3481 |  338 | 1738 | 32860 |
-| p,P_{3}                      |  46861 | max precision | 91.51 | 95.84 | 39.24 | 55.68 |   74.38 | 2048 |   89 | 3171 | 33109 |
-| p,P_{3}                      |  46861 | recall        | 93.71 | 71.53 | 89.16 | 79.38 |   74.47 | 4653 | 1852 |  566 | 31346 |
-| p,P_{3f}                     |  42321 | default       | 94.99 | 90.49 | 70.55 | 79.29 |   85.65 | 3682 |  387 | 1537 | 32811 |
-| p,P_{3f}                     |  42321 | precision     | 94.74 | 91.36 | 67.69 | 77.77 |   85.39 | 3533 |  334 | 1686 | 32864 |
-| p,P_{3f}                     |  42321 | max precision | 91.93 | 96.17 | 42.31 | 58.76 |   76.65 | 2208 |   88 | 3011 | 33110 |
-| p,P_{3f}                     |  42321 | recall        | 93.85 | 72.23 | 88.96 | 79.73 |   75.05 | 4643 | 1785 |  576 | 31413 |
-| p,P_{3s}                     |  41541 | default       | 95.20 | 90.13 | 72.62 | 80.43 |   85.98 | 3790 |  415 | 1429 | 32783 |
-| p,P_{3s}                     |  41541 | precision     | 94.94 | 91.74 | 68.94 | 78.72 |   86.05 | 3598 |  324 | 1621 | 32874 |
-| p,P_{3s}                     |  41541 | max precision | 91.91 | 96.19 | 42.12 | 58.58 |   76.54 | 2198 |   87 | 3021 | 33111 |
-| p,P_{3s}                     |  41541 | recall        | 93.95 | 72.44 | 89.48 | 80.06 |   75.31 | 4670 | 1777 |  549 | 31421 |
-
-#+BEGIN_LaTeX
-}
-\end{table*}
-#+END_LaTeX
-
-** Results
-
-*** Linear Kernel
-
-#+BEGIN_LaTeX
-\begin{table*}[tbp]
-\resizebox{12cm}{!}{
-#+END_LaTeX
-
-#+attr_latex: :center nil
-| Features      | #feats |               |   Acc |  Prec |   Rec | F_{1} | F_{0.5} |   TP |   FP |   FN |    TN |
-|---------------+--------+---------------+-------+-------+-------+-------+---------+------+------+------+-------|
-| p,P_{0},P_{1} |  70222 | default       | 95.48 | 88.95 | 76.16 | 82.06 |   86.06 | 3975 |  494 | 1244 | 32704 |
-| p,P_{0},P_{1} |  70222 | precision     | 95.18 | 90.42 | 72.20 | 80.29 |   86.08 | 3768 |  399 | 1451 | 32799 |
-| p,P_{0},P_{1} |  70222 | max precision | 92.52 | 95.57 | 47.14 | 63.13 |   79.28 | 2460 |  114 | 2759 | 33084 |
-| p,P_{0},P_{1} |  70222 | recall        | 93.84 | 71.73 | 90.25 | 79.93 |   74.80 | 4710 | 1856 |  509 | 31342 |
-
-#+BEGIN_LaTeX
-}
-\end{table*}
-#+END_LaTeX
-
-*** Linear Kernel (2)
-
-#+BEGIN_LaTeX
-\begin{table*}[tbp]
-\resizebox{12cm}{!}{
-#+END_LaTeX
-
-#+attr_latex: :center nil
-| Features        | #feats |               |   Acc |  Prec |   Rec | F_{1} | F_{0.5} |   TP |   FP |   FN |    TN |
-|-----------------+--------+---------------+-------+-------+-------+-------+---------+------+------+------+-------|
-| p,P_{1s},P_{3s} |  41553 | default       | 95.44 | 89.05 | 75.74 | 81.86 |   86.03 | 3953 |  486 | 1266 | 32712 |
-| p,P_{1s},P_{3s} |  41553 | precision     | 94.99 | 91.65 | 69.44 | 79.01 |   86.14 | 3624 |  330 | 1595 | 32868 |
-| p,P_{1s},P_{3s} |  41553 | max precision | 92.10 | 95.80 | 43.74 | 60.06 |   77.38 | 2283 |  100 | 2936 | 33098 |
-| p,P_{1s},P_{3s} |  41553 | recall        | 94.28 | 73.82 | 89.65 | 80.97 |   76.53 | 4679 | 1659 |  540 | 31539 |
-
-#+BEGIN_LaTeX
-}
-\end{table*}
-#+END_LaTeX
-
-
-*** Polynomial (d=3) Kernel
-
-#+BEGIN_LaTeX
-\begin{table*}[tbp]
-\resizebox{12cm}{!}{
-#+END_LaTeX
-
-#+attr_latex: :center nil
-| Features                  | #feats |               |   Acc |  Prec |   Rec | F_{1} | F_{0.5} |   TP |  FP |   FN |    TN |
-|---------------------------+--------+---------------+-------+-------+-------+-------+---------+------+-----+------+-------|
-| p,P_{0},P_{1},P_{2},P_{3} |  82417 | default       | 97.47 | 92.17 | 88.91 | 90.51 |   91.50 | 4640 | 394 |  579 | 32804 |
-| p,P_{0},P_{1},P_{2},P_{3} |  82417 | precision     | 97.27 | 92.95 | 86.43 | 89.58 |   91.57 | 4511 | 342 |  708 | 32856 |
-| p,P_{0},P_{1},P_{2},P_{3} |  82417 | max precision | 96.57 | 94.22 | 79.63 | 86.31 |   90.89 | 4156 | 255 | 1063 | 32943 |
-| p,P_{0},P_{1},P_{2},P_{3} |  82417 | recall        | 97.15 | 88.16 | 91.32 | 89.71 |   88.78 | 4766 | 640 |  453 | 32558 |
-
-#+BEGIN_LaTeX
-}
-\end{table*}
-#+END_LaTeX
-
+- training and testing the classifier
+  - we use opal in PA mode to train classifier and output probability
+  - train on wsj02-21, test on wsj22
+- results
+- which features are useful:
+  - local, global, local+global, etc
 
 * Parsing With Independence Constraints
+- modified the Stanford Parser CKY parser to accept independent span
+  boundaries as constraints
+  - read in classifier output
+  - index synthetic binary rules in grammar
+  - for each cell (other than the last one), if it spans a boundary
+    then only loop over synthetic rules
+- record number of times in inner CKY loop, as well as number of
+  failed parses etc, using classifier from previous section at various
+  thresholds and limited to different sentence lengths
+- extract grammar from wsj02-21, evaluate on wsj22, include final test
+  results for wsj23
+- results
 
-** Experiments
+* Related Work
 
-** Results
+There are several strains of research related to adding constraints to
+the CKY chart. TK demonstrated a classifier to decide whether any span
+begins or ends at each word in a sentence. TK showed a classifier
+which classifies each cell individually according to whether and how
+many spans exist in it.
 
-*** Linear Classifier
+TK proposed a concept of 'hedge' parsing, where only spans below a
+certain length are allowed, and show how this reduces the computation
+done by CKY. In fact, their algorithm is quite similar to the modified
+CKY algorithm used in this paper; however, their parser cannot create
+spans of length larger than the threshold and thus doesn't follow the
+original treebank annotation, while our approach is able to return the
+original gold parse tree provided that the classifier does not output
+a false positive.
 
-Features: $p$, $P_{0}$, $P_{1}$
-
-#+BEGIN_LaTeX
-\begin{table*}[tbp]
-\resizebox{12cm}{!}{
-#+END_LaTeX
-
-#+attr_latex: :center nil
-| SentLen | Constraints   | (P/R/F_{1})         | time(s) |  #rules |                      |  #edges |                      |   F_1 |       | #failed parses |
-|---------+---------------+---------------------+---------+---------+----------------------+---------+----------------------+-------+-------+----------------|
-|       0 | default       | (88.95/76.16/82.06) |  1283.0 | 1.33e10 | \hspace{-1em} (77%)  | 1.08e10 | \hspace{-1em} (62%)  | 83.71 | -2.14 |             15 |
-|       0 | precision     | (90.42/72.20/80.29) |  1143.3 | 1.36e10 | \hspace{-1em} (79%)  | 1.13e10 | \hspace{-1em} (65%)  | 84.05 | -1.80 |              7 |
-|       0 | max precision | (95.57/47.14/63.13) |  1384.4 | 1.53e10 | \hspace{-1em} (89%)  | 1.42e10 | \hspace{-1em} (81%)  | 85.55 | -0.30 |              2 |
-|       0 | recall        | (71.73/90.25/79.93) |  1024.8 | 1.23e10 | \hspace{-1em} (72%)  | 7.80e09 | \hspace{-1em} (45%)  | 78.74 | -7.11 |            136 |
-|       0 | oracle        | (100/100/100)       |  1013.0 | 1.22e10 | \hspace{-1em} (71%)  | 8.47e09 | \hspace{-1em} (48%)  | 86.71 |  0.86 |              4 |
-|      20 | default       | (88.95/76.16/82.06) |  1126.9 | 1.38e10 | \hspace{-1em} (80%)  | 1.12e10 | \hspace{-1em} (64%)  | 84.17 | -1.68 |              9 |
-|      20 | precision     | (90.42/72.20/80.29) |  1313.0 | 1.41e10 | \hspace{-1em} (82%)  | 1.16e10 | \hspace{-1em} (66%)  | 84.43 | -1.42 |              4 |
-|      20 | max precision | (95.57/47.14/63.13) |  1338.6 | 1.56e10 | \hspace{-1em} (91%)  | 1.44e10 | \hspace{-1em} (82%)  | 85.59 | -0.26 |              2 |
-|      20 | recall        | (71.73/90.25/79.93) |  1121.8 | 1.29e10 | \hspace{-1em} (75%)  | 8.24e09 | \hspace{-1em} (47%)  | 80.38 | -5.47 |            103 |
-|      20 | oracle        | (100/100/100)       |  1044.8 | 1.28e10 | \hspace{-1em} (74%)  | 8.90e09 | \hspace{-1em} (51%)  | 86.55 |  0.70 |              2 |
-|      30 | default       | (88.95/76.16/82.06) |  1312.3 | 1.51e10 | \hspace{-1em} (88%)  | 1.28e10 | \hspace{-1em} (73%)  | 84.82 | -1.03 |              3 |
-|      30 | precision     | (90.42/72.20/80.29) |  1279.7 | 1.53e10 | \hspace{-1em} (89%)  | 1.31e10 | \hspace{-1em} (75%)  | 85.01 | -0.84 |              1 |
-|      30 | max precision | (95.57/47.14/63.13) |  1485.9 | 1.63e10 | \hspace{-1em} (95%)  | 1.53e10 | \hspace{-1em} (87%)  | 85.63 | -0.22 |              1 |
-|      30 | recall        | (71.73/90.25/79.93) |  1140.5 | 1.44e10 | \hspace{-1em} (84%)  | 1.02e10 | \hspace{-1em} (58%)  | 82.79 | -3.06 |             57 |
-|      30 | oracle        | (100/100/100)       |  1125.8 | 1.43e10 | \hspace{-1em} (83%)  | 1.08e10 | \hspace{-1em} (62%)  | 86.33 |  0.48 |              0 |
-|      40 | default       | (88.95/76.16/82.06) |  1476.8 | 1.64e10 | \hspace{-1em} (95%)  | 1.51e10 | \hspace{-1em} (86%)  | 85.56 | -0.29 |              1 |
-|      40 | precision     | (90.42/72.20/80.29) |  1390.9 | 1.65e10 | \hspace{-1em} (96%)  | 1.52e10 | \hspace{-1em} (87%)  | 85.59 | -0.26 |              0 |
-|      40 | max precision | (95.57/47.14/63.13) |  1513.3 | 1.69e10 | \hspace{-1em} (98%)  | 1.65e10 | \hspace{-1em} (94%)  | 85.75 | -0.10 |              0 |
-|      40 | recall        | (71.73/90.25/79.93) |  1403.9 | 1.59e10 | \hspace{-1em} (92%)  | 1.33e10 | \hspace{-1em} (76%)  | 84.65 | -1.20 |             14 |
-|      40 | oracle        | (100/100/100)       |  1359.5 | 1.60e10 | \hspace{-1em} (93%)  | 1.39e10 | \hspace{-1em} (79%)  | 86.04 |  0.19 |              0 |
-|       ∞ | default       | (88.95/76.16/82.06) |  1563.7 | 1.72e10 | \hspace{-1em} (100%) | 1.75e10 | \hspace{-1em} (100%) | 85.85 |  0.00 |              0 |
-|       ∞ | precision     | (90.42/72.20/80.29) |  1558.7 | 1.72e10 | \hspace{-1em} (100%) | 1.75e10 | \hspace{-1em} (100%) | 85.85 |  0.00 |              0 |
-|       ∞ | max precision | (95.57/47.14/63.13) |  1489.8 | 1.72e10 | \hspace{-1em} (100%) | 1.75e10 | \hspace{-1em} (100%) | 85.85 |  0.00 |              0 |
-|       ∞ | recall        | (71.73/90.25/79.93) |  1481.3 | 1.72e10 | \hspace{-1em} (100%) | 1.75e10 | \hspace{-1em} (100%) | 85.85 |  0.00 |              0 |
-|       ∞ | oracle        | (100/100/100)       |  1270.3 | 1.72e10 | \hspace{-1em} (100%) | 1.75e10 | \hspace{-1em} (100%) | 85.85 |  0.00 |              0 |
-#+TBLFM: $4=$0;%.2e::$6=$0;%.2e::$9=$8-85.85;p4%.2f
-
-#+BEGIN_LaTeX
-}
-\end{table*}
-#+END_LaTeX
-
-*** Polynomial (d=3) Kernel
-
-Features: All
-
-#+BEGIN_LaTeX
-\begin{table*}[tbp]
-\resizebox{12cm}{!}{
-#+END_LaTeX
-
-#+attr_latex: :center nil
-| SentLen | Constraints   | (P/R/F_{1})         | time(s) |  #rules |                      |  #edges |                      |   F_1 |       | #failed parses |
-|---------+---------------+---------------------+---------+---------+----------------------+---------+----------------------+-------+-------+----------------|
-|       0 | default       | (92.17/88.91/90.51) |  1106.7 | 1.27e10 | \hspace{-1em} (74%)  | 9.74e09 | \hspace{-1em} (56%)  | 84.85 | -1.00 |              6 |
-|       0 | precision     | (92.95/86.43/89.58) |  1118.8 | 1.28e10 | \hspace{-1em} (74%)  | 9.84e09 | \hspace{-1em} (56%)  | 85.12 | -0.73 |              4 |
-|       0 | max precision | (94.22/79.63/86.31) |  1137.2 | 1.30e10 | \hspace{-1em} (76%)  | 1.02e10 | \hspace{-1em} (58%)  | 85.42 | -0.43 |              2 |
-|       0 | recall        | (88.16/91.32/89.71) |  1050.7 | 1.25e10 | \hspace{-1em} (73%)  | 9.25e09 | \hspace{-1em} (53%)  | 84.05 | -1.80 |             33 |
-|       0 | oracle        | (100/100/100)       |  1060.3 | 1.22e10 | \hspace{-1em} (71%)  | 8.47e09 | \hspace{-1em} (48%)  | 86.71 |  0.86 |              4 |
-|      20 | default       | (92.17/88.91/90.51) |  1070.7 | 1.33e10 | \hspace{-1em} (77%)  | 1.02e10 | \hspace{-1em} (58%)  | 85.08 | -0.77 |              5 |
-|      20 | precision     | (92.95/86.43/89.58) |  1172.4 | 1.33e10 | \hspace{-1em} (77%)  | 1.03e10 | \hspace{-1em} (59%)  | 85.25 | -0.60 |              3 |
-|      20 | max precision | (94.22/79.63/86.31) |  1092.4 | 1.35e10 | \hspace{-1em} (78%)  | 1.06e10 | \hspace{-1em} (61%)  | 85.41 | -0.44 |              2 |
-|      20 | recall        | (88.16/91.32/89.71) |  1088.3 | 1.30e10 | \hspace{-1em} (76%)  | 9.68e09 | \hspace{-1em} (55%)  | 84.75 | -1.10 |              7 |
-|      20 | oracle        | (100/100/100)       |  1073.1 | 1.28e10 | \hspace{-1em} (74%)  | 8.90e09 | \hspace{-1em} (51%)  | 86.55 |  0.70 |              2 |
-|      30 | default       | (92.17/88.91/90.51) |  1222.6 | 1.47e10 | \hspace{-1em} (86%)  | 1.20e10 | \hspace{-1em} (69%)  | 85.57 | -0.28 |              1 |
-|      30 | precision     | (92.95/86.43/89.58) |  1267.5 | 1.48e10 | \hspace{-1em} (86%)  | 1.20e10 | \hspace{-1em} (69%)  | 85.62 | -0.23 |              1 |
-|      30 | max precision | (94.22/79.63/86.31) |  1238.7 | 1.49e10 | \hspace{-1em} (87%)  | 1.23e10 | \hspace{-1em} (70%)  | 85.65 | -0.20 |              1 |
-|      30 | recall        | (88.16/91.32/89.71) |  1238.0 | 1.46e10 | \hspace{-1em} (85%)  | 1.16e10 | \hspace{-1em} (66%)  | 85.44 | -0.41 |              2 |
-|      30 | oracle        | (100/100/100)       |  1165.9 | 1.43e10 | \hspace{-1em} (83%)  | 1.08e10 | \hspace{-1em} (62%)  | 86.33 |  0.48 |              0 |
-|      40 | default       | (92.17/88.91/90.51) |  1465.4 | 1.63e10 | \hspace{-1em} (95%)  | 1.49e10 | \hspace{-1em} (85%)  | 85.72 | -0.13 |              0 |
-|      40 | precision     | (92.95/86.43/89.58) |  1353.3 | 1.63e10 | \hspace{-1em} (95%)  | 1.49e10 | \hspace{-1em} (85%)  | 85.75 | -0.10 |              0 |
-|      40 | max precision | (94.22/79.63/86.31) |  1570.2 | 1.64e10 | \hspace{-1em} (95%)  | 1.50e10 | \hspace{-1em} (86%)  | 85.78 | -0.07 |              0 |
-|      40 | recall        | (88.16/91.32/89.71) |  1489.7 | 1.62e10 | \hspace{-1em} (94%)  | 1.47e10 | \hspace{-1em} (84%)  | 85.69 | -0.16 |              1 |
-|      40 | oracle        | (100/100/100)       |  1476.0 | 1.60e10 | \hspace{-1em} (93%)  | 1.39e10 | \hspace{-1em} (79%)  | 86.04 |  0.19 |              0 |
-|       ∞ | default       | (92.17/88.91/90.51) |  1469.2 | 1.72e10 | \hspace{-1em} (100%) | 1.75e10 | \hspace{-1em} (100%) | 85.85 |  0.00 |              0 |
-|       ∞ | precision     | (92.95/86.43/89.58) |  1471.1 | 1.72e10 | \hspace{-1em} (100%) | 1.75e10 | \hspace{-1em} (100%) | 85.85 |  0.00 |              0 |
-|       ∞ | max precision | (94.22/79.63/86.31) |  1398.4 | 1.72e10 | \hspace{-1em} (100%) | 1.75e10 | \hspace{-1em} (100%) | 85.85 |  0.00 |              0 |
-|       ∞ | recall        | (88.16/91.32/89.71) |  1470.9 | 1.72e10 | \hspace{-1em} (100%) | 1.75e10 | \hspace{-1em} (100%) | 85.85 |  0.00 |              0 |
-|       ∞ | oracle        | (100/100/100)       |  1222.6 | 1.72e10 | \hspace{-1em} (100%) | 1.75e10 | \hspace{-1em} (100%) | 85.85 |  0.00 |              0 |
-#+TBLFM: $4=$0;%.2e::$6=$0;%.2e::$9=$8-85.85;p4%.2f
-
-#+BEGIN_LaTeX
-}
-\end{table*}
-#+END_LaTeX
-
+** TODO add references
+** TODO rewrite
 
 * Conclusions
 
@@ -409,7 +130,11 @@ current approach has several weaknesses which should be addressed by
 future research.
 
 First, the top-down nature of the independence constraints does not
-make a natural fit with the bottom-up CKY algorithm.
+make a natural fit with the bottom-up CKY algorithm. In particular,
+the binary nature of the rules in the grammar combined with the
+bottom-up search means that the parser still ends up doing some
+computation to create spans which violate the constraints, even though
+it is prevented from completing such a span.
 
 Second, the pipelined nature of the classifier means that it only has
 access to POS tags and in particular is not able to make use of
