@@ -587,3 +587,173 @@ Features: All
 |    1000 | constraints.recall    |  1470.9 | 1.72e10 | 100 | 1.75e10 | 100 | 85.85 |  0.00 |
 |    1000 | constraints.maxprec   |  1398.4 | 1.72e10 | 100 | 1.75e10 | 100 | 85.85 |  0.00 |
 |    1000 | test.boundaries       |  1222.6 | 1.72e10 | 100 | 1.75e10 | 100 | 85.85 |  0.00 |
+
+*** WSJ23
+
+**** Linear
+pP1sP3s
+
+| base1  | 1508.1 | 85.54 |
+| base2  | 1527.7 | 85.54 |
+| base3  | 1567.1 | 85.54 |
+| const1 | 1101.2 | 83.55 |
+| const2 | 1113.3 | 83.55 |
+| const3 | 1104.1 | 83.55 |
+
+#+BEGIN_EXAMPLE
+==> base.err1 <==
+ P: 100.0 R: 100.0
+factor LP/LR F1: 100.0 N: 2416.0
+ P: 100.0 R: 100.0
+factor Tag F1: 100.0 N: 2416.0
+
+Testing on treebank done [1508.1 sec].
+pcfg LP/LR summary evalb: LP: 86.09 LR: 84.99 F1: 85.54 Exact: 28.76 N: 2416
+dep DA summary evalb: LP: 0.0 LR: 0.0 F1: 0.0 Exact: 0.0 N: 0
+factor LP/LR summary evalb: LP: 86.09 LR: 84.99 F1: 85.54 Exact: 28.76 N: 2416
+factor Tag summary evalb: LP: 96.76 LR: 96.76 F1: 96.76 Exact: 51.98 N: 2416
+
+==> base.err2 <==
+ P: 100.0 R: 100.0
+factor LP/LR F1: 100.0 N: 2416.0
+ P: 100.0 R: 100.0
+factor Tag F1: 100.0 N: 2416.0
+
+Testing on treebank done [1527.7 sec].
+pcfg LP/LR summary evalb: LP: 86.09 LR: 84.99 F1: 85.54 Exact: 28.76 N: 2416
+dep DA summary evalb: LP: 0.0 LR: 0.0 F1: 0.0 Exact: 0.0 N: 0
+factor LP/LR summary evalb: LP: 86.09 LR: 84.99 F1: 85.54 Exact: 28.76 N: 2416
+factor Tag summary evalb: LP: 96.76 LR: 96.76 F1: 96.76 Exact: 51.98 N: 2416
+
+==> base.err3 <==
+ P: 100.0 R: 100.0
+factor LP/LR F1: 100.0 N: 2416.0
+ P: 100.0 R: 100.0
+factor Tag F1: 100.0 N: 2416.0
+
+Testing on treebank done [1567.1 sec].
+pcfg LP/LR summary evalb: LP: 86.09 LR: 84.99 F1: 85.54 Exact: 28.76 N: 2416
+dep DA summary evalb: LP: 0.0 LR: 0.0 F1: 0.0 Exact: 0.0 N: 0
+factor LP/LR summary evalb: LP: 86.09 LR: 84.99 F1: 85.54 Exact: 28.76 N: 2416
+factor Tag summary evalb: LP: 96.76 LR: 96.76 F1: 96.76 Exact: 51.98 N: 2416
+
+==> const.err1 <==
+ P: 58.33 R: 70.0
+factor LP/LR F1: 63.63 N: 2416.0
+ P: 100.0 R: 100.0
+factor Tag F1: 100.0 N: 2416.0
+
+Testing on treebank done [1101.2 sec].
+pcfg LP/LR summary evalb: LP: 84.02 LR: 83.08 F1: 83.55 Exact: 26.53 N: 2416
+dep DA summary evalb: LP: 0.0 LR: 0.0 F1: 0.0 Exact: 0.0 N: 0
+factor LP/LR summary evalb: LP: 84.02 LR: 83.08 F1: 83.55 Exact: 26.53 N: 2416
+factor Tag summary evalb: LP: 96.53 LR: 96.53 F1: 96.53 Exact: 50.12 N: 2416
+
+==> const.err2 <==
+ P: 58.33 R: 70.0
+factor LP/LR F1: 63.63 N: 2416.0
+ P: 100.0 R: 100.0
+factor Tag F1: 100.0 N: 2416.0
+
+Testing on treebank done [1113.3 sec].
+pcfg LP/LR summary evalb: LP: 84.02 LR: 83.08 F1: 83.55 Exact: 26.53 N: 2416
+dep DA summary evalb: LP: 0.0 LR: 0.0 F1: 0.0 Exact: 0.0 N: 0
+factor LP/LR summary evalb: LP: 84.02 LR: 83.08 F1: 83.55 Exact: 26.53 N: 2416
+factor Tag summary evalb: LP: 96.53 LR: 96.53 F1: 96.53 Exact: 50.12 N: 2416
+
+==> const.err3 <==
+ P: 58.33 R: 70.0
+factor LP/LR F1: 63.63 N: 2416.0
+ P: 100.0 R: 100.0
+factor Tag F1: 100.0 N: 2416.0
+
+Testing on treebank done [1104.1 sec].
+pcfg LP/LR summary evalb: LP: 84.02 LR: 83.08 F1: 83.55 Exact: 26.53 N: 2416
+dep DA summary evalb: LP: 0.0 LR: 0.0 F1: 0.0 Exact: 0.0 N: 0
+factor LP/LR summary evalb: LP: 84.02 LR: 83.08 F1: 83.55 Exact: 26.53 N: 2416
+factor Tag summary evalb: LP: 96.53 LR: 96.53 F1: 96.53 Exact: 50.12 N: 2416
+#+END_EXAMPLE
+
+**** Poly
+All
+
+| base1  | 1579.5 | 85.54 |
+| base2  | 1525.8 | 85.54 |
+| base3  | 1521.9 | 85.54 |
+| const1 | 1019.8 | 84.57 |
+| const2 | 1043.1 | 84.57 |
+| const3 | 1058.6 | 84.57 |
+
+#+BEGIN_EXAMPLE
+==> base.err1 <==
+ P: 100.0 R: 100.0
+factor LP/LR F1: 100.0 N: 2416.0
+ P: 100.0 R: 100.0
+factor Tag F1: 100.0 N: 2416.0
+
+Testing on treebank done [1579.5 sec].
+pcfg LP/LR summary evalb: LP: 86.09 LR: 84.99 F1: 85.54 Exact: 28.76 N: 2416
+dep DA summary evalb: LP: 0.0 LR: 0.0 F1: 0.0 Exact: 0.0 N: 0
+factor LP/LR summary evalb: LP: 86.09 LR: 84.99 F1: 85.54 Exact: 28.76 N: 2416
+factor Tag summary evalb: LP: 96.76 LR: 96.76 F1: 96.76 Exact: 51.98 N: 2416
+
+==> base.err2 <==
+ P: 100.0 R: 100.0
+factor LP/LR F1: 100.0 N: 2416.0
+ P: 100.0 R: 100.0
+factor Tag F1: 100.0 N: 2416.0
+
+Testing on treebank done [1525.8 sec].
+pcfg LP/LR summary evalb: LP: 86.09 LR: 84.99 F1: 85.54 Exact: 28.76 N: 2416
+dep DA summary evalb: LP: 0.0 LR: 0.0 F1: 0.0 Exact: 0.0 N: 0
+factor LP/LR summary evalb: LP: 86.09 LR: 84.99 F1: 85.54 Exact: 28.76 N: 2416
+factor Tag summary evalb: LP: 96.76 LR: 96.76 F1: 96.76 Exact: 51.98 N: 2416
+
+==> base.err3 <==
+ P: 100.0 R: 100.0
+factor LP/LR F1: 100.0 N: 2416.0
+ P: 100.0 R: 100.0
+factor Tag F1: 100.0 N: 2416.0
+
+Testing on treebank done [1521.9 sec].
+pcfg LP/LR summary evalb: LP: 86.09 LR: 84.99 F1: 85.54 Exact: 28.76 N: 2416
+dep DA summary evalb: LP: 0.0 LR: 0.0 F1: 0.0 Exact: 0.0 N: 0
+factor LP/LR summary evalb: LP: 86.09 LR: 84.99 F1: 85.54 Exact: 28.76 N: 2416
+factor Tag summary evalb: LP: 96.76 LR: 96.76 F1: 96.76 Exact: 51.98 N: 2416
+
+==> const.err1 <==
+ P: 100.0 R: 100.0
+factor LP/LR F1: 100.0 N: 2416.0
+ P: 100.0 R: 100.0
+factor Tag F1: 100.0 N: 2416.0
+
+Testing on treebank done [1019.8 sec].
+pcfg LP/LR summary evalb: LP: 85.12 LR: 84.03 F1: 84.57 Exact: 26.69 N: 2416
+dep DA summary evalb: LP: 0.0 LR: 0.0 F1: 0.0 Exact: 0.0 N: 0
+factor LP/LR summary evalb: LP: 85.12 LR: 84.03 F1: 84.57 Exact: 26.69 N: 2416
+factor Tag summary evalb: LP: 96.62 LR: 96.62 F1: 96.62 Exact: 51.2 N: 2416
+
+==> const.err2 <==
+ P: 100.0 R: 100.0
+factor LP/LR F1: 100.0 N: 2416.0
+ P: 100.0 R: 100.0
+factor Tag F1: 100.0 N: 2416.0
+
+Testing on treebank done [1043.1 sec].
+pcfg LP/LR summary evalb: LP: 85.12 LR: 84.03 F1: 84.57 Exact: 26.69 N: 2416
+dep DA summary evalb: LP: 0.0 LR: 0.0 F1: 0.0 Exact: 0.0 N: 0
+factor LP/LR summary evalb: LP: 85.12 LR: 84.03 F1: 84.57 Exact: 26.69 N: 2416
+factor Tag summary evalb: LP: 96.62 LR: 96.62 F1: 96.62 Exact: 51.2 N: 2416
+
+==> const.err3 <==
+ P: 100.0 R: 100.0
+factor LP/LR F1: 100.0 N: 2416.0
+ P: 100.0 R: 100.0
+factor Tag F1: 100.0 N: 2416.0
+
+Testing on treebank done [1058.6 sec].
+pcfg LP/LR summary evalb: LP: 85.12 LR: 84.03 F1: 84.57 Exact: 26.69 N: 2416
+dep DA summary evalb: LP: 0.0 LR: 0.0 F1: 0.0 Exact: 0.0 N: 0
+factor LP/LR summary evalb: LP: 85.12 LR: 84.03 F1: 84.57 Exact: 26.69 N: 2416
+factor Tag summary evalb: LP: 96.62 LR: 96.62 F1: 96.62 Exact: 51.2 N: 2416
+#+END_EXAMPLE
