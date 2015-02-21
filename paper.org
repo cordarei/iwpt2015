@@ -73,18 +73,159 @@ that it can be used to speed up a CFG parser.
   - local, global, local+global, etc
 
 * Parsing With Independence Constraints
-- modified the Stanford Parser CKY parser to accept independent span
-  boundaries as constraints
-  - read in classifier output
-  - index synthetic binary rules in grammar
-  - for each cell (other than the last one), if it spans a boundary
-    then only loop over synthetic rules
-- record number of times in inner CKY loop, as well as number of
-  failed parses etc, using classifier from previous section at various
-  thresholds and limited to different sentence lengths
-- extract grammar from wsj02-21, evaluate on wsj22, include final test
-  results for wsj23
-- results
+In order to demonstrate use of the independent constraints in a
+parser, we modified the CKY parser included in the Stanford Parser
+distribution to accept independent span boundaries as constraints and
+to use the modified CKY algorithm described above. Our modifications
+are:
+
+- after reading in the grammar, index the synthetic binary rules
+- read in the file containing the boundaries output by the classifier
+  from the previous section
+- for each CKY cell, if the cell spans a boundary then loop over just
+  the synthetic binary rules
+- if at the end of the CKY loop a parse was not successful, then loop
+  again over just the cells which span a boundary and process all of
+  the binary rules
+- output the total number of times entering the inner loop as well as the
+  number of times the parser failed
+
+** Experimental Setup
+
+We use the modified Stanford Parser described above, with a grammar
+extracted from the WSJ sections 02-21, and evaluate its performance on
+section 22 using output from the clasifier as constraints. We vary the
+threshold on the probability output by the classifier, and further
+experiment with restricting the constraints to sentences above a
+certain length. Finally, to compare with previous results we run the
+classifier and parser on section 23 in a single configuration.
+
+
+** TODO Results
+
+#+BEGIN_LaTeX
+\begin{table*}[tbp]
+\resizebox{12cm}{!}{
+#+END_LaTeX
+
+#+attr_latex: :center nil
+| SentLen | Constraints   | (P/R/F_{1})         | time(s) |  #edges |                      |   F_1 | $\Delta F_1$ | #failed parses |
+|---------+---------------+---------------------+---------+---------+----------------------+-------+--------------+----------------|
+|       0 | default       | (88.95/76.16/82.06) |  1283.0 | 1.08e10 | \hspace{-1em} (62%)  | 83.71 |        -2.14 |             15 |
+|       0 | precision     | (90.42/72.20/80.29) |  1143.3 | 1.13e10 | \hspace{-1em} (65%)  | 84.05 |        -1.80 |              7 |
+|       0 | max precision | (95.57/47.14/63.13) |  1384.4 | 1.42e10 | \hspace{-1em} (81%)  | 85.55 |        -0.30 |              2 |
+|       0 | recall        | (71.73/90.25/79.93) |  1024.8 | 7.80e09 | \hspace{-1em} (45%)  | 78.74 |        -7.11 |            136 |
+|      20 | default       | (88.95/76.16/82.06) |  1126.9 | 1.12e10 | \hspace{-1em} (64%)  | 84.17 |        -1.68 |              9 |
+|      20 | precision     | (90.42/72.20/80.29) |  1313.0 | 1.16e10 | \hspace{-1em} (66%)  | 84.43 |        -1.42 |              4 |
+|      20 | max precision | (95.57/47.14/63.13) |  1338.6 | 1.44e10 | \hspace{-1em} (82%)  | 85.59 |        -0.26 |              2 |
+|      20 | recall        | (71.73/90.25/79.93) |  1121.8 | 8.24e09 | \hspace{-1em} (47%)  | 80.38 |        -5.47 |            103 |
+|      30 | default       | (88.95/76.16/82.06) |  1312.3 | 1.28e10 | \hspace{-1em} (73%)  | 84.82 |        -1.03 |              3 |
+|      30 | precision     | (90.42/72.20/80.29) |  1279.7 | 1.31e10 | \hspace{-1em} (75%)  | 85.01 |        -0.84 |              1 |
+|      30 | max precision | (95.57/47.14/63.13) |  1485.9 | 1.53e10 | \hspace{-1em} (87%)  | 85.63 |        -0.22 |              1 |
+|      30 | recall        | (71.73/90.25/79.93) |  1140.5 | 1.02e10 | \hspace{-1em} (58%)  | 82.79 |        -3.06 |             57 |
+|      40 | default       | (88.95/76.16/82.06) |  1476.8 | 1.51e10 | \hspace{-1em} (86%)  | 85.56 |        -0.29 |              1 |
+|      40 | precision     | (90.42/72.20/80.29) |  1390.9 | 1.52e10 | \hspace{-1em} (87%)  | 85.59 |        -0.26 |              0 |
+|      40 | max precision | (95.57/47.14/63.13) |  1513.3 | 1.65e10 | \hspace{-1em} (94%)  | 85.75 |        -0.10 |              0 |
+|      40 | recall        | (71.73/90.25/79.93) |  1403.9 | 1.33e10 | \hspace{-1em} (76%)  | 84.65 |        -1.20 |             14 |
+|---------+---------------+---------------------+---------+---------+----------------------+-------+--------------+----------------|
+|       ∞ | baseline      |                     |  1558.7 | 1.75e10 | \hspace{-1em} (100%) | 85.85 |         0.00 |              0 |
+#+TBLFM: $4=$0;%.2e::$7=$6-85.85;p4%.2f
+
+#+BEGIN_LaTeX
+}
+\caption{Independence constraints reduce the work done by the CKY algorithm, trading off accuracy.}
+\label{tbl:parse-results-linear}
+\end{table*}
+#+END_LaTeX
+
+The results of running the parser on section 22 using the linear
+classifier from section (TK whichever I use) are shown in
+table~\ref{tbl:parse-results-linear}. The table shows the total time
+taken, the total times entering the inner loop, the F_1 and difference
+from the baseline, and the number of times the parse failed using the
+constraints. The baseline consisted of the same parser with the
+sentence length threshold set to 1000. The time includes the time
+spent reading in the constraints but not the time taken by the
+classifier.
+
+The parser with the independence constraints saves 35-38%
+of the computation inside the CKY loop over the baseline,
+corresponding to about 20% reduction in total time, at the cost of a
+2-point drop in F-score. After increasing recall by making negative
+instances for which the classifier assigned a low probability positive,
+the parser reduced the work done inside the loop to less than half the
+baseline, but accuracy also plummeted by 7 points.
+
+*** Polynomial Kernel
+
+A difference of 2 F_1 score is not small, but on the other hand it is
+about by how much the unlexicalized Stanford Parser trails the Collins
+parser, for example. However, as shown above in section TK, there is
+room to improve the linear classifier through conjunctive features. As
+an indication of an upper bound of the acheivable performance, we
+tried using the output of the kernel classifier in the parser as
+above, while acknowledging that at present the time needed to produce
+the classifier output dwarfs the time needed to actually parse the
+test data.
+
+#+BEGIN_LaTeX
+\begin{table*}[tbp]
+\resizebox{12cm}{!}{
+#+END_LaTeX
+
+#+attr_latex: :center nil
+| SentLen | Constraints   | (P/R/F_{1})         | time(s) |  #edges |                      |   F_1 |       | #failed parses |
+|---------+---------------+---------------------+---------+---------+----------------------+-------+-------+----------------|
+|       0 | default       | (92.17/88.91/90.51) |  1106.7 | 9.74e09 | \hspace{-1em} (56%)  | 84.85 | -1.00 |              6 |
+|       0 | precision     | (92.95/86.43/89.58) |  1118.8 | 9.84e09 | \hspace{-1em} (56%)  | 85.12 | -0.73 |              4 |
+|       0 | max precision | (94.22/79.63/86.31) |  1137.2 | 1.02e10 | \hspace{-1em} (58%)  | 85.42 | -0.43 |              2 |
+|       0 | recall        | (88.16/91.32/89.71) |  1050.7 | 9.25e09 | \hspace{-1em} (53%)  | 84.05 | -1.80 |             33 |
+|       0 | oracle        | (100/100/100)       |  1060.3 | 8.47e09 | \hspace{-1em} (48%)  | 86.71 |  0.86 |              4 |
+|      20 | default       | (92.17/88.91/90.51) |  1070.7 | 1.02e10 | \hspace{-1em} (58%)  | 85.08 | -0.77 |              5 |
+|      20 | precision     | (92.95/86.43/89.58) |  1172.4 | 1.03e10 | \hspace{-1em} (59%)  | 85.25 | -0.60 |              3 |
+|      20 | max precision | (94.22/79.63/86.31) |  1092.4 | 1.06e10 | \hspace{-1em} (61%)  | 85.41 | -0.44 |              2 |
+|      20 | recall        | (88.16/91.32/89.71) |  1088.3 | 9.68e09 | \hspace{-1em} (55%)  | 84.75 | -1.10 |              7 |
+|      20 | oracle        | (100/100/100)       |  1073.1 | 8.90e09 | \hspace{-1em} (51%)  | 86.55 |  0.70 |              2 |
+|      30 | default       | (92.17/88.91/90.51) |  1222.6 | 1.20e10 | \hspace{-1em} (69%)  | 85.57 | -0.28 |              1 |
+|      30 | precision     | (92.95/86.43/89.58) |  1267.5 | 1.20e10 | \hspace{-1em} (69%)  | 85.62 | -0.23 |              1 |
+|      30 | max precision | (94.22/79.63/86.31) |  1238.7 | 1.23e10 | \hspace{-1em} (70%)  | 85.65 | -0.20 |              1 |
+|      30 | recall        | (88.16/91.32/89.71) |  1238.0 | 1.16e10 | \hspace{-1em} (66%)  | 85.44 | -0.41 |              2 |
+|      30 | oracle        | (100/100/100)       |  1165.9 | 1.08e10 | \hspace{-1em} (62%)  | 86.33 |  0.48 |              0 |
+|      40 | default       | (92.17/88.91/90.51) |  1465.4 | 1.49e10 | \hspace{-1em} (85%)  | 85.72 | -0.13 |              0 |
+|      40 | precision     | (92.95/86.43/89.58) |  1353.3 | 1.49e10 | \hspace{-1em} (85%)  | 85.75 | -0.10 |              0 |
+|      40 | max precision | (94.22/79.63/86.31) |  1570.2 | 1.50e10 | \hspace{-1em} (86%)  | 85.78 | -0.07 |              0 |
+|      40 | recall        | (88.16/91.32/89.71) |  1489.7 | 1.47e10 | \hspace{-1em} (84%)  | 85.69 | -0.16 |              1 |
+|      40 | oracle        | (100/100/100)       |  1476.0 | 1.39e10 | \hspace{-1em} (79%)  | 86.04 |  0.19 |              0 |
+|---------+---------------+---------------------+---------+---------+----------------------+-------+-------+----------------|
+|       ∞ | baseline      |                     |  1470.9 | 1.75e10 | \hspace{-1em} (100%) | 85.85 |  0.00 |              0 |
+#+TBLFM: $4=$0;%.2e::$7=$6-85.85;p4%.2f
+
+#+BEGIN_LaTeX
+}
+\caption{The classifier using the polynomial kernel is much more accurate, leading to smaller loss in accuracy of the parser.}
+\label{tbl:parse-results-poly}
+\end{table*}
+#+END_LaTeX
+
+The results of running the parser on section 22 with the polynomial
+classifier output are shown in table~\ref{tbl:parse-results-poly}.
+With the more accurate classifier, the parser is able to reduce the
+necessary computation even further, by about 45%, while losing less
+accuracy. With a high-precision threshold, the computation of the CKY
+algorithm is reduced to less than 60% of the baseline, while losing
+less than half a point F_1 score.
+
+*** WSJ Section 23
+
+To compare with previous work on parsing using the Penn Treebank, we
+show the time and accuracy for parsing section 23, using both linear
+and kernel classifier output, along with the baseline parser, below.
+
+| parser   | time (s) |   F_1 |
+|----------+----------+-------|
+| baseline |  1538.35 | 85.54 |
+| linear   |   1106.2 | 83.55 |
+| poly     |   1040.5 | 84.57 |
 
 * Related Work
 
