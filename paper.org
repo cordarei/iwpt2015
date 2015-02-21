@@ -38,23 +38,7 @@ that it can be used to speed up a CFG parser.
   doesn't have to consider any spans over those words until the very
   last cell in the chart
 
-** Classifying Independent Span Boundaries
-- in order to be useful, we need to be able to identify which words
-  are independent using information which doesn't require a parser
-- we can create a binary classifier using only POS features which decides
-  whether any two consecutive words in a sentence are independent or not
-- in order to control the tradeoff between speed and accuracy, a
-  classifier that outputs a probability is desirable
-- from previous unpublished work, we found that transforming the POS
-  sequence and using the transformed sequence to create additional
-  features can improve this type of classifier, so we propose features
-  created from several *POS levels*
-- features: local and global
-  - local: left 1,2,3 tags, right 1,2,3 tags
-  - global: left 1-,2-,3-grams, right 1-,2-,3-grams for POS levels
-  - POS levels: level 0, 1, 2, 3
-  
-** Parsing With Independence Constraints
+** Modifying The CKY Algorithm With Independence Constraints
 - alterations to the CKY algorithm
   - check constraint inside inner loop; or
   - loop between constraints first, then fill in cells which cross constraints
@@ -65,12 +49,242 @@ that it can be used to speed up a CFG parser.
   - K constraints N/K words apart
 
 * Classifying Independent Span Boundaries
-- training and testing the classifier
-  - we use opal in PA mode to train classifier and output probability
-  - train on wsj02-21, test on wsj22
-- results
-- which features are useful:
-  - local, global, local+global, etc
+
+In order to use independence constraints in a parser, we need to be
+able to identify boundaries between independent words in a sentence
+using only surface features (words and part-of-speech tags). We
+created a binary classifier which, given a POS-tagged sentence and a
+position between two words, decides whether those two words are
+independent or not. Our classifier currently only uses POS tags as
+features. We used =opal=, a tool for fast online classification, to
+train and test the models, training on sentences from Penn Treebank
+section 02-21 and testing on section 22. We set opal to use the
+passive-aggressive perceptron update, and output probabilities in
+order to use a threshold to trade off precision and recall.
+
+** Features
+
+We use only part-of-speech tags to create features for the classifier
+(adding lexical or other features is left to future work). The
+property of independence between two words is inherently global, as it
+can be affected by structure arbitrarily far away. Thus we have both
+local and global features. The global features are furthermore
+distinguished by *POS level*, explained in detail later. The specific
+feature templates are shown below:
+
+*** Local Features
+**** Left
+- $t_{k-1}$
+- $t_{k-2},t_{k-1}$
+- $t_{k-3},t_{k-2},t_{k-1}$
+
+**** Right
+- $t_{k}$
+- $t_{k},t_{k+1}$
+- $t_{k},t_{k+1},t_{k+2}$
+
+*** Global Features
+
+Below, $t^{l}_{i}$ is the $i$ th POS tag in the $l$-level POS tag sequence.
+
+**** Left
+- $t^l_{i}$ for $1 \le i < k - 1$, $l \in {0,1,2,3}$
+- $t^l_{i},t^l_{i+1}$ for $1 \le i < k - 2$, $l \in {0,1,2,3}$
+- $t^l_{i},t^l_{i+1},t^l_{i+2}$ for $1 \le i < k - 3$, $l \in {0,1,2,3}$
+
+**** Right
+- $t^l_{i}$ for $k \le i < n - 1$, $l \in {0,1,2,3}$
+- $t^l_{i},t^l_{i+1}$ for $k \le i < n - 2$, $l \in {0,1,2,3}$
+- $t^l_{i},t^l_{i+1},t^l_{i+2}$ for $k \le i < n - 3$, $l \in {0,1,2,3}$
+
+*** POS Level
+
+In previous unpublished work on a similar task, we found that
+heuristically transforming the POS tag sequence to create additional
+features can be beneficial. We refer to these transformations as *POS
+levels*. In this classifier we implemented three levels, in addition
+to the original POS tags as level 0.
+
+We show all levels in table \ref{tbl:pos-level}. Each level specifies
+a value by which each level 0 tag is replaced during the
+transformation. Each transformation has three variations: 's', where
+'X's are removed from the sequence prior to extracting n-gram
+features; 'f', where they are not; and the default variation which
+creates features from both.
+
+The motivation behind each transformation is roughly as follows: level
+1 is meant to capture clause nuclei; level 2 is further intended to
+show boundaries between clauses; and level 3 expands almost all the
+way back to the original tags, but with some distinctions erased,
+mostly to reduce the number of features.
+
+#+BEGIN_LaTeX
+\begin{table}[tbp]
+\tiny
+#+END_LaTeX
+
+#+attr_latex: :center nil
+| Lvl0 | Lvl1 | Lvl2 | Lvl3 |   | Lvl0  | Lvl1 | Lvl2 | Lvl3 |
+|------+------+------+------+---+-------+------+------+------|
+| NN   | N    | N    | N    |   | CD    | X    | X    | #    |
+| NNP  | N    | N    | N    |   | -LRB- | X    | X    | B    |
+| NNPS | N    | N    | N    |   | -RRB- | X    | X    | B    |
+| NNS  | N    | N    | N    |   | DT    | X    | X    | D    |
+| PRP  | N    | N    | N    |   | PDT   | X    | X    | D    |
+| VB   | V    | V    | V    |   | PRP$  | X    | X    | D    |
+| VBD  | V    | V    | V    |   | WP$   | X    | X    | D    |
+| VBG  | V    | V    | V    |   | JJ    | X    | X    | J    |
+| VBN  | V    | V    | V    |   | JJR   | X    | X    | J    |
+| VBP  | V    | V    | V    |   | JJS   | X    | X    | J    |
+| VBZ  | V    | V    | V    |   | -RQ-  | X    | X    | Q    |
+| ,    | X    | ,    | ,    |   | -LQ-  | X    | X    | Q    |
+| .    | X    | .    | .    |   | RB    | X    | X    | R    |
+| :    | X    | :    | :    |   | RBR   | X    | X    | R    |
+| CC   | X    | C    | C    |   | RBS   | X    | X    | R    |
+| IN   | X    | I    | I    |   | EX    | X    | X    | X    |
+| RP   | X    | I    | I    |   | FW    | X    | X    | X    |
+| TO   | X    | T    | T    |   | LS    | X    | X    | X    |
+| WDT  | X    | W    | W    |   | MD    | X    | X    | X    |
+| WP   | X    | W    | W    |   | POS   | X    | X    | X    |
+| WRB  | X    | W    | W    |   | SYM   | X    | X    | X    |
+| #    | X    | X    | #    |   | UH    | X    | X    | X    |
+| $    | X    | X    | #    |   |       |      |      |      |
+
+#+BEGIN_LaTeX
+\caption{For each POS level, the original tag is replaced with the corresponding value.}
+\label{tbl:pos-level}
+\end{table}
+#+END_LaTeX
+
+** Which Features Are Useful?
+
+#+BEGIN_LaTeX
+\begin{table*}[tbp]
+%\resizebox{12cm}{!}{
+#+END_LaTeX
+
+#+attr_latex: :center nil
+| Features                     | #feats |     Acc |    Prec |     Rec |   F_{1} | F_{0.5} |   TP |   FP |   FN |    TN |
+|------------------------------+--------+---------+---------+---------+---------+---------+------+------+------+-------|
+| p                            |  37001 |   93.71 |   80.73 |   70.49 |   75.27 |   78.45 | 3679 |  878 | 1540 | 32320 |
+| P_{0}                        |  33167 |   87.16 |   51.69 |   83.98 |   63.99 |   55.99 | 4383 | 4097 |  836 | 29101 |
+|------------------------------+--------+---------+---------+---------+---------+---------+------+------+------+-------|
+| p,P_{0}                      |  70168 |   95.21 |   87.38 |   75.65 |   81.09 |   84.75 | 3948 |  570 | 1271 | 32628 |
+| p,P_{0},P_{1}                |  70222 | *95.48* |   88.95 |   76.16 |   82.06 | *86.06* | 3975 |  494 | 1244 | 32704 |
+| p,P_{0},P_{1f}               |  70210 |   95.39 |   89.25 |   75.11 |   81.57 |   86.01 | 3920 |  472 | 1299 | 32726 |
+| p,P_{0},P_{1s}               |  70180 |   95.33 |   88.79 |   75.13 |   81.39 |   85.67 | 3921 |  495 | 1298 | 32703 |
+| p,P_{0},P_{2}                |  72503 |   95.09 |   88.28 |   73.60 |   80.27 |   84.89 | 3841 |  510 | 1378 | 32688 |
+| p,P_{0},P_{3}                |  80028 |   94.84 |   88.81 |   70.99 |   78.91 |   84.56 | 3705 |  467 | 1514 | 32731 |
+|------------------------------+--------+---------+---------+---------+---------+---------+------+------+------+-------|
+| p,P_{0},P_{1},P_{2},P_{3}    |  82417 |   95.35 |   86.89 |   77.49 |   81.92 |   84.83 | 4044 |  610 | 1175 | 32588 |
+| p,P_{0},P_{1f},P_{2f},P_{3f} |  76830 |   95.06 |   89.36 |   72.26 |   79.90 |   85.32 | 3771 |  449 | 1448 | 32749 |
+| p,P_{0},P_{1s},P_{2s},P_{3s} |  75755 |   95.21 |   88.17 |   74.80 |   80.94 |   85.12 | 3904 |  524 | 1315 | 32674 |
+|------------------------------+--------+---------+---------+---------+---------+---------+------+------+------+-------|
+| p,P_{1}                      |  37055 |   94.81 |   78.38 | *85.38* |   81.73 |   79.69 | 4456 | 1229 |  763 | 31969 |
+| p,P_{1f}                     |  37043 |   94.68 |   78.37 |   84.06 |   81.11 |   79.44 | 4387 | 1211 |  832 | 31987 |
+| p,P_{1s}                     |  37013 |   94.08 |   84.50 |   69.13 |   76.05 |   80.90 | 3608 |  662 | 1611 | 32536 |
+| p,P_{1},P_{2}                |  39390 |   95.27 |   80.99 |   85.21 | *83.04* |   81.80 | 4447 | 1044 |  772 | 32154 |
+| p,P_{1s},P_{3s}              |  41553 | *95.44* |   89.05 |   75.74 |   81.86 | *86.03* | 3953 |  486 | 1266 | 32712 |
+|------------------------------+--------+---------+---------+---------+---------+---------+------+------+------+-------|
+| p,P_{2}                      |  39336 |   95.34 |   84.25 |   80.76 |   82.47 |   83.53 | 4215 |  788 | 1004 | 32410 |
+| p,P_{2f}                     |  38301 |   95.35 |   83.79 |   81.59 |   82.67 |   83.34 | 4258 |  824 |  961 | 32374 |
+| p,P_{2s}                     |  38036 |   95.43 |   89.04 |   75.65 |   81.80 |   85.99 | 3948 |  486 | 1271 | 32712 |
+|------------------------------+--------+---------+---------+---------+---------+---------+------+------+------+-------|
+| p,P_{3}                      |  46861 |   95.04 |   89.47 |   71.95 |   79.76 |   85.31 | 3755 |  442 | 1464 | 32756 |
+| p,P_{3f}                     |  42321 |   94.99 | *90.49* |   70.55 |   79.29 |   85.65 | 3682 |  387 | 1537 | 32811 |
+| p,P_{3s}                     |  41541 |   95.20 |   90.13 |   72.62 |   80.43 |   85.98 | 3790 |  415 | 1429 | 32783 |
+
+#+BEGIN_LaTeX
+%}
+\caption{Results of classifier using different combinations of features.}
+\label{tbl:feature-evaluation}
+\end{table*}
+#+END_LaTeX
+
+In order to find the best configuration of features for the
+classifier, and to evaluate the proposed POS levels, we tested the
+classifier using several different combinations. Selected results are
+shown in table \ref{tbl:feature-evaluation}. In the "Features" column,
+$p$ denotes the local features, and $P_{l}$ denotes the global
+features from POS level $l$. The 's' and 'f' after the number
+indicates a variation which includes ('f') or excludes ('s') the 'X'
+tags before taking the n-grams; absence of 's' or 'f' means both types
+are created.
+
+There are several things worth noting in these results. First, neither
+local nor global features are sufficient alone; it appears that local
+features promote precision, while global features promote recall.
+Second, examining the cases where global features are limited to a
+single POS level, it is apparent that each POS level (and 's'/'f'
+variant) has a different effect on precision and recall, thus
+confirming that the classifier is able to extract different signals
+from the different POS levels, as intended. Finally, combining all POS
+levels together actually reduces accuracy, likely due to overfitting
+(although see the discussion of the kernel classifier).
+
+** Results
+
+#+BEGIN_LaTeX
+\begin{table*}[htbp]
+%\resizebox{12cm}{!}{
+#+END_LaTeX
+
+#+attr_latex: :center nil
+| Features        | #feats | Threshold     |   Acc |  Prec |   Rec | F_{1} | F_{0.5} |   TP |   FP |   FN |    TN |
+|-----------------+--------+---------------+-------+-------+-------+-------+---------+------+------+------+-------|
+| p,P_{1s},P_{3s} |  41553 | default       | 95.44 | 89.05 | 75.74 | 81.86 |   86.03 | 3953 |  486 | 1266 | 32712 |
+| p,P_{1s},P_{3s} |  41553 | precision     | 94.99 | 91.65 | 69.44 | 79.01 |   86.14 | 3624 |  330 | 1595 | 32868 |
+| p,P_{1s},P_{3s} |  41553 | max precision | 92.10 | 95.80 | 43.74 | 60.06 |   77.38 | 2283 |  100 | 2936 | 33098 |
+| p,P_{1s},P_{3s} |  41553 | recall        | 94.28 | 73.82 | 89.65 | 80.97 |   76.53 | 4679 | 1659 |  540 | 31539 |
+
+#+BEGIN_LaTeX
+%}
+\caption{Results of classifier using different score thresholds.}
+\label{tbl:classifier-results-linear}
+\end{table*}
+#+END_LaTeX
+
+For use as input to the parser, we select the $p,P_{1s},P_{3s}$
+feature configuration, and show more detailed results in
+table \ref{tbl:classifier-results-linear}. We used a threshold on the
+score output by the classifier to reverse some of the classifier's
+decisions in a post-process step. Although it doesn't improve on the
+classifier in accuracy, the =precision= threshold did slightly improve in
+F_{0.5}, a measure which favors precision over recall.
+
+** Polynomial Kernel
+
+#+BEGIN_LaTeX
+\begin{table*}[htbp]
+%\resizebox{12cm}{!}{
+#+END_LaTeX
+
+#+attr_latex: :center nil
+| Features                  | #feats |               |   Acc |  Prec |   Rec | F_{1} | F_{0.5} |   TP |  FP |   FN |    TN |
+|---------------------------+--------+---------------+-------+-------+-------+-------+---------+------+-----+------+-------|
+| p,P_{0},P_{1},P_{2},P_{3} |  82417 | default       | 97.47 | 92.17 | 88.91 | 90.51 |   91.50 | 4640 | 394 |  579 | 32804 |
+| p,P_{0},P_{1},P_{2},P_{3} |  82417 | precision     | 97.27 | 92.95 | 86.43 | 89.58 |   91.57 | 4511 | 342 |  708 | 32856 |
+| p,P_{0},P_{1},P_{2},P_{3} |  82417 | max precision | 96.57 | 94.22 | 79.63 | 86.31 |   90.89 | 4156 | 255 | 1063 | 32943 |
+| p,P_{0},P_{1},P_{2},P_{3} |  82417 | recall        | 97.15 | 88.16 | 91.32 | 89.71 |   88.78 | 4766 | 640 |  453 | 32558 |
+
+#+BEGIN_LaTeX
+%}
+\caption{Results of polynomial classifier using different score thresholds.}
+\label{tbl:classifier-results-poly}
+\end{table*}
+#+END_LaTeX
+
+For comparison with the linear classifier, we trained another
+classifier using a polynomial kernel (with degree 3) with all the
+features. The results are shown in table
+\ref{tbl:classifier-results-poly}. The polynomial kernel improves over
+the linear classifier in accuracy by 2%, in precision by 3 points, and
+in recall by just over 13 points. This suggests that there is a large
+potential for improving the linear classifier by adding conjunctive
+features. The polynomial classifier is not practical for use as a
+preprocessing step in a parser, as it takes over 2 hours to run on
+section 22 (training the model took almost 4 days).
+
 
 * Parsing With Independence Constraints
 In order to demonstrate use of the independent constraints in a
@@ -105,7 +319,7 @@ classifier and parser on section 23 in a single configuration.
 
 #+BEGIN_LaTeX
 \begin{table*}[tbp]
-\resizebox{12cm}{!}{
+%\resizebox{12cm}{!}{
 #+END_LaTeX
 
 #+attr_latex: :center nil
@@ -132,7 +346,7 @@ classifier and parser on section 23 in a single configuration.
 #+TBLFM: $4=$0;%.2e::$7=$6-85.85;p4%.2f
 
 #+BEGIN_LaTeX
-}
+%}
 \caption{Independence constraints reduce the work done by the CKY algorithm, trading off accuracy.}
 \label{tbl:parse-results-linear}
 \end{table*}
@@ -140,7 +354,7 @@ classifier and parser on section 23 in a single configuration.
 
 The results of running the parser on section 22 using the linear
 classifier from section (TK whichever I use) are shown in
-table~\ref{tbl:parse-results-linear}. The table shows the total time
+table \ref{tbl:parse-results-linear}. The table shows the total time
 taken, the total times entering the inner loop, the F_1 and difference
 from the baseline, and the number of times the parse failed using the
 constraints. The baseline consisted of the same parser with the
@@ -170,7 +384,7 @@ test data.
 
 #+BEGIN_LaTeX
 \begin{table*}[tbp]
-\resizebox{12cm}{!}{
+%\resizebox{12cm}{!}{
 #+END_LaTeX
 
 #+attr_latex: :center nil
@@ -180,35 +394,31 @@ test data.
 |       0 | precision     | (92.95/86.43/89.58) |  1118.8 | 9.84e09 | \hspace{-1em} (56%)  | 85.12 | -0.73 |              4 |
 |       0 | max precision | (94.22/79.63/86.31) |  1137.2 | 1.02e10 | \hspace{-1em} (58%)  | 85.42 | -0.43 |              2 |
 |       0 | recall        | (88.16/91.32/89.71) |  1050.7 | 9.25e09 | \hspace{-1em} (53%)  | 84.05 | -1.80 |             33 |
-|       0 | oracle        | (100/100/100)       |  1060.3 | 8.47e09 | \hspace{-1em} (48%)  | 86.71 |  0.86 |              4 |
 |      20 | default       | (92.17/88.91/90.51) |  1070.7 | 1.02e10 | \hspace{-1em} (58%)  | 85.08 | -0.77 |              5 |
 |      20 | precision     | (92.95/86.43/89.58) |  1172.4 | 1.03e10 | \hspace{-1em} (59%)  | 85.25 | -0.60 |              3 |
 |      20 | max precision | (94.22/79.63/86.31) |  1092.4 | 1.06e10 | \hspace{-1em} (61%)  | 85.41 | -0.44 |              2 |
 |      20 | recall        | (88.16/91.32/89.71) |  1088.3 | 9.68e09 | \hspace{-1em} (55%)  | 84.75 | -1.10 |              7 |
-|      20 | oracle        | (100/100/100)       |  1073.1 | 8.90e09 | \hspace{-1em} (51%)  | 86.55 |  0.70 |              2 |
 |      30 | default       | (92.17/88.91/90.51) |  1222.6 | 1.20e10 | \hspace{-1em} (69%)  | 85.57 | -0.28 |              1 |
 |      30 | precision     | (92.95/86.43/89.58) |  1267.5 | 1.20e10 | \hspace{-1em} (69%)  | 85.62 | -0.23 |              1 |
 |      30 | max precision | (94.22/79.63/86.31) |  1238.7 | 1.23e10 | \hspace{-1em} (70%)  | 85.65 | -0.20 |              1 |
 |      30 | recall        | (88.16/91.32/89.71) |  1238.0 | 1.16e10 | \hspace{-1em} (66%)  | 85.44 | -0.41 |              2 |
-|      30 | oracle        | (100/100/100)       |  1165.9 | 1.08e10 | \hspace{-1em} (62%)  | 86.33 |  0.48 |              0 |
 |      40 | default       | (92.17/88.91/90.51) |  1465.4 | 1.49e10 | \hspace{-1em} (85%)  | 85.72 | -0.13 |              0 |
 |      40 | precision     | (92.95/86.43/89.58) |  1353.3 | 1.49e10 | \hspace{-1em} (85%)  | 85.75 | -0.10 |              0 |
 |      40 | max precision | (94.22/79.63/86.31) |  1570.2 | 1.50e10 | \hspace{-1em} (86%)  | 85.78 | -0.07 |              0 |
 |      40 | recall        | (88.16/91.32/89.71) |  1489.7 | 1.47e10 | \hspace{-1em} (84%)  | 85.69 | -0.16 |              1 |
-|      40 | oracle        | (100/100/100)       |  1476.0 | 1.39e10 | \hspace{-1em} (79%)  | 86.04 |  0.19 |              0 |
 |---------+---------------+---------------------+---------+---------+----------------------+-------+-------+----------------|
 |       ∞ | baseline      |                     |  1470.9 | 1.75e10 | \hspace{-1em} (100%) | 85.85 |  0.00 |              0 |
 #+TBLFM: $4=$0;%.2e::$7=$6-85.85;p4%.2f
 
 #+BEGIN_LaTeX
-}
+%}
 \caption{The classifier using the polynomial kernel is much more accurate, leading to smaller loss in accuracy of the parser.}
 \label{tbl:parse-results-poly}
 \end{table*}
 #+END_LaTeX
 
 The results of running the parser on section 22 with the polynomial
-classifier output are shown in table~\ref{tbl:parse-results-poly}.
+classifier output are shown in table \ref{tbl:parse-results-poly}.
 With the more accurate classifier, the parser is able to reduce the
 necessary computation even further, by about 45%, while losing less
 accuracy. With a high-precision threshold, the computation of the CKY
