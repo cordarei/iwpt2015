@@ -31,20 +31,94 @@ that it can be used to speed up a CFG parser.
 
 * Independence Constraints
 
-- we define a property called *independence* which holds between two
-  words in a sentence given a context-free derivation (parse tree) for
-  that sentence
-- conceptually, if two words are *independent* then a CKY parser
-  doesn't have to consider any spans over those words until the very
-  last cell in the chart
+We propose a concept we call *independence*. Given a sentence $s = w_1
+w_2 \dots w_n$ and a context-free derivation (parse tree) $t$ of $s$,
+$w_i$ and $w_{i+1}$ are *independent* if every node in $t$ that
+dominates both $w_i$ and $w_{i+1}$ also dominates $w_1$ and $w_n$.
+Furthermore, if $w_i$ and $w_{i+1}$ are independent, then $\forall
+j,k$ s.t. $j \leq i$ and $k > i$, $w_j$ and $w_k$ are independent.
+Less formally, if the children of the top node of a parse tree are
+split into separate subtrees, two words are independent if they would
+end up in different subtrees.
 
-** Modifying The CKY Algorithm With Independence Constraints
-- alterations to the CKY algorithm
-  - check constraint inside inner loop; or
-  - loop between constraints first, then fill in cells which cross constraints
-  - the difference is (likely) small compared to the work inside the
-    loop(s)
-- expected work saved (we can consider two ideal scenarios)
+#+BEGIN_LaTeX
+\begin{figure}
+\begin{forest}
+  [S
+   [NP [DT [ $_0$ This $_1$]]]
+   [VP
+    [VB [is $_2$]]
+    [NP [DT [an $_3$]]
+        [NN [example $_4$]]]]
+   [{.} [{.} $_5$]]
+  ]
+\end{forest}
+\caption{In this tree ‘This’ and ‘is’ are independent, while ‘is’ and ‘an’ are not.}
+\label{fig:independence}
+\end{figure}
+#+END_LaTeX
+
+An example is shown in Figure \ref{fig:independence}. Here, ‘This’ and
+‘is’ are independent, [0,1), [1, 4), and [4, 5) are the independent
+spans, and 1 and 4 are the independent span boundaries. The
+independent spans and independent span boundaries can be derived
+straightforwardly from the definition of independent words: the
+locations between consecutive words which are independent are the
+independent span boundaries, and the independent spans are simply the
+spans in between consecutive boundaries.
+
+* Modifying The CKY Algorithm With Independence Constraints
+
+Conceptually, the motivation for the concept of independence is this:
+if a CKY parser knows the locations of the independent span boundaries
+for a sentence, it can perform the normal CKY algorithm for each
+independent span separately, and simply join the spans at the top of
+the tree to finish the parse, thereby avoiding work which would
+otherwise be done while still obtaining the desired 1-best parse. Two
+problems make the task more complicated than this.
+
+The first problem is that if we assume that the independent boundaries
+will be identified automatically, we must allow for errors. If a
+location which is not an independent span boundary is given as one,
+the parser will make an error it would not have otherwise. On the
+other hand, if a location which is an independent span boundary is not
+marked as such, the parser may account for this at the cost of not
+achieving the minimum computation possible. By allowing for this
+second type of error, the algorithm is made more robust, and allows
+the independent boundary identification step to prioritize precision
+over recall to lessen negative impact on the parser’s accuracy.
+
+The second problem is caused by the binarization of the context-free
+grammar used in the CKY algorithm. Because the CKY algorithm requires
+a binary grammar, any rules in the original grammar that have more
+than two symbols on the right-hand side must be converted into a
+sequence of binary rules. The extra rules created in this process are
+called incomplete or synthetic rules. The topmost span in particular
+will usually need to be constructed in several steps; however, the
+bottom-up nature of the algorithm means that it is impossible to
+determine whether a given synthetic rule at any position in the CKY
+chart will eventually be used to construct a complete span at the top
+of the tree (for arbitrary grammars—if the grammar is left- or
+right-binarized, only cells on the left or right edge of the chart can
+effect the top span).
+
+The combination of these two issues means that in order to correctly
+parse a sentence when an independent span boundary is missing from the
+input the modified CKY algorithm must process synthetic rules even at
+positions in the chart that cross a boundary.
+
+Thus in the modified algorithm, cells which do not cross an
+independent boundary are processed normally, and in cells which do
+cross a boundary the algorithm will avoid looping over complete
+binary rules. While boundary-crossing cells depend on non-crossing
+cells, the reverse is not the case; thus the non-crossing cells can
+all be processed before the crossing cells, or the cells can be looped
+over in the regular order, with a check inside the loop. Although
+checking inside the loop adds at least one branch and is thus less
+efficient, the difference is probably minor.
+
+** TODO expected work saved
+we can consider two ideal scenarios:
   - with one constraint at N/K
   - K constraints N/K words apart
 
@@ -314,8 +388,7 @@ experiment with restricting the constraints to sentences above a
 certain length. Finally, to compare with previous results we run the
 classifier and parser on section 23 in a single configuration.
 
-
-** TODO Results
+** Results
 
 #+BEGIN_LaTeX
 \begin{table*}[tbp]
@@ -436,6 +509,8 @@ and kernel classifier output, along with the baseline parser, below.
 | baseline |  1538.35 | 85.54 |
 | linear   |   1106.2 | 83.55 |
 | poly     |   1040.5 | 84.57 |
+
+** TODO add oracle results
 
 * Related Work
 
