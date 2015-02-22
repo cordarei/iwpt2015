@@ -22,12 +22,27 @@ that it can be used to speed up a CFG parser.
 
 * Introduction
 
-- CFG parsing is widely used
-- CKY algorithm is common
-- there is constant research into approximate and partial parsing
-- there is research into using classifiers to constrain CKY parser
-- we propose a novel type of constraint, demonstrate a classifier to
-  create these constraints, and show a speedup in a CFG parser
+Syntactic parsing, in particular constituent parsing with context-free
+grammars extracted from treebanks, is used in a wide variety of tasks
+and applications. The CKY algorithm often appears as the whole or a part
+of the implementation of CFG parsers and of so-called “deep” parsers.
+Although CKY with a simple CFG may be cheap in comparison to a later
+step, it may be difficult to assert that it is “fast enough.” To that
+end, various approaches to reducing the computation done by the CKY
+algorithm by compromising on exhaustiveness and/or exactness have been
+explored.
+
+It is possible to add various kinds of constraints without altering
+the basic CKY algorithm. These mostly involve deciding beforehand
+whether or not a certain span or kind of span can or cannot exist in
+the chart.
+
+We propose a novel type of top-down constraint for a CFG parser that
+we call independence constraints, described in Section 2. In Section 3
+we show how the CKY algorithm can be easily modified to accomodate
+these constraints, and in Section 4 we describe a classifier which can
+provide the constraints to a parser. We integrete the constraints into
+the Stanford Parser CKY implementation and show the results in Section 5.
 
 * Independence Constraints
 
