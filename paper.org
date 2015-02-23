@@ -519,34 +519,44 @@ less than half a point F_1 score.
 To compare with previous work on parsing using the Penn Treebank, we
 show the time and accuracy for parsing section 23, using both linear
 and kernel classifier output, along with the baseline parser, below.
+The times reported are the average of three runs each. The results
+parallel those shown on the development data.
 
-| parser   | time (s) |   F_1 |
-|----------+----------+-------|
-| baseline |  1538.35 | 85.54 |
-| linear   |   1106.2 | 83.55 |
-| poly     |   1040.5 | 84.57 |
+| parser   | time (s) |      |   F_1 |       |
+|----------+----------+------+-------+-------|
+| baseline |     1538 | 1.00 | 85.54 |  0.00 |
+| linear   |     1106 | 1.39 | 83.55 | -1.99 |
+| poly     |     1040 | 1.48 | 84.57 | -0.97 |
+#+TBLFM: $3=1538/$2;%.2f::$5=$4-85.54;p4%.2f
 
 ** TODO add oracle results
 
 * Related Work
 
 There are several strains of research related to adding constraints to
-the CKY chart. TK demonstrated a classifier to decide whether any span
-begins or ends at each word in a sentence. TK showed a classifier
-which classifies each cell individually according to whether and how
-many spans exist in it.
+the CKY chart. \cite{Roark2012} describes an approach using
+finite-state taggers to decide whether each word in a sentence begins
+or ends a multiword constituent and has a unary span or not. They show
+that their tagger is able to achieve very high precision, reducing
+parse time without negatively affecting accuracy (in fact, they report
+a slight increase). Our approach is also a pipelined approach with a
+classifier that makes a linear number of decisions per sentence;
+however, each decision is made independently, and requires global
+information to achieve high accuracy.
 
-TK proposed a concept of 'hedge' parsing, where only spans below a
-certain length are allowed, and show how this reduces the computation
-done by CKY. In fact, their algorithm is quite similar to the modified
-CKY algorithm used in this paper; however, their parser cannot create
+\cite{Bodenstab2011} proposes a classifier which directly decides for
+each cell in the chart how many constituents should be created. Their
+parser uses beam search with a FOM and a beam for each chart cell.
+
+\cite{Yarmohammadi2014} proposes a concept of 'hedge' parsing, where
+only spans below a certain length are allowed, and show how this
+reduces the computation done by CKY. Their approach for segmenting a
+sentence and parsing within each segment separately is similar to the
+approach presented in this paper; however, their system does not create
 spans of length larger than the threshold and thus doesn't follow the
 original treebank annotation, while our approach is able to return the
 original gold parse tree provided that the classifier does not output
 a false positive.
-
-** TODO add references
-** TODO rewrite
 
 * Conclusions
 
@@ -586,3 +596,8 @@ Third, the current classifier combines instances from different
 syntactic structures into a single model. It is possible that training
 multiple models on different types of sentences would result in a
 better classifier.
+
+#+BEGIN_LaTeX
+\bibliographystyle{acl}
+\bibliography{references}
+#+END_LaTeX
