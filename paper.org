@@ -85,12 +85,13 @@ spans in between consecutive boundaries.
 * Modifying The CKY Algorithm With Independence Constraints
 
 Conceptually, the motivation for the concept of independence is this:
-if a CKY parser knows the locations of the independent span boundaries
-for a sentence, it can perform the normal CKY algorithm for each
-independent span separately, and simply join the spans at the top of
-the tree to finish the parse, thereby avoiding work which would
-otherwise be done while still obtaining the desired 1-best parse. Two
-problems make the task more complicated than this.
+an independent span can be parsed independently, without reference to
+anything outside it. If a CKY parser knows the locations of the
+independent span boundaries for a sentence, it can perform the normal
+CKY algorithm for each independent span separately, and simply join
+the spans at the top of the tree to finish the parse, thereby avoiding
+work which would otherwise be done while still obtaining the desired
+1-best parse. Two problems make the task more complicated than this.
 
 The first problem is that if we assume that the independent boundaries
 will be identified automatically, we must allow for errors. If a
