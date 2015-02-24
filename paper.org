@@ -26,7 +26,7 @@ Syntactic parsing, in particular constituent parsing with context-free
 grammars extracted from treebanks, is used in a wide variety of tasks
 and applications. The CKY algorithm often appears as the whole or a part
 of the implementation of CFG parsers and of so-called “deep” parsers.
-Although CKY with a simple CFG may be cheap in comparison to a later
+Although CKY with a small grammar may be cheap in comparison to a later
 step, it may be difficult to assert that it is “fast enough.” To that
 end, various approaches to reducing the computation done by the CKY
 algorithm by compromising on exhaustiveness and/or exactness have been
@@ -145,7 +145,7 @@ able to identify boundaries between independent words in a sentence
 using only surface features (words and part-of-speech tags). We
 created a binary classifier which, given a POS-tagged sentence and a
 position between two words, decides whether those two words are
-independent or not. Our classifier currently only uses POS tags as
+independent or not. Our classifier currently uses only POS tags as
 features. We used =opal=, a tool for fast online classification, to
 train and test the models, training on sentences from Penn Treebank
 section 02-21 and testing on section 22. We set opal to use the
@@ -334,6 +334,7 @@ levels together actually reduces accuracy, likely due to overfitting
 \end{table*}
 #+END_LaTeX
 
+\label{sec:linear-classifier}
 For use as input to the parser, we select the $p,P_{1s},P_{3s}$
 feature configuration, and show more detailed results in
 table \ref{tbl:classifier-results-linear}. We used a threshold on the
@@ -364,6 +365,7 @@ F_{0.5}, a measure which favors precision over recall.
 \end{table*}
 #+END_LaTeX
 
+\label{sec:poly-classifier}
 For comparison with the linear classifier, we trained another
 classifier using a polynomial kernel (with degree 3) with all the
 features. The results are shown in table
@@ -442,7 +444,7 @@ classifier and parser on section 23 in a single configuration.
 #+END_LaTeX
 
 The results of running the parser on section 22 using the linear
-classifier from section (TK whichever I use) are shown in
+classifier from Section \ref{sec:linear-classifier} are shown in
 table \ref{tbl:parse-results-linear}. The table shows the total time
 taken, the total times entering the inner loop, the F_1 and difference
 from the baseline, and the number of times the parse failed using the
@@ -463,13 +465,13 @@ baseline, but accuracy also plummeted by 7 points.
 
 A difference of 2 F_1 score is not small, but on the other hand it is
 about by how much the unlexicalized Stanford Parser trails the Collins
-parser, for example. However, as shown above in section TK, there is
-room to improve the linear classifier through conjunctive features. As
-an indication of an upper bound of the acheivable performance, we
-tried using the output of the kernel classifier in the parser as
-above, while acknowledging that at present the time needed to produce
-the classifier output dwarfs the time needed to actually parse the
-test data.
+parser, for example. However, as shown above in Section
+\ref{sec:poly-classifier}, there is room to improve the linear
+classifier through conjunctive features. As an indication of an upper
+bound of the acheivable performance, we tried using the output of the
+kernel classifier in the parser as above, while acknowledging that at
+present the time needed to produce the classifier output dwarfs the
+time needed to actually parse the test data.
 
 #+BEGIN_LaTeX
 \begin{table*}[tbp]
