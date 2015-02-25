@@ -221,11 +221,12 @@ using only surface features (words and part-of-speech tags). We
 created a binary classifier which, given a POS-tagged sentence and a
 position between two words, decides whether those two words are
 independent or not. Our classifier currently uses only POS tags as
-features. We used =opal=, a tool for fast online classification, to
-train and test the models, training on sentences from Penn Treebank
-section 02-21 and testing on section 22. We set opal to use the
-passive-aggressive perceptron update, and output probabilities in
-order to use a threshold to trade off precision and recall.
+features. We used =opal= \cite{Yoshinaga2010}, a tool for fast online
+classification, to train and test the models, training on sentences
+from Penn Treebank section 02-21 and testing on section 22. We set
+opal to use the passive-aggressive perceptron update, and output
+probabilities in order to use a threshold to trade off precision and
+recall.
 
 ** Features
 
@@ -481,6 +482,12 @@ experiment with restricting the constraints to sentences above a
 certain length. Finally, to compare with previous results we run the
 classifier and parser on section 23 in a single configuration.
 
+All experiments were run on a Dell Opteron TK with Xeon TK. Unless
+otherwise noted multiple processes were run in parallel, and times
+reported were not averaged over multiple runs. Since we saw
+significant variation of up to 10%, the times should be taken with a
+grain of salt.
+
 ** Results
 
 #+BEGIN_LaTeX
@@ -536,7 +543,7 @@ instances for which the classifier assigned a low probability positive,
 the parser reduced the work done inside the loop to less than half the
 baseline, but accuracy also plummeted by 7 points.
 
-*** Polynomial Kernel
+** Polynomial Kernel
 
 A difference of 2 F_1 score is not small, but on the other hand it is
 about by how much the unlexicalized Stanford Parser trails the Collins
@@ -591,13 +598,46 @@ accuracy. With a high-precision threshold, the computation of the CKY
 algorithm is reduced to less than 60% of the baseline, while losing
 less than half a point F_1 score.
 
-*** WSJ Section 23
+** Gold Indpendent Span Boundaries
+
+For another comparison, we tested the parser using the gold
+independent span boundaries. The results for section 22 are shown in
+Table \ref{tbl:parse-results-oracle}. The number of binary edges
+visited is cut in half, and parse accuracy is improved by almost 1
+point. We note that the parser was unable to parse 4 sentences with
+the gold constraints.
+
+#+BEGIN_LaTeX
+\begin{table*}[tbp]
+%\resizebox{12cm}{!}{
+#+END_LaTeX
+
+#+attr_latex: :center nil
+| SentLen | time(s) |   #edges |                      |   F_1 |       | #failed |
+|---------+---------+----------+----------------------+-------+-------+---------|
+|       0 |  1016.8 | 8.47e+09 | \hspace{-1em} (48%)  | 86.71 | +0.86 |       4 |
+|      20 |  1054.6 | 8.90e+09 | \hspace{-1em} (51%)  | 86.55 | +0.70 |       2 |
+|      30 |  1152.9 | 1.08e+10 | \hspace{-1em} (62%)  | 86.33 | +0.48 |       0 |
+|      40 |  1344.4 | 1.39e+10 | \hspace{-1em} (79%)  | 86.04 | +0.19 |       0 |
+|---------+---------+----------+----------------------+-------+-------+---------|
+|       ∞ |  1292.9 | 1.75e+10 | \hspace{-1em} (100%) | 85.85 |       |       0 |
+
+#+BEGIN_LaTeX
+%}
+\caption{Using the gold independent span boundaries halves the work done by the CKY algorithm while improving parse accuracy.}
+\label{tbl:parse-results-oracle}
+\end{table*}
+#+END_LaTeX
+
+** WSJ Section 23
 
 To compare with previous work on parsing using the Penn Treebank, we
 show the time and accuracy for parsing section 23, using both linear
 and kernel classifier output, along with the baseline parser, below.
-The times reported are the average of three runs each. The results
-parallel those shown on the development data.
+The times reported are the average of three runs each. Because there
+was significant variation in parse time when multiple processes were
+run in parallel, for these results only one process was run at a time.
+ The results parallel those shown on the development data.
 
 | parser   | time (s) |      |   F_1 |       |
 |----------+----------+------+-------+-------|
@@ -605,8 +645,6 @@ parallel those shown on the development data.
 | linear   |     1106 | 1.39 | 83.55 | -1.99 |
 | poly     |     1040 | 1.48 | 84.57 | -0.97 |
 #+TBLFM: $3=1538/$2;%.2f::$5=$4-85.54;p4%.2f
-
-** TODO add oracle results
 
 * Related Work
 
