@@ -41,7 +41,7 @@ We propose a novel type of top-down constraint for a CFG parser that
 we call independence constraints, described in Section 2. In Section 3
 we show how the CKY algorithm can be easily modified to accomodate
 these constraints, and in Section 4 we describe a classifier which can
-provide the constraints to a parser. We integrete the constraints into
+provide the constraints to a parser. We integrate the constraints into
 the Stanford Parser CKY implementation and show the results in Section 5.
 
 * Independence Constraints
@@ -263,7 +263,7 @@ Below, $t^{l}_{i}$ is the $i$ th POS tag in the $l$-level POS tag sequence.
 - $t^l_{i},t^l_{i+1}$ for $k \le i < n - 2$, $l \in {0,1,2,3}$
 - $t^l_{i},t^l_{i+1},t^l_{i+2}$ for $k \le i < n - 3$, $l \in {0,1,2,3}$
 
-*** POS Level
+** POS Level
 
 In previous unpublished work on a similar task, we found that
 heuristically transforming the POS tag sequence to create additional
@@ -482,11 +482,11 @@ experiment with restricting the constraints to sentences above a
 certain length. Finally, to compare with previous results we run the
 classifier and parser on section 23 in a single configuration.
 
-All experiments were run on a Dell Opteron TK with Xeon TK. Unless
-otherwise noted multiple processes were run in parallel, and times
-reported were not averaged over multiple runs. Since we saw
-significant variation of up to 10%, the times should be taken with a
-grain of salt.
+All experiments were run on a DELL Precision 690, with 8 cores and 32G
+of RAM. Unless otherwise noted multiple processes were run in
+parallel, and times reported were not averaged over multiple runs.
+Since we saw significant variation of up to 10%, the times should be
+taken with a grain of salt.
 
 ** Results
 
@@ -598,7 +598,7 @@ accuracy. With a high-precision threshold, the computation of the CKY
 algorithm is reduced to less than 60% of the baseline, while losing
 less than half a point F_1 score.
 
-** Gold Indpendent Span Boundaries
+** Gold Independent Span Boundaries
 
 For another comparison, we tested the parser using the gold
 independent span boundaries. The results for section 22 are shown in
@@ -615,12 +615,11 @@ the gold constraints.
 #+attr_latex: :center nil
 | SentLen | time(s) |   #edges |                      |   F_1 |       | #failed |
 |---------+---------+----------+----------------------+-------+-------+---------|
-|       0 |  1016.8 | 8.47e+09 | \hspace{-1em} (48%)  | 86.71 | +0.86 |       4 |
-|      20 |  1054.6 | 8.90e+09 | \hspace{-1em} (51%)  | 86.55 | +0.70 |       2 |
-|      30 |  1152.9 | 1.08e+10 | \hspace{-1em} (62%)  | 86.33 | +0.48 |       0 |
-|      40 |  1344.4 | 1.39e+10 | \hspace{-1em} (79%)  | 86.04 | +0.19 |       0 |
-|---------+---------+----------+----------------------+-------+-------+---------|
-|       ∞ |  1292.9 | 1.75e+10 | \hspace{-1em} (100%) | 85.85 |       |       0 |
+|       0 |  1016.8 | 8.47e09 | \hspace{-1em} (48%)  | 86.71 | +0.86 |       4 |
+|      20 |  1054.6 | 8.90e09 | \hspace{-1em} (51%)  | 86.55 | +0.70 |       2 |
+|      30 |  1152.9 | 1.08e10 | \hspace{-1em} (62%)  | 86.33 | +0.48 |       0 |
+|      40 |  1344.4 | 1.39e10 | \hspace{-1em} (79%)  | 86.04 | +0.19 |       0 |
+|       ∞ |  1292.9 | 1.75e10 | \hspace{-1em} (100%) | 85.85 |       |       0 |
 
 #+BEGIN_LaTeX
 %}
@@ -639,12 +638,11 @@ was significant variation in parse time when multiple processes were
 run in parallel, for these results only one process was run at a time.
  The results parallel those shown on the development data.
 
-| parser   | time (s) |      |   F_1 |       |
-|----------+----------+------+-------+-------|
-| baseline |     1538 | 1.00 | 85.54 |  0.00 |
-| linear   |     1106 | 1.39 | 83.55 | -1.99 |
-| poly     |     1040 | 1.48 | 84.57 | -0.97 |
-#+TBLFM: $3=1538/$2;%.2f::$5=$4-85.54;p4%.2f
+| parser   | time (s) |            |   F_1 |       |
+|----------+----------+------------+-------+-------|
+| baseline |     1538 |            | 85.54 |  0.00 |
+| linear   |     1106 | \times1.39 | 83.55 | -1.99 |
+| poly     |     1040 | \times1.48 | 84.57 | -0.97 |
 
 * Related Work
 
