@@ -74,11 +74,11 @@ end up in different subtrees.
 #+END_LaTeX
 
 An example is shown in Figure \ref{fig:independence}. Here, ‘This’ and
-‘is’ are independent, [0,1), [1, 4), and [4, 5) are the independent
-spans, and 1 and 4 are the independent span boundaries. The
-independent spans and independent span boundaries can be derived
-straightforwardly from the definition of independent words: the
-locations between consecutive words which are independent are the
+‘is’ are independent, as are ‘example’ and ‘.’. The independent spans
+are [‘This’], [‘is’, ‘an’, ‘example’], and [‘.’], with boundaries 1
+and 4. The independent spans and independent span boundaries can be
+derived straightforwardly from the definition of independent words:
+the locations between consecutive words which are independent are the
 independent span boundaries, and the independent spans are simply the
 spans in between consecutive boundaries.
 
