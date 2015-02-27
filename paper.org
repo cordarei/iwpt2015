@@ -109,7 +109,7 @@ grammar used in the CKY algorithm. Because the CKY algorithm requires
 a binary grammar, any rules in the original grammar that have more
 than two symbols on the right-hand side must be converted into a
 sequence of binary rules. The extra rules created in this process are
-called incomplete or synthetic rules. The topmost span in particular
+called intermediate or synthetic rules. The topmost span in particular
 will usually need to be constructed in several steps; however, the
 bottom-up nature of the algorithm means that it is impossible to
 determine whether a given synthetic rule at any position in the CKY
@@ -230,100 +230,6 @@ recall.
 
 ** Features
 
-We use only part-of-speech tags to create features for the classifier
-(adding lexical or other features is left to future work). The
-property of independence between two words is inherently global, as it
-can be affected by structure arbitrarily far away. Thus we have both
-local and global features. The global features are furthermore
-distinguished by *POS level*, explained in detail later. The specific
-feature templates are shown below:
-
-*** Local Features
-**** Left
-- $t_{k-1}$
-- $t_{k-2},t_{k-1}$
-- $t_{k-3},t_{k-2},t_{k-1}$
-
-**** Right
-- $t_{k}$
-- $t_{k},t_{k+1}$
-- $t_{k},t_{k+1},t_{k+2}$
-
-*** Global Features
-
-Below, $t^{l}_{i}$ is the $i$ th POS tag in the $l$-level POS tag sequence.
-
-**** Left
-- $t^l_{i}$ for $1 \le i < k - 1$, $l \in {0,1,2,3}$
-- $t^l_{i},t^l_{i+1}$ for $1 \le i < k - 2$, $l \in {0,1,2,3}$
-- $t^l_{i},t^l_{i+1},t^l_{i+2}$ for $1 \le i < k - 3$, $l \in {0,1,2,3}$
-
-**** Right
-- $t^l_{i}$ for $k \le i < n - 1$, $l \in {0,1,2,3}$
-- $t^l_{i},t^l_{i+1}$ for $k \le i < n - 2$, $l \in {0,1,2,3}$
-- $t^l_{i},t^l_{i+1},t^l_{i+2}$ for $k \le i < n - 3$, $l \in {0,1,2,3}$
-
-** POS Level
-
-In previous unpublished work on a similar task, we found that
-heuristically transforming the POS tag sequence to create additional
-features can be beneficial. We refer to these transformations as *POS
-levels*. In this classifier we implemented three levels, in addition
-to the original POS tags as level 0.
-
-We show all levels in table \ref{tbl:pos-level}. Each level specifies
-a value by which each level 0 tag is replaced during the
-transformation. Each transformation has three variations: 's', where
-'X's are removed from the sequence prior to extracting n-gram
-features; 'f', where they are not; and the default variation which
-creates features from both.
-
-The motivation behind each transformation is roughly as follows: level
-1 is meant to capture clause nuclei; level 2 is further intended to
-show boundaries between clauses; and level 3 expands almost all the
-way back to the original tags, but with some distinctions erased,
-mostly to reduce the number of features.
-
-#+BEGIN_LaTeX
-\begin{table}[tbp]
-\tiny
-#+END_LaTeX
-
-#+attr_latex: :center nil
-| Lvl0 | Lvl1 | Lvl2 | Lvl3 |   | Lvl0  | Lvl1 | Lvl2 | Lvl3 |
-|------+------+------+------+---+-------+------+------+------|
-| NN   | N    | N    | N    |   | CD    | X    | X    | #    |
-| NNP  | N    | N    | N    |   | -LRB- | X    | X    | B    |
-| NNPS | N    | N    | N    |   | -RRB- | X    | X    | B    |
-| NNS  | N    | N    | N    |   | DT    | X    | X    | D    |
-| PRP  | N    | N    | N    |   | PDT   | X    | X    | D    |
-| VB   | V    | V    | V    |   | PRP$  | X    | X    | D    |
-| VBD  | V    | V    | V    |   | WP$   | X    | X    | D    |
-| VBG  | V    | V    | V    |   | JJ    | X    | X    | J    |
-| VBN  | V    | V    | V    |   | JJR   | X    | X    | J    |
-| VBP  | V    | V    | V    |   | JJS   | X    | X    | J    |
-| VBZ  | V    | V    | V    |   | -RQ-  | X    | X    | Q    |
-| ,    | X    | ,    | ,    |   | -LQ-  | X    | X    | Q    |
-| .    | X    | .    | .    |   | RB    | X    | X    | R    |
-| :    | X    | :    | :    |   | RBR   | X    | X    | R    |
-| CC   | X    | C    | C    |   | RBS   | X    | X    | R    |
-| IN   | X    | I    | I    |   | EX    | X    | X    | X    |
-| RP   | X    | I    | I    |   | FW    | X    | X    | X    |
-| TO   | X    | T    | T    |   | LS    | X    | X    | X    |
-| WDT  | X    | W    | W    |   | MD    | X    | X    | X    |
-| WP   | X    | W    | W    |   | POS   | X    | X    | X    |
-| WRB  | X    | W    | W    |   | SYM   | X    | X    | X    |
-| #    | X    | X    | #    |   | UH    | X    | X    | X    |
-| $    | X    | X    | #    |   |       |      |      |      |
-
-#+BEGIN_LaTeX
-\caption{For each POS level, the original tag is replaced with the corresponding value.}
-\label{tbl:pos-level}
-\end{table}
-#+END_LaTeX
-
-** Which Features Are Useful?
-
 #+BEGIN_LaTeX
 \begin{table*}[tbp]
 %\resizebox{12cm}{!}{
@@ -367,6 +273,101 @@ mostly to reduce the number of features.
 \end{table*}
 #+END_LaTeX
 
+We use only part-of-speech tags to create features for the classifier
+(adding lexical or other features is left to future work). The
+property of independence between two words is inherently global, as it
+can be affected by structure arbitrarily far away. Thus we have both
+local and global features. The global features are furthermore
+distinguished by *POS level*, explained in detail later. The specific
+feature templates are shown below:
+
+*** Local Features
+**** Left
+- $t_{k-1}$
+- $t_{k-2},t_{k-1}$
+- $t_{k-3},t_{k-2},t_{k-1}$
+
+**** Right
+- $t_{k}$
+- $t_{k},t_{k+1}$
+- $t_{k},t_{k+1},t_{k+2}$
+
+*** Global Features
+
+Below, $t^{l}_{i}$ is the $i$ th POS tag in the $l$-level POS tag sequence.
+
+**** Left
+- $t^l_{i}$ for $1 \le i < k - 1$, $l \in {0,1,2,3}$
+- $t^l_{i},t^l_{i+1}$ for $1 \le i < k - 2$, $l \in {0,1,2,3}$
+- $t^l_{i},t^l_{i+1},t^l_{i+2}$ for $1 \le i < k - 3$, $l \in {0,1,2,3}$
+
+**** Right
+- $t^l_{i}$ for $k \le i < n - 1$, $l \in {0,1,2,3}$
+- $t^l_{i},t^l_{i+1}$ for $k \le i < n - 2$, $l \in {0,1,2,3}$
+- $t^l_{i},t^l_{i+1},t^l_{i+2}$ for $k \le i < n - 3$, $l \in {0,1,2,3}$
+
+** POS Level
+
+#+BEGIN_LaTeX
+\begin{table}[tbp]
+\centering
+\scriptsize
+#+END_LaTeX
+
+#+attr_latex: :center nil
+| Lvl0 | Lvl1 | Lvl2 | Lvl3 | Lvl0  | Lvl1 | Lvl2 | Lvl3 |
+|------+------+------+------+-------+------+------+------|
+| NN   | N    | N    | N    | CD    | X    | X    | #    |
+| NNP  | N    | N    | N    | -LRB- | X    | X    | B    |
+| NNPS | N    | N    | N    | -RRB- | X    | X    | B    |
+| NNS  | N    | N    | N    | DT    | X    | X    | D    |
+| PRP  | N    | N    | N    | PDT   | X    | X    | D    |
+| VB   | V    | V    | V    | PRP$  | X    | X    | D    |
+| VBD  | V    | V    | V    | WP$   | X    | X    | D    |
+| VBG  | V    | V    | V    | JJ    | X    | X    | J    |
+| VBN  | V    | V    | V    | JJR   | X    | X    | J    |
+| VBP  | V    | V    | V    | JJS   | X    | X    | J    |
+| VBZ  | V    | V    | V    | -RQ-  | X    | X    | Q    |
+| ,    | X    | ,    | ,    | -LQ-  | X    | X    | Q    |
+| .    | X    | .    | .    | RB    | X    | X    | R    |
+| :    | X    | :    | :    | RBR   | X    | X    | R    |
+| CC   | X    | C    | C    | RBS   | X    | X    | R    |
+| IN   | X    | I    | I    | EX    | X    | X    | X    |
+| RP   | X    | I    | I    | FW    | X    | X    | X    |
+| TO   | X    | T    | T    | LS    | X    | X    | X    |
+| WDT  | X    | W    | W    | MD    | X    | X    | X    |
+| WP   | X    | W    | W    | POS   | X    | X    | X    |
+| WRB  | X    | W    | W    | SYM   | X    | X    | X    |
+| #    | X    | X    | #    | UH    | X    | X    | X    |
+| $    | X    | X    | #    |       |      |      |      |
+
+#+BEGIN_LaTeX
+\caption{For each POS level, the original tag is replaced with the corresponding value.}
+\label{tbl:pos-level}
+\end{table}
+#+END_LaTeX
+
+In previous unpublished work on a similar task, we found that
+heuristically transforming the POS tag sequence to create additional
+features can be beneficial. We refer to these transformations as *POS
+levels*. In this classifier we implemented three levels, in addition
+to the original POS tags as level 0.
+
+We show all levels in table \ref{tbl:pos-level}. Each level specifies
+a value by which each level 0 tag is replaced during the
+transformation. Each transformation has three variations: 's', where
+'X's are removed from the sequence prior to extracting n-gram
+features; 'f', where they are not; and the default variation which
+creates features from both.
+
+The motivation behind each transformation is roughly as follows: level
+1 is meant to capture clause nuclei; level 2 is further intended to
+show boundaries between clauses; and level 3 expands almost all the
+way back to the original tags, but with some distinctions erased,
+mostly to reduce the number of features.
+
+** Which Features Are Useful?
+
 In order to find the best configuration of features for the
 classifier, and to evaluate the proposed POS levels, we tested the
 classifier using several different combinations. Selected results are
@@ -396,12 +397,12 @@ levels together actually reduces accuracy, likely due to overfitting
 #+END_LaTeX
 
 #+attr_latex: :center nil
-| Features        | #feats | Threshold     |   Acc |  Prec |   Rec | F_{1} | F_{0.5} |   TP |   FP |   FN |    TN |
-|-----------------+--------+---------------+-------+-------+-------+-------+---------+------+------+------+-------|
-| p,P_{1s},P_{3s} |  41553 | default       | 95.44 | 89.05 | 75.74 | 81.86 |   86.03 | 3953 |  486 | 1266 | 32712 |
-| p,P_{1s},P_{3s} |  41553 | precision     | 94.99 | 91.65 | 69.44 | 79.01 |   86.14 | 3624 |  330 | 1595 | 32868 |
-| p,P_{1s},P_{3s} |  41553 | max precision | 92.10 | 95.80 | 43.74 | 60.06 |   77.38 | 2283 |  100 | 2936 | 33098 |
-| p,P_{1s},P_{3s} |  41553 | recall        | 94.28 | 73.82 | 89.65 | 80.97 |   76.53 | 4679 | 1659 |  540 | 31539 |
+| Features        | Threshold     |   Acc |  Prec |   Rec | F_{1} | F_{0.5} |   TP |   FP |   FN |    TN |
+|-----------------+---------------+-------+-------+-------+-------+---------+------+------+------+-------|
+| p,P_{1s},P_{3s} | default       | 95.44 | 89.05 | 75.74 | 81.86 |   86.03 | 3953 |  486 | 1266 | 32712 |
+| p,P_{1s},P_{3s} | precision     | 94.99 | 91.65 | 69.44 | 79.01 |   86.14 | 3624 |  330 | 1595 | 32868 |
+| p,P_{1s},P_{3s} | max precision | 92.10 | 95.80 | 43.74 | 60.06 |   77.38 | 2283 |  100 | 2936 | 33098 |
+| p,P_{1s},P_{3s} | recall        | 94.28 | 73.82 | 89.65 | 80.97 |   76.53 | 4679 | 1659 |  540 | 31539 |
 
 #+BEGIN_LaTeX
 %}
@@ -419,20 +420,18 @@ decisions in a post-process step. Although it doesn't improve on the
 classifier in accuracy, the =precision= threshold did slightly improve in
 F_{0.5}, a measure which favors precision over recall.
 
-** Polynomial Kernel
-
 #+BEGIN_LaTeX
 \begin{table*}[htbp]
 %\resizebox{12cm}{!}{
 #+END_LaTeX
 
 #+attr_latex: :center nil
-| Features                  | #feats |               |   Acc |  Prec |   Rec | F_{1} | F_{0.5} |   TP |  FP |   FN |    TN |
-|---------------------------+--------+---------------+-------+-------+-------+-------+---------+------+-----+------+-------|
-| p,P_{0},P_{1},P_{2},P_{3} |  82417 | default       | 97.47 | 92.17 | 88.91 | 90.51 |   91.50 | 4640 | 394 |  579 | 32804 |
-| p,P_{0},P_{1},P_{2},P_{3} |  82417 | precision     | 97.27 | 92.95 | 86.43 | 89.58 |   91.57 | 4511 | 342 |  708 | 32856 |
-| p,P_{0},P_{1},P_{2},P_{3} |  82417 | max precision | 96.57 | 94.22 | 79.63 | 86.31 |   90.89 | 4156 | 255 | 1063 | 32943 |
-| p,P_{0},P_{1},P_{2},P_{3} |  82417 | recall        | 97.15 | 88.16 | 91.32 | 89.71 |   88.78 | 4766 | 640 |  453 | 32558 |
+| Features                  | Threshold     |   Acc |  Prec |   Rec | F_{1} | F_{0.5} |   TP |  FP |   FN |    TN |
+|---------------------------+---------------+-------+-------+-------+-------+---------+------+-----+------+-------|
+| p,P_{0},P_{1},P_{2},P_{3} | default       | 97.47 | 92.17 | 88.91 | 90.51 |   91.50 | 4640 | 394 |  579 | 32804 |
+| p,P_{0},P_{1},P_{2},P_{3} | precision     | 97.27 | 92.95 | 86.43 | 89.58 |   91.57 | 4511 | 342 |  708 | 32856 |
+| p,P_{0},P_{1},P_{2},P_{3} | max precision | 96.57 | 94.22 | 79.63 | 86.31 |   90.89 | 4156 | 255 | 1063 | 32943 |
+| p,P_{0},P_{1},P_{2},P_{3} | recall        | 97.15 | 88.16 | 91.32 | 89.71 |   88.78 | 4766 | 640 |  453 | 32558 |
 
 #+BEGIN_LaTeX
 %}
@@ -440,6 +439,8 @@ F_{0.5}, a measure which favors precision over recall.
 \label{tbl:classifier-results-poly}
 \end{table*}
 #+END_LaTeX
+
+** Polynomial Kernel
 
 \label{sec:poly-classifier}
 For comparison with the linear classifier, we trained another
@@ -496,27 +497,27 @@ taken with a grain of salt.
 #+END_LaTeX
 
 #+attr_latex: :center nil
-| SentLen | Constraints   | (P/R/F_{1})         | time(s) |  #edges |                      |   F_1 | $\Delta F_1$ | #failed parses |
-|---------+---------------+---------------------+---------+---------+----------------------+-------+--------------+----------------|
-|       0 | default       | (88.95/76.16/82.06) |  1283.0 | 1.08e10 | \hspace{-1em} (62%)  | 83.71 |        -2.14 |             15 |
-|       0 | precision     | (90.42/72.20/80.29) |  1143.3 | 1.13e10 | \hspace{-1em} (65%)  | 84.05 |        -1.80 |              7 |
-|       0 | max precision | (95.57/47.14/63.13) |  1384.4 | 1.42e10 | \hspace{-1em} (81%)  | 85.55 |        -0.30 |              2 |
-|       0 | recall        | (71.73/90.25/79.93) |  1024.8 | 7.80e09 | \hspace{-1em} (45%)  | 78.74 |        -7.11 |            136 |
-|      20 | default       | (88.95/76.16/82.06) |  1126.9 | 1.12e10 | \hspace{-1em} (64%)  | 84.17 |        -1.68 |              9 |
-|      20 | precision     | (90.42/72.20/80.29) |  1313.0 | 1.16e10 | \hspace{-1em} (66%)  | 84.43 |        -1.42 |              4 |
-|      20 | max precision | (95.57/47.14/63.13) |  1338.6 | 1.44e10 | \hspace{-1em} (82%)  | 85.59 |        -0.26 |              2 |
-|      20 | recall        | (71.73/90.25/79.93) |  1121.8 | 8.24e09 | \hspace{-1em} (47%)  | 80.38 |        -5.47 |            103 |
-|      30 | default       | (88.95/76.16/82.06) |  1312.3 | 1.28e10 | \hspace{-1em} (73%)  | 84.82 |        -1.03 |              3 |
-|      30 | precision     | (90.42/72.20/80.29) |  1279.7 | 1.31e10 | \hspace{-1em} (75%)  | 85.01 |        -0.84 |              1 |
-|      30 | max precision | (95.57/47.14/63.13) |  1485.9 | 1.53e10 | \hspace{-1em} (87%)  | 85.63 |        -0.22 |              1 |
-|      30 | recall        | (71.73/90.25/79.93) |  1140.5 | 1.02e10 | \hspace{-1em} (58%)  | 82.79 |        -3.06 |             57 |
-|      40 | default       | (88.95/76.16/82.06) |  1476.8 | 1.51e10 | \hspace{-1em} (86%)  | 85.56 |        -0.29 |              1 |
-|      40 | precision     | (90.42/72.20/80.29) |  1390.9 | 1.52e10 | \hspace{-1em} (87%)  | 85.59 |        -0.26 |              0 |
-|      40 | max precision | (95.57/47.14/63.13) |  1513.3 | 1.65e10 | \hspace{-1em} (94%)  | 85.75 |        -0.10 |              0 |
-|      40 | recall        | (71.73/90.25/79.93) |  1403.9 | 1.33e10 | \hspace{-1em} (76%)  | 84.65 |        -1.20 |             14 |
-|---------+---------------+---------------------+---------+---------+----------------------+-------+--------------+----------------|
-|       ∞ | baseline      |                     |  1558.7 | 1.75e10 | \hspace{-1em} (100%) | 85.85 |         0.00 |              0 |
-#+TBLFM: $4=$0;%.2e::$7=$6-85.85;p4%.2f
+| SentLen | Constraints   | Time (s) | # Edges                | F_1           | Parse Failures |
+|---------+---------------+----------+------------------------+---------------+----------------|
+|       0 | default       |     1283 | 1.08\times10^10 (62%)  | 83.71 (-2.14) |             15 |
+|       0 | precision     |     1143 | 1.13\times10^10 (65%)  | 84.05 (-1.80) |              7 |
+|       0 | max precision |     1384 | 1.42\times10^10 (81%)  | 85.55 (-0.30) |              2 |
+|       0 | recall        |     1024 | 7.80\times10^09 (45%)  | 78.74 (-7.11) |            136 |
+|      20 | default       |     1126 | 1.12\times10^10 (64%)  | 84.17 (-1.68) |              9 |
+|      20 | precision     |     1313 | 1.16\times10^10 (66%)  | 84.43 (-1.42) |              4 |
+|      20 | max precision |     1338 | 1.44\times10^10 (82%)  | 85.59 (-0.26) |              2 |
+|      20 | recall        |     1121 | 8.24\times10^09 (47%)  | 80.38 (-5.47) |            103 |
+|      30 | default       |     1312 | 1.28\times10^10 (73%)  | 84.82 (-1.03) |              3 |
+|      30 | precision     |     1279 | 1.31\times10^10 (75%)  | 85.01 (-0.84) |              1 |
+|      30 | max precision |     1485 | 1.53\times10^10 (87%)  | 85.63 (-0.22) |              1 |
+|      30 | recall        |     1140 | 1.02\times10^10 (58%)  | 82.79 (-3.06) |             57 |
+|      40 | default       |     1476 | 1.51\times10^10 (86%)  | 85.56 (-0.29) |              1 |
+|      40 | precision     |     1390 | 1.52\times10^10 (87%)  | 85.59 (-0.26) |              0 |
+|      40 | max precision |     1513 | 1.65\times10^10 (94%)  | 85.75 (-0.10) |              0 |
+|      40 | recall        |     1403 | 1.33\times10^10 (76%)  | 84.65 (-1.20) |             14 |
+|---------+---------------+----------+------------------------+---------------+----------------|
+|       ∞ | baseline      |     1558 | 1.75\times10^10 (100%) | 85.85         |              0 |
+#+TBLFM: $3=$0;%.2e::$6=$5-85.85;p4%.2f
 
 #+BEGIN_LaTeX
 %}
@@ -561,27 +562,27 @@ time needed to actually parse the test data.
 #+END_LaTeX
 
 #+attr_latex: :center nil
-| SentLen | Constraints   | (P/R/F_{1})         | time(s) |  #edges |                      |   F_1 |       | #failed parses |
-|---------+---------------+---------------------+---------+---------+----------------------+-------+-------+----------------|
-|       0 | default       | (92.17/88.91/90.51) |  1106.7 | 9.74e09 | \hspace{-1em} (56%)  | 84.85 | -1.00 |              6 |
-|       0 | precision     | (92.95/86.43/89.58) |  1118.8 | 9.84e09 | \hspace{-1em} (56%)  | 85.12 | -0.73 |              4 |
-|       0 | max precision | (94.22/79.63/86.31) |  1137.2 | 1.02e10 | \hspace{-1em} (58%)  | 85.42 | -0.43 |              2 |
-|       0 | recall        | (88.16/91.32/89.71) |  1050.7 | 9.25e09 | \hspace{-1em} (53%)  | 84.05 | -1.80 |             33 |
-|      20 | default       | (92.17/88.91/90.51) |  1070.7 | 1.02e10 | \hspace{-1em} (58%)  | 85.08 | -0.77 |              5 |
-|      20 | precision     | (92.95/86.43/89.58) |  1172.4 | 1.03e10 | \hspace{-1em} (59%)  | 85.25 | -0.60 |              3 |
-|      20 | max precision | (94.22/79.63/86.31) |  1092.4 | 1.06e10 | \hspace{-1em} (61%)  | 85.41 | -0.44 |              2 |
-|      20 | recall        | (88.16/91.32/89.71) |  1088.3 | 9.68e09 | \hspace{-1em} (55%)  | 84.75 | -1.10 |              7 |
-|      30 | default       | (92.17/88.91/90.51) |  1222.6 | 1.20e10 | \hspace{-1em} (69%)  | 85.57 | -0.28 |              1 |
-|      30 | precision     | (92.95/86.43/89.58) |  1267.5 | 1.20e10 | \hspace{-1em} (69%)  | 85.62 | -0.23 |              1 |
-|      30 | max precision | (94.22/79.63/86.31) |  1238.7 | 1.23e10 | \hspace{-1em} (70%)  | 85.65 | -0.20 |              1 |
-|      30 | recall        | (88.16/91.32/89.71) |  1238.0 | 1.16e10 | \hspace{-1em} (66%)  | 85.44 | -0.41 |              2 |
-|      40 | default       | (92.17/88.91/90.51) |  1465.4 | 1.49e10 | \hspace{-1em} (85%)  | 85.72 | -0.13 |              0 |
-|      40 | precision     | (92.95/86.43/89.58) |  1353.3 | 1.49e10 | \hspace{-1em} (85%)  | 85.75 | -0.10 |              0 |
-|      40 | max precision | (94.22/79.63/86.31) |  1570.2 | 1.50e10 | \hspace{-1em} (86%)  | 85.78 | -0.07 |              0 |
-|      40 | recall        | (88.16/91.32/89.71) |  1489.7 | 1.47e10 | \hspace{-1em} (84%)  | 85.69 | -0.16 |              1 |
-|---------+---------------+---------------------+---------+---------+----------------------+-------+-------+----------------|
-|       ∞ | baseline      |                     |  1470.9 | 1.75e10 | \hspace{-1em} (100%) | 85.85 |  0.00 |              0 |
-#+TBLFM: $4=$0;%.2e::$7=$6-85.85;p4%.2f
+| SentLen | Constraints   | Time (s) | # Edges                | F_1           | Parse Failures |
+|---------+---------------+----------+------------------------+---------------+----------------|
+|       0 | default       |     1106 | 9.74\times10^09 (56%)  | 84.85 (-1.00) |              6 |
+|       0 | precision     |     1118 | 9.84\times10^09 (56%)  | 85.12 (-0.73) |              4 |
+|       0 | max precision |     1137 | 1.02\times10^10 (58%)  | 85.42 (-0.43) |              2 |
+|       0 | recall        |     1050 | 9.25\times10^09 (53%)  | 84.05 (-1.80) |             33 |
+|      20 | default       |     1070 | 1.02\times10^10 (58%)  | 85.08 (-0.77) |              5 |
+|      20 | precision     |     1172 | 1.03\times10^10 (59%)  | 85.25 (-0.60) |              3 |
+|      20 | max precision |     1092 | 1.06\times10^10 (61%)  | 85.41 (-0.44) |              2 |
+|      20 | recall        |     1088 | 9.68\times10^09 (55%)  | 84.75 (-1.10) |              7 |
+|      30 | default       |     1222 | 1.20\times10^10 (69%)  | 85.57 (-0.28) |              1 |
+|      30 | precision     |     1267 | 1.20\times10^10 (69%)  | 85.62 (-0.23) |              1 |
+|      30 | max precision |     1238 | 1.23\times10^10 (70%)  | 85.65 (-0.20) |              1 |
+|      30 | recall        |     1238 | 1.16\times10^10 (66%)  | 85.44 (-0.41) |              2 |
+|      40 | default       |     1465 | 1.49\times10^10 (85%)  | 85.72 (-0.13) |              0 |
+|      40 | precision     |     1353 | 1.49\times10^10 (85%)  | 85.75 (-0.10) |              0 |
+|      40 | max precision |     1570 | 1.50\times10^10 (86%)  | 85.78 (-0.07) |              0 |
+|      40 | recall        |     1489 | 1.47\times10^10 (84%)  | 85.69 (-0.16) |              1 |
+|---------+---------------+----------+------------------------+---------------+----------------|
+|       ∞ | baseline      |     1470 | 1.75\times10^10 (100%) | 85.85         |              0 |
+#+TBLFM: $3=$0;%.2e::$6=$5-85.85;p4%.2f
 
 #+BEGIN_LaTeX
 %}
@@ -608,24 +609,24 @@ point. We note that the parser was unable to parse 4 sentences with
 the gold constraints.
 
 #+BEGIN_LaTeX
-\begin{table*}[tbp]
+\begin{table}[tbh]
 %\resizebox{12cm}{!}{
 #+END_LaTeX
 
 #+attr_latex: :center nil
-| SentLen | time(s) |   #edges |                      |   F_1 |       | #failed |
-|---------+---------+----------+----------------------+-------+-------+---------|
-|       0 |  1016.8 | 8.47e09 | \hspace{-1em} (48%)  | 86.71 | +0.86 |       4 |
-|      20 |  1054.6 | 8.90e09 | \hspace{-1em} (51%)  | 86.55 | +0.70 |       2 |
-|      30 |  1152.9 | 1.08e10 | \hspace{-1em} (62%)  | 86.33 | +0.48 |       0 |
-|      40 |  1344.4 | 1.39e10 | \hspace{-1em} (79%)  | 86.04 | +0.19 |       0 |
-|       ∞ |  1292.9 | 1.75e10 | \hspace{-1em} (100%) | 85.85 |       |       0 |
+| SentLen | Time (s) | # Edges                | F_1           | Parse Failures |
+|---------+----------+------------------------+---------------+----------------|
+|       0 |     1016 | 8.47\times10^09 (48%)  | 86.71 (+0.86) |              4 |
+|      20 |     1054 | 8.90\times10^09 (51%)  | 86.55 (+0.70) |              2 |
+|      30 |     1152 | 1.08\times10^10 (62%)  | 86.33 (+0.48) |              0 |
+|      40 |     1344 | 1.39\times10^10 (79%)  | 86.04 (+0.19) |              0 |
+|       ∞ |     1292 | 1.75\times10^10 (100%) | 85.85         |              0 |
 
 #+BEGIN_LaTeX
 %}
 \caption{Using the gold independent span boundaries halves the work done by the CKY algorithm while improving parse accuracy.}
 \label{tbl:parse-results-oracle}
-\end{table*}
+\end{table}
 #+END_LaTeX
 
 ** WSJ Section 23
