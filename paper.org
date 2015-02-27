@@ -1,6 +1,6 @@
 #+title: CKY Parsing With Independence Constraints
 #+author: Joseph Irwin
-#+OPTIONS: H:2 toc:nil _:{}
+#+OPTIONS: H:3 toc:nil _:{}
 #+LATEX_CLASS: acl2015
 #+LATEX_HEADER: \usepackage{forest}
 #+LATEX_HEADER: \DeclareMathOperator*{\argmin}{arg\,min}
