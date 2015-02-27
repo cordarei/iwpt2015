@@ -75,7 +75,7 @@ end up in different subtrees.
 
 An example is shown in Figure \ref{fig:independence}. Here, ‘This’ and
 ‘is’ are independent, as are ‘example’ and ‘.’. The independent spans
-are [‘This’], [‘is’, ‘an’, ‘example’], and [‘.’], with boundaries 1
+are (‘This’), (‘is’, ‘an’, ‘example’), and (‘.’), with boundaries 1
 and 4. The independent spans and independent span boundaries can be
 derived straightforwardly from the definition of independent words:
 the locations between consecutive words which are independent are the
@@ -135,8 +135,9 @@ efficient, the difference is probably minor.
 
 ** How much work can we expect to save?
 
-The number of times the CKY algorithm calculates the probability of each
-binary rule in the grammar is
+To parse a sentence of length $N$, the number of times the CKY
+algorithm calculates the probability of each binary rule in the
+grammar is
 
 #+BEGIN_LaTeX
 \begin{equation*}
@@ -147,8 +148,9 @@ binary rule in the grammar is
 The amount of work saved depends on the number and locations of the
 independent span boundaries. We can consider two idealized scenarios:
 one boundary at $\frac{N}{K}$, and $K-1$ boundaries at $\frac{N}{K},
-\frac{2N}{K}, \dots, \frac{(K-1)N}{K}$, where $N$ is the sentence
-length and $K$ is an integer $1 < K < N$.
+\frac{2N}{K}, \dots, \frac{(K-1)N}{K}$, where $K$ is an integer $1 < K
+< N$.
+
 # We can calculate the number
 # of rule updates saved as $|G_r|X$, where $X$ is the number of updates
 # which are not performed per non-synthetic rule and $|G_r|$ is the
@@ -556,6 +558,14 @@ kernel classifier in the parser as above, while acknowledging that at
 present the time needed to produce the classifier output dwarfs the
 time needed to actually parse the test data.
 
+The results of running the parser on section 22 with the polynomial
+classifier output are shown in table \ref{tbl:parse-results-poly}.
+With the more accurate classifier, the parser is able to reduce the
+necessary computation even further, by about 45%, while losing less
+accuracy. With a high-precision threshold, the computation of the CKY
+algorithm is reduced to less than 60% of the baseline, while losing
+less than half a point F_1 score.
+
 #+BEGIN_LaTeX
 \begin{table*}[tbp]
 %\resizebox{12cm}{!}{
@@ -590,14 +600,6 @@ time needed to actually parse the test data.
 \label{tbl:parse-results-poly}
 \end{table*}
 #+END_LaTeX
-
-The results of running the parser on section 22 with the polynomial
-classifier output are shown in table \ref{tbl:parse-results-poly}.
-With the more accurate classifier, the parser is able to reduce the
-necessary computation even further, by about 45%, while losing less
-accuracy. With a high-precision threshold, the computation of the CKY
-algorithm is reduced to less than 60% of the baseline, while losing
-less than half a point F_1 score.
 
 ** Gold Independent Span Boundaries
 
