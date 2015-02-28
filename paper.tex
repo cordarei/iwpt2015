@@ -435,7 +435,7 @@ the linear classifier in accuracy by 2\%, in precision by 3 points, and
 in recall by just over 13 points. This suggests that there is a large
 potential for improving the linear classifier by adding conjunctive
 features. Alternatively, there are methods for effectively linearizing
-a kernel-based classifier, e.g. \cite{Kudo2003,Isozaki2002}.
+a kernel-based classifier \cite{Kudo2003,Isozaki2002}.
 Currently, the polynomial classifier takes over 2 hours to run on
 section 22 (training the model took almost 4 days).
 
@@ -600,8 +600,8 @@ run in parallel, for these results only one process was run at a time.
  The results parallel those shown on the development data.
 
 \begin{center}
-\begin{tabular}{lrlrr}
-parser & time (s) &  & F$_{\text{1}}$ & \\
+\begin{tabular}{rc@{}lrr}
+Parser & Time (s) &  & F$_{\text{1}}$ & \\
 \hline
 baseline & 1538 &  & 85.54 & 0.00\\
 linear & 1106 & \texttimes{}1.39 & 83.55 & -1.99\\
