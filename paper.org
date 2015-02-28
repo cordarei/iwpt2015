@@ -1,5 +1,5 @@
 #+title: CKY Parsing With Independence Constraints
-#+author: Joseph Irwin
+#+author:
 #+OPTIONS: H:3 toc:nil _:{}
 #+LATEX_CLASS: acl2015
 #+LATEX_HEADER: \usepackage{forest}
@@ -11,31 +11,59 @@
 
 #+BEGIN_LaTeX
 \begin{abstract}
-We propose a novel property of words in a sentence, derived from a
-context-free derivation, and show how this property can be used to
-reduce the computation done by the CKY algorithm. We demonstrate a
+The CKY algorithm is an important component in many natural language
+parsers. We propose a novel type of constraint for context-free
+parsing called independence constraints. Based on the concept
+of independence between words, we show how these constraints can be
+used to reduce the work done in the CKY algorithm. We demonstrate a
 classifier which can be used to identify boundaries between
 independent words in a sentence using only surface features, and show
-that it can be used to speed up a CFG parser.
+that it can be used to speed up a CKY parser. We investigate the
+tradeoff between speed and accuracy, and indicate directions for
+improvement.
 \end{abstract}
 #+END_LaTeX
 
 * Introduction
 
-Syntactic parsing, in particular constituent parsing with context-free
-grammars extracted from treebanks, is used in a wide variety of tasks
-and applications. The CKY algorithm often appears as the whole or a part
-of the implementation of CFG parsers and of so-called “deep” parsers.
-Although CKY with a small grammar may be cheap in comparison to a later
-step, it may be difficult to assert that it is “fast enough.” To that
-end, various approaches to reducing the computation done by the CKY
-algorithm by compromising on exhaustiveness and/or exactness have been
-explored.
+# Syntactic parsing, in particular constituent parsing with context-free
+# grammars extracted from treebanks, is used in a wide variety of tasks
+# and applications. The CKY algorithm often appears as the whole or a part
+# of the implementation of CFG parsers and of so-called “deep” parsers.
+# Although CKY with a small grammar may be cheap in comparison to a later
+# step, it may be difficult to assert that it is “fast enough.” To that
+# end, various approaches to reducing the computation done by the CKY
+# algorithm by compromising on exhaustiveness and/or exactness have been
+# explored.
 
-It is possible to add various kinds of constraints without altering
-the basic CKY algorithm. These mostly involve deciding beforehand
-whether or not a certain span or kind of span can or cannot exist in
-the chart.
+# It is possible to add various kinds of constraints without altering
+# the basic CKY algorithm. These mostly involve deciding beforehand
+# whether or not a certain span or kind of span can or cannot exist in
+# the chart.
+
+The CKY algorithm (TK) is a \BigO(|G|n^3) dynamic programming
+algorithm for finding all of the possible derivations of a sentence in
+a context-free language. Its complexity depends on both the sentence
+length $n$ and the size of the grammar $|G|$. Methods for improving
+parse accuracy typically increase the size of the grammar (TK
+berkeley, stanford) or even the exponent of $n$ (TK lex parsers). 
+More powerful “deep” grammar formalisms multiply the computational
+complexity even more TK.
+
+A common technique for speeding up such parsers is coarse-to-fine
+parsing, where input is first parsed using a much simpler (and thus
+smaller) grammar, and the content of the chart is then used to
+constrain the search over the final grammar (TK charn,berk,stan factpar,hpsg).
+Even with a much smaller grammar, the CKY algorithm may be expensive—
+Roark et al. (2012) report that the initial CKY step in the Berkeley
+Parser takes half of the total parse time.
+
+Other techniques can be used to prune cells in the chart. Roark et al.
+(2012) use a finite-state model to label words that do/don’t begin/end
+spans, and skip cells that don’t satisfy the labels. Bodenstab et al.
+(2011) directly apply a classifier to each cell to decide how many
+spans to keep. Both approaches reduce the work done by the parser
+while preserving accuracy.
 
 We propose a novel type of top-down constraint for a CFG parser that
 we call independence constraints, described in Section 2. In Section 3
@@ -45,16 +73,6 @@ provide the constraints to a parser. We integrate the constraints into
 the Stanford Parser CKY implementation and show the results in Section 5.
 
 * Independence Constraints
-
-We propose a concept we call *independence*. Given a sentence $s = w_1
-w_2 \dots w_n$ and a context-free derivation (parse tree) $t$ of $s$,
-$w_i$ and $w_{i+1}$ are *independent* if every node in $t$ that
-dominates both $w_i$ and $w_{i+1}$ also dominates $w_1$ and $w_n$.
-Furthermore, if $w_i$ and $w_{i+1}$ are independent, then $\forall
-j,k$ s.t. $j \leq i$ and $k > i$, $w_j$ and $w_k$ are independent.
-Less formally, if the children of the top node of a parse tree are
-split into separate subtrees, two words are independent if they would
-end up in different subtrees.
 
 #+BEGIN_LaTeX
 \begin{figure}
@@ -72,6 +90,16 @@ end up in different subtrees.
 \label{fig:independence}
 \end{figure}
 #+END_LaTeX
+
+We propose a concept we call *independence*. Given a sentence $s = w_1
+w_2 \dots w_n$ and a context-free derivation (parse tree) $t$ of $s$,
+words $w_i$ and $w_{i+1}$ are *independent* if every node in $t$ that
+dominates both $w_i$ and $w_{i+1}$ also dominates $w_1$ and $w_n$.
+Furthermore, if $w_i$ and $w_{i+1}$ are independent, then $\forall
+j,k$ s.t. $j \leq i$ and $k > i$, $w_j$ and $w_k$ are independent.
+Less formally, if the children of the top node of a parse tree were
+split into separate subtrees, two words are independent if they would
+end up in different subtrees.
 
 An example is shown in Figure \ref{fig:independence}. Here, ‘This’ and
 ‘is’ are independent, as are ‘example’ and ‘.’. The independent spans
