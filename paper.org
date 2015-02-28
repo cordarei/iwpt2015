@@ -231,35 +231,24 @@ recall.
 #+END_LaTeX
 
 #+attr_latex: :center nil
-| Features                     | #feats |     Acc |    Prec |     Rec |   F_{1} | F_{0.5} |   TP |   FP |   FN |    TN |
-|------------------------------+--------+---------+---------+---------+---------+---------+------+------+------+-------|
-| p                            |  37001 |   93.71 |   80.73 |   70.49 |   75.27 |   78.45 | 3679 |  878 | 1540 | 32320 |
-| P_{0}                        |  33167 |   87.16 |   51.69 |   83.98 |   63.99 |   55.99 | 4383 | 4097 |  836 | 29101 |
-|------------------------------+--------+---------+---------+---------+---------+---------+------+------+------+-------|
-| p,P_{0}                      |  70168 |   95.21 |   87.38 |   75.65 |   81.09 |   84.75 | 3948 |  570 | 1271 | 32628 |
-| p,P_{0},P_{1}                |  70222 | *95.48* |   88.95 |   76.16 |   82.06 | *86.06* | 3975 |  494 | 1244 | 32704 |
-| p,P_{0},P_{1f}               |  70210 |   95.39 |   89.25 |   75.11 |   81.57 |   86.01 | 3920 |  472 | 1299 | 32726 |
-| p,P_{0},P_{1s}               |  70180 |   95.33 |   88.79 |   75.13 |   81.39 |   85.67 | 3921 |  495 | 1298 | 32703 |
-| p,P_{0},P_{2}                |  72503 |   95.09 |   88.28 |   73.60 |   80.27 |   84.89 | 3841 |  510 | 1378 | 32688 |
-| p,P_{0},P_{3}                |  80028 |   94.84 |   88.81 |   70.99 |   78.91 |   84.56 | 3705 |  467 | 1514 | 32731 |
-|------------------------------+--------+---------+---------+---------+---------+---------+------+------+------+-------|
-| p,P_{0},P_{1},P_{2},P_{3}    |  82417 |   95.35 |   86.89 |   77.49 |   81.92 |   84.83 | 4044 |  610 | 1175 | 32588 |
-| p,P_{0},P_{1f},P_{2f},P_{3f} |  76830 |   95.06 |   89.36 |   72.26 |   79.90 |   85.32 | 3771 |  449 | 1448 | 32749 |
-| p,P_{0},P_{1s},P_{2s},P_{3s} |  75755 |   95.21 |   88.17 |   74.80 |   80.94 |   85.12 | 3904 |  524 | 1315 | 32674 |
-|------------------------------+--------+---------+---------+---------+---------+---------+------+------+------+-------|
-| p,P_{1}                      |  37055 |   94.81 |   78.38 | *85.38* |   81.73 |   79.69 | 4456 | 1229 |  763 | 31969 |
-| p,P_{1f}                     |  37043 |   94.68 |   78.37 |   84.06 |   81.11 |   79.44 | 4387 | 1211 |  832 | 31987 |
-| p,P_{1s}                     |  37013 |   94.08 |   84.50 |   69.13 |   76.05 |   80.90 | 3608 |  662 | 1611 | 32536 |
-| p,P_{1},P_{2}                |  39390 |   95.27 |   80.99 |   85.21 | *83.04* |   81.80 | 4447 | 1044 |  772 | 32154 |
-| p,P_{1s},P_{3s}              |  41553 | *95.44* |   89.05 |   75.74 |   81.86 | *86.03* | 3953 |  486 | 1266 | 32712 |
-|------------------------------+--------+---------+---------+---------+---------+---------+------+------+------+-------|
-| p,P_{2}                      |  39336 |   95.34 |   84.25 |   80.76 |   82.47 |   83.53 | 4215 |  788 | 1004 | 32410 |
-| p,P_{2f}                     |  38301 |   95.35 |   83.79 |   81.59 |   82.67 |   83.34 | 4258 |  824 |  961 | 32374 |
-| p,P_{2s}                     |  38036 |   95.43 |   89.04 |   75.65 |   81.80 |   85.99 | 3948 |  486 | 1271 | 32712 |
-|------------------------------+--------+---------+---------+---------+---------+---------+------+------+------+-------|
-| p,P_{3}                      |  46861 |   95.04 |   89.47 |   71.95 |   79.76 |   85.31 | 3755 |  442 | 1464 | 32756 |
-| p,P_{3f}                     |  42321 |   94.99 | *90.49* |   70.55 |   79.29 |   85.65 | 3682 |  387 | 1537 | 32811 |
-| p,P_{3s}                     |  41541 |   95.20 |   90.13 |   72.62 |   80.43 |   85.98 | 3790 |  415 | 1429 | 32783 |
+| Features                  | #feats |     Acc |  Prec |     Rec |   F_{1} | F_{0.5} |   TP |   FP |   FN |    TN |
+|---------------------------+--------+---------+-------+---------+---------+---------+------+------+------+-------|
+| p                         |  37001 |   93.71 | 80.73 |   70.49 |   75.27 |   78.45 | 3679 |  878 | 1540 | 32320 |
+| P_{0}                     |  33167 |   87.16 | 51.69 |   83.98 |   63.99 |   55.99 | 4383 | 4097 |  836 | 29101 |
+|---------------------------+--------+---------+-------+---------+---------+---------+------+------+------+-------|
+| p,P_{0}                   |  70168 |   95.21 | 87.38 |   75.65 |   81.09 |   84.75 | 3948 |  570 | 1271 | 32628 |
+| p,P_{1}                   |  37055 |   94.81 | 78.38 | *85.38* |   81.73 |   79.69 | 4456 | 1229 |  763 | 31969 |
+| p,P_{2}                   |  39336 |   95.34 | 84.25 |   80.76 |   82.47 |   83.53 | 4215 |  788 | 1004 | 32410 |
+| p,P_{3}                   |  46861 |   95.04 | 89.47 |   71.95 |   79.76 |   85.31 | 3755 |  442 | 1464 | 32756 |
+|---------------------------+--------+---------+-------+---------+---------+---------+------+------+------+-------|
+| p,P_{0},P_{1}             |  70222 | *95.48* | 88.95 |   76.16 |   82.06 | *86.06* | 3975 |  494 | 1244 | 32704 |
+| p,P_{0},P_{2}             |  72503 |   95.09 | 88.28 |   73.60 |   80.27 |   84.89 | 3841 |  510 | 1378 | 32688 |
+| p,P_{0},P_{3}             |  80028 |   94.84 | 88.81 |   70.99 |   78.91 |   84.56 | 3705 |  467 | 1514 | 32731 |
+|---------------------------+--------+---------+-------+---------+---------+---------+------+------+------+-------|
+| p,P_{1},P_{2}             |  39390 |   95.27 | 80.99 |   85.21 | *83.04* |   81.80 | 4447 | 1044 |  772 | 32154 |
+| p,P_{1},P_{3}             |  41553 | *95.44* | 89.05 |   75.74 |   81.86 | *86.03* | 3953 |  486 | 1266 | 32712 |
+|---------------------------+--------+---------+-------+---------+---------+---------+------+------+------+-------|
+| p,P_{0},P_{1},P_{2},P_{3} |  82417 |   95.35 | 86.89 |   77.49 |   81.92 |   84.83 | 4044 |  610 | 1175 | 32588 |
 
 #+BEGIN_LaTeX
 %}
@@ -350,12 +339,7 @@ to the original POS tags as level 0.
 
 We show all levels in Table \ref{tbl:pos-level}. Each level specifies
 a value by which each level 0 tag is replaced during the
-transformation. Each transformation has three variations: 's', where
-'X's are removed from the sequence prior to extracting n-gram
-features; 'f', where they are not; and the default variation which
-creates features from both.
-
-The motivation behind each transformation is roughly as follows: level
+transformation. The motivation behind each transformation is roughly as follows: level
 1 is meant to capture clause nuclei; level 2 is further intended to
 show boundaries between clauses; and level 3 expands almost all the
 way back to the original tags, but with some distinctions erased,
@@ -368,21 +352,18 @@ classifier, and to evaluate the proposed POS levels, we tested the
 classifier using several different combinations. Selected results are
 shown in Table \ref{tbl:feature-evaluation}. In the "Features" column,
 $p$ denotes the local features, and $P_{l}$ denotes the global
-features from POS level $l$. The 's' and 'f' after the number
-indicates a variation which includes ('f') or excludes ('s') the 'X'
-tags before taking the n-grams; absence of 's' or 'f' means both types
-are created.
+features from POS level $l$. 
 
 There are several things worth noting in these results. First, neither
 local nor global features are sufficient alone; it appears that local
 features promote precision, while global features promote recall.
 Second, examining the cases where global features are limited to a
-single POS level, it is apparent that each POS level (and 's'/'f'
-variant) has a different effect on precision and recall, thus
-confirming that the classifier is able to extract different signals
-from the different POS levels, as intended. Finally, combining all POS
-levels together actually reduces accuracy, likely due to overfitting
-(although see the discussion of the kernel classifier).
+single POS level, it is apparent that each POS level has a different
+effect on precision and recall, thus confirming that the classifier is
+able to extract different signals from the different POS levels, as
+intended. Finally, combining all POS levels together actually reduces
+accuracy, likely due to overfitting (although see the discussion of
+the kernel classifier).
 
 ** Results
 
@@ -392,12 +373,12 @@ levels together actually reduces accuracy, likely due to overfitting
 #+END_LaTeX
 
 #+attr_latex: :center nil
-| Features        | Threshold     |   Acc |  Prec |   Rec | F_{1} | F_{0.5} |   TP |   FP |   FN |    TN |
-|-----------------+---------------+-------+-------+-------+-------+---------+------+------+------+-------|
-| p,P_{1s},P_{3s} | default       | 95.44 | 89.05 | 75.74 | 81.86 |   86.03 | 3953 |  486 | 1266 | 32712 |
-| p,P_{1s},P_{3s} | precision     | 94.99 | 91.65 | 69.44 | 79.01 |   86.14 | 3624 |  330 | 1595 | 32868 |
-| p,P_{1s},P_{3s} | max precision | 92.10 | 95.80 | 43.74 | 60.06 |   77.38 | 2283 |  100 | 2936 | 33098 |
-| p,P_{1s},P_{3s} | recall        | 94.28 | 73.82 | 89.65 | 80.97 |   76.53 | 4679 | 1659 |  540 | 31539 |
+| Features      | Threshold     |   Acc |  Prec |   Rec | F_{1} | F_{0.5} |   TP |   FP |   FN |    TN |
+|---------------+---------------+-------+-------+-------+-------+---------+------+------+------+-------|
+| p,P_{1},P_{3} | default       | 95.44 | 89.05 | 75.74 | 81.86 |   86.03 | 3953 |  486 | 1266 | 32712 |
+| p,P_{1},P_{3} | precision     | 94.99 | 91.65 | 69.44 | 79.01 |   86.14 | 3624 |  330 | 1595 | 32868 |
+| p,P_{1},P_{3} | max precision | 92.10 | 95.80 | 43.74 | 60.06 |   77.38 | 2283 |  100 | 2936 | 33098 |
+| p,P_{1},P_{3} | recall        | 94.28 | 73.82 | 89.65 | 80.97 |   76.53 | 4679 | 1659 |  540 | 31539 |
 
 #+BEGIN_LaTeX
 %}
@@ -407,7 +388,7 @@ levels together actually reduces accuracy, likely due to overfitting
 #+END_LaTeX
 
 \label{sec:linear-classifier}
-For use as input to the parser, we select the $p,P_{1s},P_{3s}$
+For use as input to the parser, we select the $p,P_{1},P_{3}$
 feature configuration, and show more detailed results in
 Table \ref{tbl:classifier-results-linear}. We used a threshold on the
 score output by the classifier to reverse some of the classifier's
@@ -600,36 +581,37 @@ less than half a point F_1 score.
 \end{table*}
 #+END_LaTeX
 
-** Gold Independent Span Boundaries
 
-For another comparison, we tested the parser using the gold
-independent span boundaries. The results for section 22 are shown in
-Table \ref{tbl:parse-results-oracle}. The number of binary edges
-visited is cut in half, and parse accuracy is improved by almost 1
-point. We note that the parser was unable to parse 4 sentences with
-the gold constraints.
+# ** Gold Independent Span Boundaries
 
-#+BEGIN_LaTeX
-\begin{table}[tbp]
-%\resizebox{12cm}{!}{
-#+END_LaTeX
+# For another comparison, we tested the parser using the gold
+# independent span boundaries. The results for section 22 are shown in
+# Table \ref{tbl:parse-results-oracle}. The number of binary edges
+# visited is cut in half, and parse accuracy is improved by almost 1
+# point. We note that the parser was unable to parse 4 sentences with
+# the gold constraints.
 
-#+attr_latex: :center nil
-|         |          |                        |               |    Parse |
-| SentLen | Time (s) | # Edges                | F_1           | Failures |
-|---------+----------+------------------------+---------------+----------|
-|       0 |     1016 | 8.47\times10^09 (48%)  | 86.71 (+0.86) |        4 |
-|      20 |     1054 | 8.90\times10^09 (51%)  | 86.55 (+0.70) |        2 |
-|      30 |     1152 | 1.08\times10^10 (62%)  | 86.33 (+0.48) |        0 |
-|      40 |     1344 | 1.39\times10^10 (79%)  | 86.04 (+0.19) |        0 |
-|       ∞ |     1292 | 1.75\times10^10 (100%) | 85.85         |        0 |
+# #+BEGIN_LaTeX
+# \begin{table}[tbp]
+# %\resizebox{12cm}{!}{
+# #+END_LaTeX
 
-#+BEGIN_LaTeX
-%}
-\caption{Using the gold independent span boundaries halves the work done by the CKY algorithm while improving parse accuracy.}
-\label{tbl:parse-results-oracle}
-\end{table}
-#+END_LaTeX
+# #+attr_latex: :center nil
+# |         |          |                        |               |    Parse |
+# | SentLen | Time (s) | # Edges                | F_1           | Failures |
+# |---------+----------+------------------------+---------------+----------|
+# |       0 |     1016 | 8.47\times10^09 (48%)  | 86.71 (+0.86) |        4 |
+# |      20 |     1054 | 8.90\times10^09 (51%)  | 86.55 (+0.70) |        2 |
+# |      30 |     1152 | 1.08\times10^10 (62%)  | 86.33 (+0.48) |        0 |
+# |      40 |     1344 | 1.39\times10^10 (79%)  | 86.04 (+0.19) |        0 |
+# |       ∞ |     1292 | 1.75\times10^10 (100%) | 85.85         |        0 |
+
+# #+BEGIN_LaTeX
+# %}
+# \caption{Using the gold independent span boundaries halves the work done by the CKY algorithm while improving parse accuracy.}
+# \label{tbl:parse-results-oracle}
+# \end{table}
+# #+END_LaTeX
 
 ** WSJ Section 23
 
@@ -641,7 +623,7 @@ was significant variation in parse time when multiple processes were
 run in parallel, for these results only one process was run at a time.
  The results parallel those shown on the development data.
 
-| parser   | time (s) |            |   F_1 |       |
+| Parser   | Time (s) |            |   F_1 |       |
 |----------+----------+------------+-------+-------|
 | baseline |     1538 |            | 85.54 |  0.00 |
 | linear   |     1106 | \times1.39 | 83.55 | -1.99 |
@@ -654,15 +636,18 @@ the CKY chart. \cite{Roark2012} describes an approach using
 finite-state taggers to decide whether each word in a sentence begins
 or ends a multiword constituent and has a unary span or not. They show
 that their tagger is able to achieve very high precision, reducing
-parse time without negatively affecting accuracy (in fact, they report
-a slight increase). Our approach is also a pipelined approach with a
-classifier that makes a linear number of decisions per sentence;
-however, each decision is made independently, and requires global
-information to achieve high accuracy.
+parse time without negatively affecting accuracy.
 
 \cite{Bodenstab2011} proposes a classifier which directly decides for
 each cell in the chart how many constituents should be created. Their
 parser uses beam search with a FOM and a beam for each chart cell.
+
+Like these approaches, our method uses a classifier to avoid doing
+work in certain chart cells. While not completely orthogonal, we
+believe our independence constraints are complementary. A single
+decision by our classifier closes a large swath of cells based on the
+global structure, while their methods make local decision using local
+information.
 
 \cite{Yarmohammadi2014} proposes a concept of 'hedge' parsing, where
 only spans below a certain length are allowed, and show how this
@@ -691,11 +676,12 @@ results.
 
 Although the loss of accuracy when using the linear classifier is
 currently uncomfortably large, the performance of the kernel
-classifier indicates that there is room for improvement by manually
-adding conjunctive features to the linear classifier. Features based
-on words as well as POS tags may also be beneficial. However, the
-current approach has several weaknesses which should be addressed by
-future research.
+classifier indicates that there is room for improvement, either by
+manually adding conjunctive features to the linear classifier or using
+a method to automatically linearize the model. Features based on words
+as well as POS tags may also be beneficial. However, the current
+approach has several weaknesses which should be addressed by future
+research.
 
 First, the top-down nature of the independence constraints does not
 make a natural fit with the bottom-up CKY algorithm. In particular,
@@ -707,6 +693,8 @@ it is prevented from completing such a span.
 Second, the pipelined nature of the classifier means that it only has
 access to POS tags and in particular is not able to make use of
 information generated as the parser processes lower-level spans.
+Tighter integration of the classifier into the parser may be
+beneficial to both.
 
 Third, the current classifier combines instances from different
 syntactic structures into a single model. It is possible that training
