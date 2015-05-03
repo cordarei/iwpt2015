@@ -41,7 +41,7 @@ improvement.
 # whether or not a certain span or kind of span can or cannot exist in
 # the chart.
 
-The CKY algorithm is a \BigO{|G|n^3} dynamic programming
+The CKY algorithm is an \BigO{|G|n^3} dynamic programming
 algorithm for finding all of the possible derivations of a sentence in
 a context-free language. Its complexity depends on both the sentence
 length $n$ and the size of the grammar $|G|$. Methods for improving
@@ -68,7 +68,7 @@ while preserving accuracy.
 
 We propose a novel type of top-down constraint for a CFG parser that
 we call independence constraints, described in Section 2. In Section 3
-we show how the CKY algorithm can be easily modified to accomodate
+we show how the CKY algorithm can be easily modified to accommodate
 these constraints, and in Section 4 we describe a classifier which can
 provide the constraints to a parser. We integrate the constraints into
 the Stanford Parser CKY implementation and show the results in Section 5.
