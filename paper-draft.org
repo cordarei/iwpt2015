@@ -416,6 +416,18 @@ F_{0.5}, a measure which favors precision over recall.
 \end{table*}
 #+END_LaTeX
 
+** Efficiency of the Classifier
+
+The efficiency of the classifier is as important as the accuracy---it doesn't
+matter how much time is saved during parsing if it takes even longer to run the
+classifier. =opal= takes less than half a second to run on the instances from
+section 22; however, the instances are created by a Python script, which is not
+very optimized. This script takes about 100 seconds to run. While this time is
+already less than the time saved in the parser (see Section
+\ref{sec:parse-results}), it could be significantly reduced by reimplementing in
+Java or even C++. Thus the potential gains offered by this approach are not just
+theoretical.
+
 ** Polynomial Kernel
 
 \label{sec:poly-classifier} For comparison with the linear classifier,
@@ -454,13 +466,10 @@ are:
 
 ** Experimental Setup
 
-We use the modified Stanford Parser described above, with a grammar
-extracted from the WSJ sections 02-21, and evaluate its performance on
-section 22 using output from the clasifier as constraints. We vary the
-threshold on the probability output by the classifier, and further
-experiment with restricting the constraints to sentences above a
-certain length. Finally, to compare with previous results we run the
-classifier and parser on section 23 in a single configuration.
+We used the modified Stanford Parser described above, with an unlexicalized
+grammar[1] extracted from the WSJ sections 02-21, and evaluated its performance
+on section 22 using output from the clasifier as constraints. For the baseline,
+the parser was given null constraints.
 
 All experiments were run on a DELL Precision 690, with 8 cores and 32G
 of RAM. Unless otherwise noted multiple processes were run in
@@ -471,7 +480,10 @@ is measured in the number of binary edges visited in the inner loop. A
 binary edge is a tuple of a span (begin & end), a binary rule $A →
 BC$, and a split point (the position where $B$ and $C$ meet).
 
+[1] The grammar was extracted using the Stanford Parser with command-line options =-acl03pcfg -noRebinarization -compactGrammar 1=
+
 ** Results
+\label{sec:parse-results}
 
 #+BEGIN_LaTeX
 \begin{table*}[tbp]
@@ -479,52 +491,30 @@ BC$, and a split point (the position where $B$ and $C$ meet).
 #+END_LaTeX
 
 #+attr_latex: :center nil
-| SentLen | Constraints   | Time (s) | # Edges                | F_1           | Parse Failures |
-|---------+---------------+----------+------------------------+---------------+----------------|
-|       0 | default       |     1283 | 1.08\times10^10 (62%)  | 83.71 (-2.14) |             15 |
-|       0 | precision     |     1143 | 1.13\times10^10 (65%)  | 84.05 (-1.80) |              7 |
-|       0 | max precision |     1384 | 1.42\times10^10 (81%)  | 85.55 (-0.30) |              2 |
-|       0 | recall        |     1024 | 7.80\times10^09 (45%)  | 78.74 (-7.11) |            136 |
-|      20 | default       |     1126 | 1.12\times10^10 (64%)  | 84.17 (-1.68) |              9 |
-|      20 | precision     |     1313 | 1.16\times10^10 (66%)  | 84.43 (-1.42) |              4 |
-|      20 | max precision |     1338 | 1.44\times10^10 (82%)  | 85.59 (-0.26) |              2 |
-|      20 | recall        |     1121 | 8.24\times10^09 (47%)  | 80.38 (-5.47) |            103 |
-|      30 | default       |     1312 | 1.28\times10^10 (73%)  | 84.82 (-1.03) |              3 |
-|      30 | precision     |     1279 | 1.31\times10^10 (75%)  | 85.01 (-0.84) |              1 |
-|      30 | max precision |     1485 | 1.53\times10^10 (87%)  | 85.63 (-0.22) |              1 |
-|      30 | recall        |     1140 | 1.02\times10^10 (58%)  | 82.79 (-3.06) |             57 |
-|      40 | default       |     1476 | 1.51\times10^10 (86%)  | 85.56 (-0.29) |              1 |
-|      40 | precision     |     1390 | 1.52\times10^10 (87%)  | 85.59 (-0.26) |              0 |
-|      40 | max precision |     1513 | 1.65\times10^10 (94%)  | 85.75 (-0.10) |              0 |
-|      40 | recall        |     1403 | 1.33\times10^10 (76%)  | 84.65 (-1.20) |             14 |
-|---------+---------------+----------+------------------------+---------------+----------------|
-|       ∞ | baseline      |     1558 | 1.75\times10^10 (100%) | 85.85         |              0 |
-#+TBLFM: $3=$0;%.2e::$6=$5-85.85;p4%.2f
+| Parser   | Time (s)    | Speedup             | # Binary Edges         | F_1            | Parse Failures |
+|----------+-------------+---------------------+------------------------+----------------+----------------|
+| baseline | 1558        | -                   | 1.75\times10^10 (100%) | 85.85          |              0 |
+| linear   | 1283 (+100) | \times{}1.21 (1.12) | 1.08\times10^10 (62%)  | 83.71 (-2.14)  |             15 |
+| poly     | 1106 (+2h)  | \times{}1.41 (-)    | 9.74\times10^09 (56%)  | 84.85 (-1.00)  |              6 |
+| oracle   | 1016        | \times{}1.53 (-)    | 8.47\times10^09 (48%)  | 86.71 (\+0.86) |              4 |
 
 #+BEGIN_LaTeX
 %}
-\caption{Independence constraints reduce the work done by the CKY algorithm, trading off accuracy.}
-\label{tbl:parse-results-linear}
+\caption{Results of parsing with independence constraints. Results for both linear and polynomial classifiers are shown, as well as
+for the gold independent span boundaries. The times in parentheses are the classifier run times.}
+\label{tbl:parse-results}
 \end{table*}
 #+END_LaTeX
 
-The results of running the parser on section 22 using the linear
-classifier from Section \ref{sec:linear-classifier} are shown in
-Table \ref{tbl:parse-results-linear}. The table shows the total time
-taken, the total times entering the inner loop, the F_1 and difference
-from the baseline, and the number of times the parse failed using the
-constraints. The baseline consisted of the same parser with the
-sentence length threshold set to 1000. The time includes the time
-spent reading in the constraints but not the time taken by the
-classifier.
-
-The parser with the independence constraints saves 35-38%
-of the computation inside the CKY loop over the baseline,
-corresponding to about 20% reduction in total time, at the cost of a
-2-point drop in F-score. After increasing recall by making negative
-instances for which the classifier assigned a low probability positive,
-the parser reduced the work done inside the loop to less than half the
-baseline, but accuracy also plummeted by 7 points.
+The results of running the parser on section 22 using the linear classifier from
+Section \ref{sec:linear-classifier} are shown in Table
+\ref{tbl:parse-results-linear}. The table shows the total time taken, the total
+times entering the inner loop, the F_1 and difference from the baseline, and the
+number of times the parse failed using the constraints. The parser with
+independence constraints saves 38% of the computation inside the CKY loop over
+the baseline, corresponding to about 20% reduction in total parse time (10% if
+the running time of the classifier is included), at the cost of a 2-point drop
+in F-score.
 
 ** Polynomial Kernel
 
@@ -538,13 +528,151 @@ kernel classifier in the parser as above, while acknowledging that at
 present the time needed to produce the classifier output dwarfs the
 time needed to actually parse the test data.
 
-The results of running the parser on section 22 with the polynomial
-classifier output are shown in Table \ref{tbl:parse-results-poly}.
-With the more accurate classifier, the parser is able to reduce the
-necessary computation even further, by about 45%, while losing less
-accuracy. With a high-precision threshold, the computation of the CKY
-algorithm is reduced to less than 60% of the baseline, while losing
-less than half a point F_1 score.
+The results of running the parser on section 22 with the polynomial classifier
+output are shown with the previous results in Table \ref{tbl:parse-results}.
+With the more accurate classifier, the parser is able to reduce the necessary
+computation even further, by 44%, while losing less accuracy. 
+
+** Gold Independent Span Boundaries
+
+For another comparison, we tested the parser using the gold independent span
+boundaries. The results for section 22 are shown in Table
+\ref{tbl:parse-results}. The number of binary edges visited is cut in half, and
+parse accuracy is improved by almost 1 point. It is interesting to note that the
+parser was unable to parse 4 sentences with the gold constraints (the grammar
+only allowed a parse that violated the gold boundaries).
+
+
+** WSJ Section 23
+
+To compare with previous work on parsing using the Penn Treebank, we show the
+time and accuracy for parsing section 23, using both linear and kernel
+classifier output, along with the baseline parser, below. The times reported are
+the average of three runs each. Because there was significant variation in parse
+time when multiple processes were run in parallel, for these results only one
+process was run at a time. The results parallel those shown on the development
+data.
+
+| Parser   | Time (s) |            |   F_1 |       |
+|----------+----------+------------+-------+-------|
+| baseline |     1538 |            | 85.54 |  0.00 |
+| linear   |     1106 | \times1.39 | 83.55 | -1.99 |
+| poly     |     1040 | \times1.48 | 84.57 | -0.97 |
+
+As a point of comparison, Roark et al. (2012) reported speedups of 1.6-2x with
+no loss of accuracy. These results are not directly comparable due to
+differences in parser (their parsers use beam search variants of CYK and
+coarse-to-fine pruning) and grammar (the Berkeley latent variable grammar and a
+lexicalized grammar).
+
+* Related Work
+
+There are several strains of research related to adding constraints to
+the CKY chart. \cite{Roark2012} describes an approach using
+finite-state taggers to decide whether each word in a sentence begins
+or ends a multiword constituent and has a unary span or not. They show
+that their tagger is able to achieve very high precision, reducing
+parse time without negatively affecting accuracy.
+
+\cite{Bodenstab2011} proposes a classifier which directly decides for
+each cell in the chart how many constituents should be created. Their
+parser uses beam search with a FOM and a beam for each chart cell.
+
+Like these approaches, our method uses a classifier to avoid doing
+work in certain chart cells. While not completely orthogonal, we
+believe our independence constraints are complementary. A single
+decision by our classifier closes a large swath of cells based on the
+global structure, while their methods make local decision using local
+information. The high accuracy of their classifiers shows the necessity
+of improving our model.
+
+\cite{Yarmohammadi2014} proposes a concept of `hedge' parsing, where only spans
+below a certain length are allowed, and show how this reduces the computation
+done by the CKY algorithm. Their system does not create spans of length larger
+than the threshold and thus doesn't follow the original treebank annotation,
+while our approach is able to return the original gold parse tree, provided that
+the classifier does not output a false positive. Their approach of segmenting a
+sentence before parsing is essentially the same as ours, but they segment based
+on a maximum span length and their classifier is based on a finite-state
+sequence model.
+
+* Conclusions
+
+We have proposed a property of *independence* between words in a
+sentence, and shown how to use this property to create top-down
+constraints which can be used to reduce the computation done by the
+CKY algorithm. We demonstrated two classifiers for identifying
+boundaries between independent words given a sentence with only
+surface features, a linear classifier which is fast but less accurate,
+and a classifier with a polynomial kernel which is much more accurate
+but very slow. We then showed that a widely-used CKY parser can be
+made faster by using the output of these classifiers to create
+top-down constraints at the cost of some accuracy.
+
+Although the loss of accuracy when using the linear classifier is currently
+uncomfortably large, there are several possible avenues for improvement. The
+performance of the kernel classifier indicates that there is room for
+improvement by manually adding conjunctive features to the linear classifier or
+using a method to automatically linearize the model. Features based on words as
+well as POS tags may also be beneficial. Changing the model itself to, e.g., a
+sequence model might also help. However, the current approach has several
+weaknesses which should be addressed by future research.
+
+First, the top-down nature of the independence constraints does not
+make a natural fit with the bottom-up CKY algorithm. In particular,
+the binary nature of the rules in the grammar combined with the
+bottom-up search means that the parser still ends up doing some
+computation to create spans which violate the constraints, even though
+it is prevented from completing such a span.
+
+Second, the pipelined nature of the classifier means that it only has
+access to POS tags and in particular is not able to make use of
+information generated as the parser processes lower-level spans.
+Tighter integration of the classifier into the parser may be
+beneficial to both.
+
+Third, the current classifier combines instances from different
+syntactic structures into a single model. It is possible that training
+multiple models on different types of sentences would result in a
+better classifier.
+
+* Appendix
+
+#+BEGIN_LaTeX
+\begin{table*}[tbp]
+%\resizebox{12cm}{!}{
+#+END_LaTeX
+
+#+attr_latex: :center nil
+| SentLen | Constraints   | Time (s) | # Edges                | F_1            | Parse Failures |
+|---------+---------------+----------+------------------------+----------------+----------------|
+|       0 | default       |     1283 | 1.08\times10^10 (62%)  | 83.71 (-2.14)  |             15 |
+|       0 | precision     |     1143 | 1.13\times10^10 (65%)  | 84.05 (-1.80)  |              7 |
+|       0 | max precision |     1384 | 1.42\times10^10 (81%)  | 85.55 (-0.30)  |              2 |
+|       0 | recall        |     1024 | 7.80\times10^09 (45%)  | 78.74 (-7.11)  |            136 |
+|      20 | default       |     1126 | 1.12\times10^10 (64%)  | 84.17 (-1.68)  |              9 |
+|      20 | precision     |     1313 | 1.16\times10^10 (66%)  | 84.43 (-1.42)  |              4 |
+|      20 | max precision |     1338 | 1.44\times10^10 (82%)  | 85.59 (-0.26)  |              2 |
+|      20 | recall        |     1121 | 8.24\times10^09 (47%)  | 80.38 (-5.47)  |            103 |
+|      30 | default       |     1312 | 1.28\times10^10 (73%)  | 84.82 (-1.03)  |              3 |
+|      30 | precision     |     1279 | 1.31\times10^10 (75%)  | 85.01 (-0.84)  |              1 |
+|      30 | max precision |     1485 | 1.53\times10^10 (87%)  | 85.63 (-0.22)  |              1 |
+|      30 | recall        |     1140 | 1.02\times10^10 (58%)  | 82.79 (-3.06)  |             57 |
+|      40 | default       |     1476 | 1.51\times10^10 (86%)  | 85.56 (-0.29)  |              1 |
+|      40 | precision     |     1390 | 1.52\times10^10 (87%)  | 85.59 (-0.26)  |              0 |
+|      40 | max precision |     1513 | 1.65\times10^10 (94%)  | 85.75 (-0.10)  |              0 |
+|      40 | recall        |     1403 | 1.33\times10^10 (76%)  | 84.65 (-1.20)  |             14 |
+|---------+---------------+----------+------------------------+----------------+----------------|
+|       0 | oracle        |     1016 | 8.47\times10^09 (48%)  | 86.71 (\+0.86) |              4 |
+|---------+---------------+----------+------------------------+----------------+----------------|
+|      ∞ | baseline      |     1558 | 1.75\times10^10 (100%) | 85.85          |              0 |
+
+#+BEGIN_LaTeX
+%}
+\caption{Independence constraints reduce the work done by the CKY algorithm, trading off accuracy.}
+\label{tbl:parse-results-linear}
+\end{table*}
+#+END_LaTeX
 
 #+BEGIN_LaTeX
 \begin{table*}[tbp]
@@ -580,126 +708,6 @@ less than half a point F_1 score.
 \label{tbl:parse-results-poly}
 \end{table*}
 #+END_LaTeX
-
-
-# ** Gold Independent Span Boundaries
-
-# For another comparison, we tested the parser using the gold
-# independent span boundaries. The results for section 22 are shown in
-# Table \ref{tbl:parse-results-oracle}. The number of binary edges
-# visited is cut in half, and parse accuracy is improved by almost 1
-# point. We note that the parser was unable to parse 4 sentences with
-# the gold constraints.
-
-# #+BEGIN_LaTeX
-# \begin{table}[tbp]
-# %\resizebox{12cm}{!}{
-# #+END_LaTeX
-
-# #+attr_latex: :center nil
-# |         |          |                        |               |    Parse |
-# | SentLen | Time (s) | # Edges                | F_1           | Failures |
-# |---------+----------+------------------------+---------------+----------|
-# |       0 |     1016 | 8.47\times10^09 (48%)  | 86.71 (+0.86) |        4 |
-# |      20 |     1054 | 8.90\times10^09 (51%)  | 86.55 (+0.70) |        2 |
-# |      30 |     1152 | 1.08\times10^10 (62%)  | 86.33 (+0.48) |        0 |
-# |      40 |     1344 | 1.39\times10^10 (79%)  | 86.04 (+0.19) |        0 |
-# |       ∞ |     1292 | 1.75\times10^10 (100%) | 85.85         |        0 |
-
-# #+BEGIN_LaTeX
-# %}
-# \caption{Using the gold independent span boundaries halves the work done by the CKY algorithm while improving parse accuracy.}
-# \label{tbl:parse-results-oracle}
-# \end{table}
-# #+END_LaTeX
-
-** WSJ Section 23
-
-To compare with previous work on parsing using the Penn Treebank, we
-show the time and accuracy for parsing section 23, using both linear
-and kernel classifier output, along with the baseline parser, below.
-The times reported are the average of three runs each. Because there
-was significant variation in parse time when multiple processes were
-run in parallel, for these results only one process was run at a time.
- The results parallel those shown on the development data.
-
-| Parser   | Time (s) |            |   F_1 |       |
-|----------+----------+------------+-------+-------|
-| baseline |     1538 |            | 85.54 |  0.00 |
-| linear   |     1106 | \times1.39 | 83.55 | -1.99 |
-| poly     |     1040 | \times1.48 | 84.57 | -0.97 |
-
-* Related Work
-
-There are several strains of research related to adding constraints to
-the CKY chart. \cite{Roark2012} describes an approach using
-finite-state taggers to decide whether each word in a sentence begins
-or ends a multiword constituent and has a unary span or not. They show
-that their tagger is able to achieve very high precision, reducing
-parse time without negatively affecting accuracy.
-
-\cite{Bodenstab2011} proposes a classifier which directly decides for
-each cell in the chart how many constituents should be created. Their
-parser uses beam search with a FOM and a beam for each chart cell.
-
-Like these approaches, our method uses a classifier to avoid doing
-work in certain chart cells. While not completely orthogonal, we
-believe our independence constraints are complementary. A single
-decision by our classifier closes a large swath of cells based on the
-global structure, while their methods make local decision using local
-information.
-
-\cite{Yarmohammadi2014} proposes a concept of 'hedge' parsing, where
-only spans below a certain length are allowed, and show how this
-reduces the computation done by CKY. Their approach for segmenting a
-sentence and parsing within each segment separately is similar to the
-approach presented in this paper; however, their system does not create
-spans of length larger than the threshold and thus doesn't follow the
-original treebank annotation, while our approach is able to return the
-original gold parse tree provided that the classifier does not output
-a false positive.
-
-* Conclusions
-
-We have proposed a property of *independence* between words in a
-sentence, and shown how to use this property to create top-down
-constraints which can be used to reduce the computation done by the
-CKY algorithm. We demonstrated two classifiers for identifying
-boundaries between independent words given a sentence with only
-surface features, a linear classifier which is fast but less accurate,
-and a classifier with a polynomial kernel which is much more accurate
-but very slow. We then showed that a commonly-used CFG parser can be
-made faster by using the output of these classifiers to create
-top-down constraints at the cost of some accuracy, which can be
-traded-off by varying the confidence threshold of the classifier
-results.
-
-Although the loss of accuracy when using the linear classifier is
-currently uncomfortably large, the performance of the kernel
-classifier indicates that there is room for improvement, either by
-manually adding conjunctive features to the linear classifier or using
-a method to automatically linearize the model. Features based on words
-as well as POS tags may also be beneficial. However, the current
-approach has several weaknesses which should be addressed by future
-research.
-
-First, the top-down nature of the independence constraints does not
-make a natural fit with the bottom-up CKY algorithm. In particular,
-the binary nature of the rules in the grammar combined with the
-bottom-up search means that the parser still ends up doing some
-computation to create spans which violate the constraints, even though
-it is prevented from completing such a span.
-
-Second, the pipelined nature of the classifier means that it only has
-access to POS tags and in particular is not able to make use of
-information generated as the parser processes lower-level spans.
-Tighter integration of the classifier into the parser may be
-beneficial to both.
-
-Third, the current classifier combines instances from different
-syntactic structures into a single model. It is possible that training
-multiple models on different types of sentences would result in a
-better classifier.
 
 #+BEGIN_LaTeX
 \bibliographystyle{acl}
