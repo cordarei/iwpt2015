@@ -131,29 +131,26 @@ second type of error, the algorithm is made more robust, and allows
 the independent boundary identification step to prioritize precision
 over recall to lessen negative impact on the parser’s accuracy.
 
-The second issue is caused by the binarization of the context-free
-grammar used in the CKY algorithm. Because the CKY algorithm requires
-a binary grammar, any rules in the original grammar that have more
-than two symbols on the right-hand side must be converted into a
-sequence of binary rules. The extra rules created in this process are
-called intermediate or synthetic rules. The topmost span in particular
-will usually need to be constructed in several steps; however, the
-bottom-up nature of the algorithm means that it is impossible to
-determine whether a given synthetic rule at any position in the CKY
-chart will eventually be used to construct a complete span at the top
-of the tree (for arbitrary grammars—if the grammar is left- or
-right-binarized, only cells on the left or right edge of the chart can
-effect the top span).
+The second issue is caused by the binarization of the context-free grammar used
+in the CKY algorithm. Because the CKY algorithm requires a binary grammar, any
+rules in the original grammar that have more than two symbols on the right-hand
+side must be converted into a sequence of binary rules. The extra rules created
+in this process are called intermediate or synthetic rules. The topmost span in
+particular will usually need to be constructed in several steps, applying
+multiple synthetic rules before creating a complete span. If the grammar rules
+are always binarized from the left (right), then only cells on the left (right)
+edge of the chart can affect the top span; however, the grammar used in our
+parser is binarized ``head-outward'' \cite{Klein2003}, which means that
+potentially any cell in the chart can be used to create the top span.
 
-The combination of these two issues means that in order to correctly
-parse a sentence when an independent span boundary is missing from the
-input the modified CKY algorithm must process synthetic rules even at
-positions in the chart that cross a boundary.
+The combination of these two issues means that in order to correctly parse a
+sentence when an independent span boundary is missing from the input the
+modified CKY algorithm must process synthetic rules even at positions in the
+chart that cross a boundary. Thus in the modified algorithm, cells which do not
+cross an independent boundary are processed normally, and in cells which do
+cross a boundary the algorithm will avoid looping over complete binary rules.[fn:impl]
 
-Thus in the modified algorithm, cells which do not cross an
-independent boundary are processed normally, and in cells which do
-cross a boundary the algorithm will avoid looping over complete
-binary rules. While boundary-crossing cells depend on non-crossing
+[fn:impl] While boundary-crossing cells depend on non-crossing
 cells, the reverse is not the case; thus the non-crossing cells can
 all be processed before the crossing cells, or the cells can be looped
 over in the regular order, with a check inside the loop.
@@ -467,7 +464,7 @@ are:
 ** Experimental Setup
 
 We used the modified Stanford Parser described above, with an unlexicalized
-grammar[1] extracted from the WSJ sections 02-21, and evaluated its performance
+grammar[fn:gram] extracted from the WSJ sections 02-21, and evaluated its performance
 on section 22 using output from the clasifier as constraints. For the baseline,
 the parser was given null constraints.
 
@@ -480,7 +477,7 @@ is measured in the number of binary edges visited in the inner loop. A
 binary edge is a tuple of a span (begin & end), a binary rule $A →
 BC$, and a split point (the position where $B$ and $C$ meet).
 
-[1] The grammar was extracted using the Stanford Parser with command-line options =-acl03pcfg -noRebinarization -compactGrammar 1=
+[fn:gram] The grammar was extracted using the Stanford Parser with command-line options =-acl03pcfg -noRebinarization -compactGrammar 1=
 
 ** Results
 \label{sec:parse-results}
@@ -620,7 +617,7 @@ weaknesses which should be addressed by future research.
 
 First, the top-down nature of the independence constraints does not
 make a natural fit with the bottom-up CKY algorithm. In particular,
-the binary nature of the rules in the grammar combined with the
+the presence of synthetic rules in the grammar combined with the
 bottom-up search means that the parser still ends up doing some
 computation to create spans which violate the constraints, even though
 it is prevented from completing such a span.
