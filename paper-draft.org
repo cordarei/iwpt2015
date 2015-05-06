@@ -1,13 +1,17 @@
 #+title: CKY Parsing With Independence Constraints
 #+author:
 #+OPTIONS: H:3 toc:nil _:{}
-#+LATEX_CLASS: acl2015
+#+LATEX_CLASS: article
+#+LATEX_HEADER: \usepackage{acl2015}
+#+LATEX_HEADER: \usepackage{times}
+#+LATEX_HEADER: \usepackage{url}
+#+LATEX_HEADER: \usepackage{latexsym}
 #+LATEX_HEADER: \usepackage{forest}
 #+LATEX_HEADER: \DeclareMathOperator*{\argmin}{arg\,min}
 #+LATEX_HEADER: \DeclareMathOperator*{\argmax}{arg\,max}
 #+LaTeX_HEADER: \newcommand{\BigO}[1]{\ensuremath{\operatorname{O}\bigl(#1\bigr)}}
 
-# file:paper.pdf
+# file:paper-draft.pdf
 
 #+BEGIN_LaTeX
 \begin{abstract}
@@ -55,13 +59,13 @@ parsing, where input is first parsed using a much simpler (and thus
 smaller) grammar, and the content of the chart is then used to
 constrain the search over the final grammar
 \cite{Torisawa2000,Charniak2005,Petrov2007}. Even with a much smaller
-grammar, the CKY algorithm may be expensive—Roark et al. (2012)
+grammar, the CKY algorithm may be expensive---Roark et al. (2012)
 report that the initial CKY step in the Berkeley Parser takes half of
 the total parse time.
 
 Other techniques can be used to prune cells in the chart. Roark et al.
-(2012) use a finite-state model to label words that do/don’t begin/end
-spans, and skip cells that don’t satisfy the labels. Bodenstab et al.
+(2012) use a finite-state model to label words that do/don't begin/end
+spans, and skip cells that don't satisfy the labels. Bodenstab et al.
 (2011) directly apply a classifier to each cell to decide how many
 spans to keep. Both approaches reduce the work done by the parser
 while preserving accuracy.
@@ -87,7 +91,7 @@ the Stanford Parser CKY implementation and show the results in Section 5.
    [{.} [{.} $_5$]]
   ]
 \end{forest}
-\caption{In this tree ‘This’ and ‘is’ are independent, while ‘is’ and ‘an’ are not.}
+\caption{In this tree `This' and `is' are independent, while `is' and `an' are not.}
 \label{fig:independence}
 \end{figure}
 #+END_LaTeX
@@ -102,9 +106,9 @@ Less formally, if the children of the top node of a parse tree were
 split into separate subtrees, two words are independent if they would
 end up in different subtrees.
 
-An example is shown in Figure \ref{fig:independence}. Here, ‘This’ and
-‘is’ are independent, as are ‘example’ and ‘.’. The independent spans
-are (‘This’), (‘is’, ‘an’, ‘example’), and (‘.’), with boundaries 1
+An example is shown in Figure \ref{fig:independence}. Here, `This' and
+`is' are independent, as are `example' and `.'. The independent spans
+are (`This'), (`is', `an', `example'), and (`.'), with boundaries 1
 and 4. The independent spans and independent span boundaries can be
 derived straightforwardly from the definition of independent words:
 the locations between consecutive words which are independent are the
@@ -129,7 +133,7 @@ marked as such, the parser may account for this at the cost of not
 achieving the minimum computation possible. By allowing for this
 second type of error, the algorithm is made more robust, and allows
 the independent boundary identification step to prioritize precision
-over recall to lessen negative impact on the parser’s accuracy.
+over recall to lessen negative impact on the parser's accuracy.
 
 The second issue is caused by the binarization of the context-free grammar used
 in the CKY algorithm. Because the CKY algorithm requires a binary grammar, any
@@ -185,8 +189,8 @@ For the first case, the ratio of work saved approaches
 as $n$ grows. This limit converges quickly for $n \ge 10$. If we
 approximate $|G_r|/|G|$ as 0.5 (for the grammar used by the parser in
 Section \ref{sec:parser}, it is $\approx .54$), then for
-$K=2,3,4,\dots$, the values are $\frac{3}{8}, \frac{1}{3},
-\frac{3}{32}, \dots$. Intuitively, for one boundary, the best location
+$K=2,3,4,\dots$, the values are $\frac{3}{8}, \frac{1}{3}, \frac{3}{32}, \dots$
+Intuitively, for one boundary, the best location
 is exactly in the center of the sentence, and the upper limit on how
 much work is saved is about 37%.
 
@@ -196,8 +200,8 @@ For the case of $K-1$ boundaries equally spaced, the ratio is
 \frac{|G_r|}{|G|}\frac{K^2 - 1}{K^2}
 \end{equation*}
 
-The values for $K=2,3,4,\dots$ are $\frac{3}{8}, \frac{4}{9},
-\frac{15}{32}, \dots$. Clearly, the smaller pieces a sentence can be
+The values for $K=2,3,4,\dots$ are $\frac{3}{8}, \frac{4}{9}, \frac{15}{32}, \dots$
+Clearly, the smaller pieces a sentence can be
 divided into the less work the parser will do; however, realistically
 most sentences will not have a large number of independent spans, and
 they will not be equal in length. We might take $K=3$ as best-case
@@ -474,8 +478,8 @@ parallel, and times reported were not averaged over multiple runs.
 Since we saw significant variation of up to 10%, the times should be
 taken with a grain of salt. The computation done in the CKY algorithm
 is measured in the number of binary edges visited in the inner loop. A
-binary edge is a tuple of a span (begin & end), a binary rule $A →
-BC$, and a split point (the position where $B$ and $C$ meet).
+binary edge is a tuple of a span (begin & end), a binary rule $A \rightarrow BC$,
+and a split point (the position where $B$ and $C$ meet).
 
 [fn:gram] The grammar was extracted using the Stanford Parser with command-line options =-acl03pcfg -noRebinarization -compactGrammar 1=
 
@@ -488,12 +492,12 @@ BC$, and a split point (the position where $B$ and $C$ meet).
 #+END_LaTeX
 
 #+attr_latex: :center nil
-| Parser   | Time (s)    | Speedup             | # Binary Edges         | F_1            | Parse Failures |
-|----------+-------------+---------------------+------------------------+----------------+----------------|
-| baseline | 1558        | -                   | 1.75\times10^10 (100%) | 85.85          |              0 |
-| linear   | 1283 (+100) | \times{}1.21 (1.12) | 1.08\times10^10 (62%)  | 83.71 (-2.14)  |             15 |
-| poly     | 1106 (+2h)  | \times{}1.41 (-)    | 9.74\times10^09 (56%)  | 84.85 (-1.00)  |              6 |
-| oracle   | 1016        | \times{}1.53 (-)    | 8.47\times10^09 (48%)  | 86.71 (\+0.86) |              4 |
+| Parser   | Time (s)    | Speedup             | # Binary Edges         | F_1           | Parse Failures |
+|----------+-------------+---------------------+------------------------+---------------+----------------|
+| baseline | 1558        | -                   | 1.75\times10^10 (100%) | 85.85         |              0 |
+| linear   | 1283 (+100) | \times{}1.21 (1.12) | 1.08\times10^10 (62%)  | 83.71 (-2.14) |             15 |
+| poly     | 1106 (+2h)  | \times{}1.41 (-)    | 9.74\times10^09 (56%)  | 84.85 (-1.00) |              6 |
+| oracle   | 1016        | \times{}1.53 (-)    | 8.47\times10^09 (48%)  | 86.71 (+0.86) |              4 |
 
 #+BEGIN_LaTeX
 %}
@@ -505,7 +509,7 @@ for the gold independent span boundaries. The times in parentheses are the class
 
 The results of running the parser on section 22 using the linear classifier from
 Section \ref{sec:linear-classifier} are shown in Table
-\ref{tbl:parse-results-linear}. The table shows the total time taken, the total
+\ref{tbl:parse-results}. The table shows the total time taken, the total
 times entering the inner loop, the F_1 and difference from the baseline, and the
 number of times the parse failed using the constraints. The parser with
 independence constraints saves 38% of the computation inside the CKY loop over
@@ -633,8 +637,6 @@ syntactic structures into a single model. It is possible that training
 multiple models on different types of sentences would result in a
 better classifier.
 
-* Appendix
-
 #+BEGIN_LaTeX
 \begin{table*}[tbp]
 %\resizebox{12cm}{!}{
@@ -688,6 +690,10 @@ better classifier.
 \label{tbl:parse-results-full}
 \end{table*}
 #+END_LaTeX
+
+* Appendix
+
+The full parse results are shown in Table \ref{tbl:parse-results-full}.
 
 #+BEGIN_LaTeX
 \bibliographystyle{acl}
