@@ -7,6 +7,7 @@
 #+LATEX_HEADER: \usepackage{url}
 #+LATEX_HEADER: \usepackage{latexsym}
 #+LATEX_HEADER: \usepackage{forest}
+#+LATEX_HEADER: \usepackage{algorithm2e}
 #+LATEX_HEADER: \DeclareMathOperator*{\argmin}{arg\,min}
 #+LATEX_HEADER: \DeclareMathOperator*{\argmax}{arg\,max}
 #+LaTeX_HEADER: \newcommand{\BigO}[1]{\ensuremath{\operatorname{O}\bigl(#1\bigr)}}
@@ -165,12 +166,30 @@ over in the regular order, with a check inside the loop. While this may have
 implications for e.g. parallelization, we do not explore this idea further here.
 
 ** How much work can we expect to save?
+\label{sec:comp-saved}
+
+#+BEGIN_LaTeX
+\begin{algorithm}[t]
+  \caption{The CKY algorithm.\label{alg:cky}}
+  \DontPrintSemicolon
+  \For {$1 \le i \le n$}{
+    $T_{i,i+1} \gets \{A|A\rightarrow a \in G \wedge w_i = a\}$
+  }
+  \For {$2 \le j \le n$}{
+    \For {$1 \le i \le n-j$}{
+      \For {$i < k < i+j$}{
+        $T_{i,i+j} \gets \{A|A\rightarrow BC \in G \wedge B \in T_{i,k} \wedge C \in T_{k,i+j} \}$\;
+      }
+    }
+  }
+\end{algorithm}
+#+END_LaTeX
 
 For our purposes, we can consider the amount of work done in the CKY algorithm
-to be the number of binary edges visited in the inner loop. For each cell
-the algorithm iterates over the binary rules in the grammar, calculating the
-probability of the left-hand-side at each split point. The number of these
-binary edges is
+to be the number of binary edges visited in the inner loop (shown in Algorithm
+\ref{alg:cky}). For each cell the algorithm iterates over the binary rules in
+the grammar, calculating the probability of the left-hand-side at each split
+point. The number of these binary edges is
 
 #+BEGIN_LaTeX
 \begin{equation*}
@@ -497,12 +516,12 @@ and a split point (the position where $B$ and $C$ meet).
 #+END_LaTeX
 
 #+attr_latex: :center nil
-| Parser   | Time (s)    | Speedup             | # Binary Edges         | F_1           | Parse Failures |
-|----------+-------------+---------------------+------------------------+---------------+----------------|
-| baseline | 1558        | -                   | 1.75\times10^10 (100%) | 85.85         |              0 |
-| linear   | 1283 (+100) | \times{}1.21 (1.12) | 1.08\times10^10 (62%)  | 83.71 (-2.14) |             15 |
-| poly     | 1106 (+2h)  | \times{}1.41 (-)    | 9.74\times10^09 (56%)  | 84.85 (-1.00) |              6 |
-| oracle   | 1016        | \times{}1.53 (-)    | 8.47\times10^09 (48%)  | 86.71 (+0.86) |              4 |
+| Parser   | Time (s)    | Speedup                     | # Binary Edges         | F_1           | Parse Failures |
+|----------+-------------+-----------------------------+------------------------+---------------+----------------|
+| baseline | 1558        | -                           | 1.75\times10^10 (100%) | 85.85         |              0 |
+| linear   | 1283 (+100) | 1.21\times{} (1.12\times{}) | 1.08\times10^10 (62%)  | 83.71 (-2.14) |             15 |
+| poly     | 1106 (+2h)  | 1.41\times{} (.19\times{})  | 9.74\times10^09 (56%)  | 84.85 (-1.00) |              6 |
+| oracle   | 1016        | 1.53\times{}                | 8.47\times10^09 (48%)  | 86.71 (+0.86) |              4 |
 
 #+BEGIN_LaTeX
 %}
@@ -562,8 +581,8 @@ data.
 | Parser   | Time (s) |            |   F_1 |       |
 |----------+----------+------------+-------+-------|
 | baseline |     1538 |            | 85.54 |  0.00 |
-| linear   |     1106 | \times1.39 | 83.55 | -1.99 |
-| poly     |     1040 | \times1.48 | 84.57 | -0.97 |
+| linear   |     1106 | 1.39\times | 83.55 | -1.99 |
+| poly     |     1040 | 1.48\times | 84.57 | -0.97 |
 
 As a point of comparison, Roark et al. (2012) reported speedups of 1.6-2x with
 no loss of accuracy. These results are not directly comparable due to
@@ -648,7 +667,6 @@ better classifier.
 #+END_LaTeX
 
 #+attr_latex: :center nil
-|------------+------------+---------------+----------+------------------------+---------------+----------------|
 | Classifier | MinSentLen | Constraints   | Time (s) | # Edges                | F_1           | Parse Failures |
 |------------+------------+---------------+----------+------------------------+---------------+----------------|
 | -          |          - | baseline      |     1558 | 1.75\times10^10 (100%) | 85.85         |              0 |
@@ -697,6 +715,16 @@ better classifier.
 #+END_LaTeX
 
 * Appendix
+
+** Derivation of equations in section \ref{sec:comp-saved}
+
+#+BEGIN_LaTeX
+\begin{equation*}
+|G|\left[\frac{n^3}{6} - \frac{n}{6}\right]
+\end{equation*}
+#+END_LaTeX
+
+** Detailed parse results
 
 The full parse results are shown in Table \ref{tbl:parse-results-full}.
 
