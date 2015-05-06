@@ -81,6 +81,7 @@ the Stanford Parser CKY implementation and show the results in Section 5.
 
 #+BEGIN_LaTeX
 \begin{figure}
+\centering
 \begin{forest}
   [S
    [NP [DT [ $_0$ This $_1$]]]
@@ -139,9 +140,9 @@ The second issue is caused by the binarization of the context-free grammar used
 in the CKY algorithm. Because the CKY algorithm requires a binary grammar, any
 rules in the original grammar that have more than two symbols on the right-hand
 side must be converted into a sequence of binary rules. The extra rules created
-in this process are called intermediate or synthetic rules. The topmost span in
+in this process are called incomplete[fn:rule] rules. The topmost span in
 particular will usually need to be constructed in several steps, applying
-multiple synthetic rules before creating a complete span. If the grammar rules
+multiple incomplete rules before creating a complete span. If the grammar rules
 are always binarized from the left (right), then only cells on the left (right)
 edge of the chart can affect the top span; however, the grammar used in our
 parser is binarized ``head-outward'' \cite{Klein2003}, which means that
@@ -149,15 +150,19 @@ potentially any cell in the chart can be used to create the top span.
 
 The combination of these two issues means that in order to correctly parse a
 sentence when an independent span boundary is missing from the input the
-modified CKY algorithm must process synthetic rules even at positions in the
+modified CKY algorithm must process incomplete rules even at positions in the
 chart that cross a boundary. Thus in the modified algorithm, cells which do not
 cross an independent boundary are processed normally, and in cells which do
 cross a boundary the algorithm will avoid looping over complete binary rules.[fn:impl]
 
+[fn:rule] E.g., if a rule $A \rightarrow B C D$ becomes $@_{BC} \rightarrow B C$ and
+$A \rightarrow @_{BC} D$, then the former is /incomplete/ and the latter is /complete/.
+
 [fn:impl] While boundary-crossing cells depend on non-crossing
 cells, the reverse is not the case; thus the non-crossing cells can
 all be processed before the crossing cells, or the cells can be looped
-over in the regular order, with a check inside the loop.
+over in the regular order, with a check inside the loop. While this may have
+implications for e.g. parallelization, we do not explore this idea further here.
 
 ** How much work can we expect to save?
 
@@ -175,7 +180,7 @@ binary edges is
 
 The amount of work saved depends on the number and locations of the
 independent span boundaries, as well as the proportion of
-non-synthetic edges in the grammar, denoted $\frac{|G_r|}{|G|}$. We
+complete rules in the grammar, denoted $\frac{|G_c|}{|G|}$. We
 can consider two idealized scenarios: one boundary at $\frac{n}{K}$,
 and $K-1$ boundaries at $\frac{n}{K}, \frac{2n}{K}, \dots,
 \frac{(K-1)n}{K}$, where $K$ is an integer $1 < K < n$.
@@ -183,11 +188,11 @@ and $K-1$ boundaries at $\frac{n}{K}, \frac{2n}{K}, \dots,
 For the first case, the ratio of work saved approaches
 
 \begin{equation*}
-\frac{|G_r|}{|G|} \left[ \frac{3}{K} - \frac{3}{K^2} \right]
+\frac{|G_c|}{|G|} \left[ \frac{3}{K} - \frac{3}{K^2} \right]
 \end{equation*}
 
 as $n$ grows. This limit converges quickly for $n \ge 10$. If we
-approximate $|G_r|/|G|$ as 0.5 (for the grammar used by the parser in
+approximate $|G_c|/|G|$ as 0.5 (for the grammar used by the parser in
 Section \ref{sec:parser}, it is $\approx .54$), then for
 $K=2,3,4,\dots$, the values are $\frac{3}{8}, \frac{1}{3}, \frac{3}{32}, \dots$
 Intuitively, for one boundary, the best location
@@ -197,7 +202,7 @@ much work is saved is about 37%.
 For the case of $K-1$ boundaries equally spaced, the ratio is
 
 \begin{equation*}
-\frac{|G_r|}{|G|}\frac{K^2 - 1}{K^2}
+\frac{|G_c|}{|G|}\frac{K^2 - 1}{K^2}
 \end{equation*}
 
 The values for $K=2,3,4,\dots$ are $\frac{3}{8}, \frac{4}{9}, \frac{15}{32}, \dots$
@@ -454,11 +459,11 @@ distribution to accept independent span boundaries as constraints and
 to use the modified CKY algorithm described above. Our modifications
 are:
 
-- after reading in the grammar, index the synthetic binary rules
+- after reading in the grammar, index the incomplete binary rules
 - read in the file containing the boundaries output by the classifier
   from the previous section
 - for each CKY cell, if the cell spans a boundary then loop over just
-  the synthetic binary rules
+  the incomplete binary rules
 - if at the end of the CKY loop a parse was not successful, then loop
   again over just the cells which span a boundary and process all of
   the binary rules
@@ -563,8 +568,8 @@ data.
 As a point of comparison, Roark et al. (2012) reported speedups of 1.6-2x with
 no loss of accuracy. These results are not directly comparable due to
 differences in parser (their parsers use beam search variants of CYK and
-coarse-to-fine pruning) and grammar (the Berkeley latent variable grammar and a
-lexicalized grammar).
+coarse-to-fine pruning) and grammar (they used the Berkeley latent variable
+grammar and a lexicalized grammar).
 
 * Related Work
 
@@ -621,7 +626,7 @@ weaknesses which should be addressed by future research.
 
 First, the top-down nature of the independence constraints does not
 make a natural fit with the bottom-up CKY algorithm. In particular,
-the presence of synthetic rules in the grammar combined with the
+the presence of incomplete rules in the grammar combined with the
 bottom-up search means that the parser still ends up doing some
 computation to create spans which violate the constraints, even though
 it is prevented from completing such a span.
