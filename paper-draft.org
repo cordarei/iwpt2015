@@ -176,7 +176,7 @@ implications for e.g. parallelization, we do not explore this idea further here.
     $T_{i,i+1} \gets \{A|A\rightarrow a \in G \wedge w_i = a\}$
   }
   \For {$2 \le j \le n$}{
-    \For {$1 \le i \le n-j$}{
+    \For {$1 \le i \le n-j+1$}{
       \For {$i < k < i+j$}{
         $T_{i,i+j} \gets \{A|A\rightarrow BC \in G \wedge B \in T_{i,k} \wedge C \in T_{k,i+j} \}$\;
       }
@@ -192,9 +192,9 @@ the grammar, calculating the probability of the left-hand-side at each split
 point. The number of these binary edges is
 
 #+BEGIN_LaTeX
-\begin{equation*}
+\begin{equation}
 |G|\left[\frac{n^3}{6} - \frac{n}{6}\right]
-\end{equation*}
+\end{equation}
 #+END_LaTeX
 
 The amount of work saved depends on the number and locations of the
@@ -206,9 +206,11 @@ and $K-1$ boundaries at $\frac{n}{K}, \frac{2n}{K}, \dots,
 
 For the first case, the ratio of work saved approaches
 
-\begin{equation*}
+#+BEGIN_LaTeX
+\begin{equation}
 \frac{|G_c|}{|G|} \left[ \frac{3}{K} - \frac{3}{K^2} \right]
-\end{equation*}
+\end{equation}
+#+END_LaTeX
 
 as $n$ grows. This limit converges quickly for $n \ge 10$. If we
 approximate $|G_c|/|G|$ as 0.5 (for the grammar used by the parser in
@@ -220,9 +222,11 @@ much work is saved is about 37%.
 
 For the case of $K-1$ boundaries equally spaced, the ratio is
 
-\begin{equation*}
+#+BEGIN_LaTeX
+\begin{equation}
 \frac{|G_c|}{|G|}\frac{K^2 - 1}{K^2}
-\end{equation*}
+\end{equation}
+#+END_LaTeX
 
 The values for $K=2,3,4,\dots$ are $\frac{3}{8}, \frac{4}{9}, \frac{15}{32}, \dots$
 Clearly, the smaller pieces a sentence can be
@@ -720,7 +724,14 @@ better classifier.
 
 #+BEGIN_LaTeX
 \begin{equation*}
-|G|\left[\frac{n^3}{6} - \frac{n}{6}\right]
+\sum_{j=2}^{n}\sum_{i=1}^{n-j+1}\sum_{k=i+1}^{i+j-1}|G|\\
+= |G|\sum_{j=2}^{n}(n-j+1)(j-1)\\
+= |G|\sum_{i=1}^{n-1}(n-i)(i)\\
+= |G|\sum_{i=1}^{n-1}(ni - i^2)\\
+= |G|(n\sum_{i=1}^{n-1}i - \sum_{i=1}^{n-1}i^2)\\
+= |G|(n\frac{(n-1)n}{2} - (\frac{n^3}{3} - \frac{n^2}{2} + \frac{n}{6}))\\
+= |G|(\frac{1}{2}n^3 - \frac{1}{2}n^2 - \frac{1}{3}n^3 + \frac{1}{2}n^2 - \frac{1}{6}n)\\
+= |G|(\frac{1}{6}n^3 - \frac{1}{6}n)
 \end{equation*}
 #+END_LaTeX
 
