@@ -236,9 +236,9 @@ most sentences will not have a large number of independent spans, and
 they will not be equal in length. We might take $K=3$ as best-case
 estimate, giving us about 44%. Thus we can guess that a parser will be
 able to save around 35-45% of the work it does in the CKY algorithm
-loop (not counting unary rules) by using independence constraints.
+loop by using independence constraints.
 
-The derivations of equations 1-3 are shown in the appendix.
+The derivations of Equations 1-3 are shown in the appendix.
 
 * Classifying Independent Span Boundaries
 
@@ -263,24 +263,24 @@ recall.
 #+END_LaTeX
 
 #+attr_latex: :center nil
-| Features                  | #feats |     Acc |  Prec |     Rec |   F_{1} | F_{0.5} |   TP |   FP |   FN |    TN |
-|---------------------------+--------+---------+-------+---------+---------+---------+------+------+------+-------|
-| p                         |  37001 |   93.71 | 80.73 |   70.49 |   75.27 |   78.45 | 3679 |  878 | 1540 | 32320 |
-| P_{0}                     |  33167 |   87.16 | 51.69 |   83.98 |   63.99 |   55.99 | 4383 | 4097 |  836 | 29101 |
-|---------------------------+--------+---------+-------+---------+---------+---------+------+------+------+-------|
-| p,P_{0}                   |  70168 |   95.21 | 87.38 |   75.65 |   81.09 |   84.75 | 3948 |  570 | 1271 | 32628 |
-| p,P_{1}                   |  37055 |   94.81 | 78.38 | *85.38* |   81.73 |   79.69 | 4456 | 1229 |  763 | 31969 |
-| p,P_{2}                   |  39336 |   95.34 | 84.25 |   80.76 |   82.47 |   83.53 | 4215 |  788 | 1004 | 32410 |
-| p,P_{3}                   |  46861 |   95.04 | 89.47 |   71.95 |   79.76 |   85.31 | 3755 |  442 | 1464 | 32756 |
-|---------------------------+--------+---------+-------+---------+---------+---------+------+------+------+-------|
-| p,P_{0},P_{1}             |  70222 | *95.48* | 88.95 |   76.16 |   82.06 | *86.06* | 3975 |  494 | 1244 | 32704 |
-| p,P_{0},P_{2}             |  72503 |   95.09 | 88.28 |   73.60 |   80.27 |   84.89 | 3841 |  510 | 1378 | 32688 |
-| p,P_{0},P_{3}             |  80028 |   94.84 | 88.81 |   70.99 |   78.91 |   84.56 | 3705 |  467 | 1514 | 32731 |
-|---------------------------+--------+---------+-------+---------+---------+---------+------+------+------+-------|
-| p,P_{1},P_{2}             |  39390 |   95.27 | 80.99 |   85.21 | *83.04* |   81.80 | 4447 | 1044 |  772 | 32154 |
-| p,P_{1},P_{3}             |  41553 | *95.44* | 89.05 |   75.74 |   81.86 | *86.03* | 3953 |  486 | 1266 | 32712 |
-|---------------------------+--------+---------+-------+---------+---------+---------+------+------+------+-------|
-| p,P_{0},P_{1},P_{2},P_{3} |  82417 |   95.35 | 86.89 |   77.49 |   81.92 |   84.83 | 4044 |  610 | 1175 | 32588 |
+| Features                  | #feats |   Acc |  Prec |   Rec | F_{1} | F_{0.5} |   TP |   FP |   FN |    TN |
+|---------------------------+--------+-------+-------+-------+-------+---------+------+------+------+-------|
+| p                         |  37001 | 93.71 | 80.73 | 70.49 | 75.27 |   78.45 | 3679 |  878 | 1540 | 32320 |
+| P_{0}                     |  33167 | 87.16 | 51.69 | 83.98 | 63.99 |   55.99 | 4383 | 4097 |  836 | 29101 |
+|---------------------------+--------+-------+-------+-------+-------+---------+------+------+------+-------|
+| p,P_{0}                   |  70168 | 95.21 | 87.38 | 75.65 | 81.09 |   84.75 | 3948 |  570 | 1271 | 32628 |
+| p,P_{1}                   |  37055 | 94.81 | 78.38 | 85.38 | 81.73 |   79.69 | 4456 | 1229 |  763 | 31969 |
+| p,P_{2}                   |  39336 | 95.34 | 84.25 | 80.76 | 82.47 |   83.53 | 4215 |  788 | 1004 | 32410 |
+| p,P_{3}                   |  46861 | 95.04 | 89.47 | 71.95 | 79.76 |   85.31 | 3755 |  442 | 1464 | 32756 |
+|---------------------------+--------+-------+-------+-------+-------+---------+------+------+------+-------|
+| p,P_{0},P_{1}             |  70222 | 95.48 | 88.95 | 76.16 | 82.06 |   86.06 | 3975 |  494 | 1244 | 32704 |
+| p,P_{0},P_{2}             |  72503 | 95.09 | 88.28 | 73.60 | 80.27 |   84.89 | 3841 |  510 | 1378 | 32688 |
+| p,P_{0},P_{3}             |  80028 | 94.84 | 88.81 | 70.99 | 78.91 |   84.56 | 3705 |  467 | 1514 | 32731 |
+|---------------------------+--------+-------+-------+-------+-------+---------+------+------+------+-------|
+| p,P_{1},P_{2}             |  39390 | 95.27 | 80.99 | 85.21 | 83.04 |   81.80 | 4447 | 1044 |  772 | 32154 |
+| p,P_{1},P_{3}             |  41553 | 95.44 | 89.05 | 75.74 | 81.86 |   86.03 | 3953 |  486 | 1266 | 32712 |
+|---------------------------+--------+-------+-------+-------+-------+---------+------+------+------+-------|
+| p,P_{0},P_{1},P_{2},P_{3} |  82417 | 95.35 | 86.89 | 77.49 | 81.92 |   84.83 | 4044 |  610 | 1175 | 32588 |
 
 #+BEGIN_LaTeX
 %}
@@ -316,7 +316,7 @@ Below, $t^{l}_{i}$ is the $i$ th POS tag in the $l$-level POS tag sequence.
 - $t^l_{i}$ for $1 \le i < k - 1$, $l \in {0,1,2,3}$
 - $t^l_{i},t^l_{i+1}$ for $1 \le i < k - 2$, $l \in {0,1,2,3}$
 - $t^l_{i},t^l_{i+1},t^l_{i+2}$ for $1 \le i < k - 3$, $l \in {0,1,2,3}$
-
+  
 **** Right
 - $t^l_{i}$ for $k \le i < n - 1$, $l \in {0,1,2,3}$
 - $t^l_{i},t^l_{i+1}$ for $k \le i < n - 2$, $l \in {0,1,2,3}$
@@ -453,11 +453,11 @@ The efficiency of the classifier is as important as the accuracy---it doesn't
 matter how much time is saved during parsing if it takes even longer to run the
 classifier. =opal= takes less than half a second to run on the instances from
 section 22; however, the instances are created by a Python script, which is not
-very optimized. This script takes about 100 seconds to run. While this time is
-already less than the time saved in the parser (see Section
-\ref{sec:parse-results}), it could be significantly reduced by reimplementing in
-Java or even C++. Thus the potential gains offered by this approach are not just
-theoretical.
+very optimized. This script takes about 100 seconds to run on the machine
+described in Section \ref{sec:setup}. While this time is already less than the
+time saved in the parser (see Section \ref{sec:parse-results}), it could be
+significantly reduced by reimplementing in Java or even C++. Thus the potential
+gains offered by this approach are not just theoretical.
 
 ** Polynomial Kernel
 
@@ -496,6 +496,7 @@ are:
   number of times the parser failed
 
 ** Experimental Setup
+\label{sec:setup}
 
 We used the modified Stanford Parser described above, with an unlexicalized
 grammar[fn:gram] extracted from the WSJ sections 02-21, and evaluated its performance
@@ -543,7 +544,7 @@ Section \ref{sec:linear-classifier} are shown in Table
 times entering the inner loop, the F_1 and difference from the baseline, and the
 number of times the parse failed using the constraints. The parser with
 independence constraints saves 38% of the computation inside the CKY loop over
-the baseline, corresponding to about 20% reduction in total parse time (10% if
+the baseline, corresponding to about 20% reduction in total parse time (12% if
 the running time of the classifier is included), at the cost of a 2-point drop
 in F-score.
 
@@ -584,11 +585,11 @@ time when multiple processes were run in parallel, for these results only one
 process was run at a time. The results parallel those shown on the development
 data.
 
-| Parser   | Time (s) |            |   F_1 |       |
-|----------+----------+------------+-------+-------|
-| baseline |     1538 |            | 85.54 |  0.00 |
-| linear   |     1106 | 1.39\times | 83.55 | -1.99 |
-| poly     |     1040 | 1.48\times | 84.57 | -0.97 |
+| Parser   |    Time (s) |                         |   F_1 |       |
+|----------+-------------+-------------------------+-------+-------|
+| baseline |        1538 |                         | 85.54 |  0.00 |
+| linear   | 1106 (1206) | 1.39\times (1.28\times) | 83.55 | -1.99 |
+| poly     |        1040 | 1.48\times              | 84.57 | -0.97 |
 
 As a point of comparison, Roark et al. (2012) reported speedups of 1.6-2x with
 no loss of accuracy. These results are not directly comparable due to
@@ -755,50 +756,61 @@ and the proportion of the original work saved is approximately
 
 ** Detailed parse results
 
+We experimented with a post-processing step to adjust the recall and precision of the classifier, as well as
+adding a threshold on the minimum length of a sentence to apply constraints to in the parser (on the hypothesis
+that longer sentences are likely to gain a proportionally larger advantage). We show the detailed results from
+the parser in Table \ref{tbl:parse-results-full}, using both the linear and polynomial classifiers. Sentences
+shorter than =MinSentLen= were parsed without constraints.
+
+The results are largely as expected. Sentences less than 20 words do not affect the results much. The =recall= threshold
+predictably results in a large loss in classifier precision and thus parse accuracy. We note the results in
+boldface: with a high precision threshold, the polynomial classifier is able to reduce the computation in the CKY loop
+by 42% while losing less that half a point in F_1 score.
+
 #+BEGIN_LaTeX
 \begin{table*}[tbp]
 %\resizebox{12cm}{!}{
 #+END_LaTeX
 
 #+attr_latex: :center nil
-| Classifier | MinSentLen | Constraints   | Time (s) | # Edges                | F_1           | Parse Failures |
-|------------+------------+---------------+----------+------------------------+---------------+----------------|
-| -          |          - | baseline      |     1558 | 1.75\times10^10 (100%) | 85.85         |              0 |
-|------------+------------+---------------+----------+------------------------+---------------+----------------|
-| linear     |          0 | default       |     1283 | 1.08\times10^10 (62%)  | 83.71 (-2.14) |             15 |
-| linear     |          0 | precision     |     1143 | 1.13\times10^10 (65%)  | 84.05 (-1.80) |              7 |
-| linear     |          0 | max precision |     1384 | 1.42\times10^10 (81%)  | 85.55 (-0.30) |              2 |
-| linear     |          0 | recall        |     1024 | 7.80\times10^09 (45%)  | 78.74 (-7.11) |            136 |
-| linear     |         20 | default       |     1126 | 1.12\times10^10 (64%)  | 84.17 (-1.68) |              9 |
-| linear     |         20 | precision     |     1313 | 1.16\times10^10 (66%)  | 84.43 (-1.42) |              4 |
-| linear     |         20 | max precision |     1338 | 1.44\times10^10 (82%)  | 85.59 (-0.26) |              2 |
-| linear     |         20 | recall        |     1121 | 8.24\times10^09 (47%)  | 80.38 (-5.47) |            103 |
-| linear     |         30 | default       |     1312 | 1.28\times10^10 (73%)  | 84.82 (-1.03) |              3 |
-| linear     |         30 | precision     |     1279 | 1.31\times10^10 (75%)  | 85.01 (-0.84) |              1 |
-| linear     |         30 | max precision |     1485 | 1.53\times10^10 (87%)  | 85.63 (-0.22) |              1 |
-| linear     |         30 | recall        |     1140 | 1.02\times10^10 (58%)  | 82.79 (-3.06) |             57 |
-| linear     |         40 | default       |     1476 | 1.51\times10^10 (86%)  | 85.56 (-0.29) |              1 |
-| linear     |         40 | precision     |     1390 | 1.52\times10^10 (87%)  | 85.59 (-0.26) |              0 |
-| linear     |         40 | max precision |     1513 | 1.65\times10^10 (94%)  | 85.75 (-0.10) |              0 |
-| linear     |         40 | recall        |     1403 | 1.33\times10^10 (76%)  | 84.65 (-1.20) |             14 |
-|------------+------------+---------------+----------+------------------------+---------------+----------------|
-| poly       |          0 | default       |     1106 | 9.74\times10^09 (56%)  | 84.85 (-1.00) |              6 |
-| poly       |          0 | precision     |     1118 | 9.84\times10^09 (56%)  | 85.12 (-0.73) |              4 |
-| poly       |          0 | max precision |     1137 | 1.02\times10^10 (58%)  | 85.42 (-0.43) |              2 |
-| poly       |          0 | recall        |     1050 | 9.25\times10^09 (53%)  | 84.05 (-1.80) |             33 |
-| poly       |         20 | default       |     1070 | 1.02\times10^10 (58%)  | 85.08 (-0.77) |              5 |
-| poly       |         20 | precision     |     1172 | 1.03\times10^10 (59%)  | 85.25 (-0.60) |              3 |
-| poly       |         20 | max precision |     1092 | 1.06\times10^10 (61%)  | 85.41 (-0.44) |              2 |
-| poly       |         20 | recall        |     1088 | 9.68\times10^09 (55%)  | 84.75 (-1.10) |              7 |
-| poly       |         30 | default       |     1222 | 1.20\times10^10 (69%)  | 85.57 (-0.28) |              1 |
-| poly       |         30 | precision     |     1267 | 1.20\times10^10 (69%)  | 85.62 (-0.23) |              1 |
-| poly       |         30 | max precision |     1238 | 1.23\times10^10 (70%)  | 85.65 (-0.20) |              1 |
-| poly       |         30 | recall        |     1238 | 1.16\times10^10 (66%)  | 85.44 (-0.41) |              2 |
-| poly       |         40 | default       |     1465 | 1.49\times10^10 (85%)  | 85.72 (-0.13) |              0 |
-| poly       |         40 | precision     |     1353 | 1.49\times10^10 (85%)  | 85.75 (-0.10) |              0 |
-| poly       |         40 | max precision |     1570 | 1.50\times10^10 (86%)  | 85.78 (-0.07) |              0 |
-| poly       |         40 | recall        |     1489 | 1.47\times10^10 (84%)  | 85.69 (-0.16) |              1 |
-|------------+------------+---------------+----------+------------------------+---------------+----------------|
+| Classifier | MinSentLen | Constraints   | Time (s) | # Edges                 | F_1             | Parse Failures |
+|------------+------------+---------------+----------+-------------------------+-----------------+----------------|
+| -          |          - | baseline      |     1558 | 1.75\times10^10 (100%)  | 85.85           |              0 |
+|------------+------------+---------------+----------+-------------------------+-----------------+----------------|
+| linear     |          0 | default       |     1283 | 1.08\times10^10 (62%)   | 83.71 (-2.14)   |             15 |
+| linear     |          0 | precision     |     1143 | 1.13\times10^10 (65%)   | 84.05 (-1.80)   |              7 |
+| linear     |          0 | max precision |     1384 | 1.42\times10^10 (81%)   | 85.55 (-0.30)   |              2 |
+| linear     |          0 | recall        |     1024 | 7.80\times10^09 (45%)   | 78.74 (-7.11)   |            136 |
+| linear     |         20 | default       |     1126 | 1.12\times10^10 (64%)   | 84.17 (-1.68)   |              9 |
+| linear     |         20 | precision     |     1313 | 1.16\times10^10 (66%)   | 84.43 (-1.42)   |              4 |
+| linear     |         20 | max precision |     1338 | 1.44\times10^10 (82%)   | 85.59 (-0.26)   |              2 |
+| linear     |         20 | recall        |     1121 | 8.24\times10^09 (47%)   | 80.38 (-5.47)   |            103 |
+| linear     |         30 | default       |     1312 | 1.28\times10^10 (73%)   | 84.82 (-1.03)   |              3 |
+| linear     |         30 | precision     |     1279 | 1.31\times10^10 (75%)   | 85.01 (-0.84)   |              1 |
+| linear     |         30 | max precision |     1485 | 1.53\times10^10 (87%)   | 85.63 (-0.22)   |              1 |
+| linear     |         30 | recall        |     1140 | 1.02\times10^10 (58%)   | 82.79 (-3.06)   |             57 |
+| linear     |         40 | default       |     1476 | 1.51\times10^10 (86%)   | 85.56 (-0.29)   |              1 |
+| linear     |         40 | precision     |     1390 | 1.52\times10^10 (87%)   | 85.59 (-0.26)   |              0 |
+| linear     |         40 | max precision |     1513 | 1.65\times10^10 (94%)   | 85.75 (-0.10)   |              0 |
+| linear     |         40 | recall        |     1403 | 1.33\times10^10 (76%)   | 84.65 (-1.20)   |             14 |
+|------------+------------+---------------+----------+-------------------------+-----------------+----------------|
+| poly       |          0 | default       |     1106 | 9.74\times10^09 (56%)   | 84.85 (-1.00)   |              6 |
+| poly       |          0 | precision     |     1118 | 9.84\times10^09 (56%)   | 85.12 (-0.73)   |              4 |
+| poly       |          0 | max precision |     1137 | *1.02\times10^10 (58%)* | *85.42 (-0.43)* |              2 |
+| poly       |          0 | recall        |     1050 | 9.25\times10^09 (53%)   | 84.05 (-1.80)   |             33 |
+| poly       |         20 | default       |     1070 | 1.02\times10^10 (58%)   | 85.08 (-0.77)   |              5 |
+| poly       |         20 | precision     |     1172 | 1.03\times10^10 (59%)   | 85.25 (-0.60)   |              3 |
+| poly       |         20 | max precision |     1092 | 1.06\times10^10 (61%)   | 85.41 (-0.44)   |              2 |
+| poly       |         20 | recall        |     1088 | 9.68\times10^09 (55%)   | 84.75 (-1.10)   |              7 |
+| poly       |         30 | default       |     1222 | 1.20\times10^10 (69%)   | 85.57 (-0.28)   |              1 |
+| poly       |         30 | precision     |     1267 | 1.20\times10^10 (69%)   | 85.62 (-0.23)   |              1 |
+| poly       |         30 | max precision |     1238 | 1.23\times10^10 (70%)   | 85.65 (-0.20)   |              1 |
+| poly       |         30 | recall        |     1238 | 1.16\times10^10 (66%)   | 85.44 (-0.41)   |              2 |
+| poly       |         40 | default       |     1465 | 1.49\times10^10 (85%)   | 85.72 (-0.13)   |              0 |
+| poly       |         40 | precision     |     1353 | 1.49\times10^10 (85%)   | 85.75 (-0.10)   |              0 |
+| poly       |         40 | max precision |     1570 | 1.50\times10^10 (86%)   | 85.78 (-0.07)   |              0 |
+| poly       |         40 | recall        |     1489 | 1.47\times10^10 (84%)   | 85.69 (-0.16)   |              1 |
+|------------+------------+---------------+----------+-------------------------+-----------------+----------------|
 #+TBLFM: $4=$0;%.2e::$7=$6-85.85;p4%.2f
 
 #+BEGIN_LaTeX
@@ -809,8 +821,6 @@ probability threshhold. }
 \label{tbl:parse-results-full}
 \end{table*}
 #+END_LaTeX
-
-The full parse results are shown in Table \ref{tbl:parse-results-full}.
 
 #+BEGIN_LaTeX
 \bibliographystyle{acl}
