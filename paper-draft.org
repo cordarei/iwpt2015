@@ -765,7 +765,7 @@ shorter than =MinSentLen= were parsed without constraints.
 The results are largely as expected. Sentences less than 20 words do not affect the results much. The =recall= threshold
 predictably results in a large loss in classifier precision and thus parse accuracy. We note the results in
 boldface: with a high precision threshold, the polynomial classifier is able to reduce the computation in the CKY loop
-by 42% while losing less that half a point in F_1 score.
+by 42% while losing less than half a point in F_1 score.
 
 #+BEGIN_LaTeX
 \begin{table*}[tbp]
