@@ -155,6 +155,16 @@ modified CKY algorithm must process incomplete rules even at positions in the
 chart that cross a boundary. Thus in the modified algorithm, cells which do not
 cross an independent boundary are processed normally, and in cells which do
 cross a boundary the algorithm will avoid looping over complete binary rules.[fn:impl]
+Figure \ref{fig:chart} shows an example CKY chart where boundary-crossing cells are
+colored gray.
+
+#+BEGIN_LaTeX
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=6cm]{chart-constraints}
+  \caption{Example of a CKY chart with independence constraints. In the gray cells the modified algorithm will only loop over incomplete rules. \label{fig:chart}}
+\end{figure}
+#+END_LaTeX
 
 [fn:rule] E.g., if a rule $A \rightarrow B C D$ becomes $@_{BC} \rightarrow B C$ and
 $A \rightarrow @_{BC} D$, then the former is /incomplete/ and the latter is /complete/.
@@ -585,11 +595,12 @@ time when multiple processes were run in parallel, for these results only one
 process was run at a time. The results parallel those shown on the development
 data.
 
-| Parser   |    Time (s) |                         |   F_1 |       |
-|----------+-------------+-------------------------+-------+-------|
-| baseline |        1538 |                         | 85.54 |  0.00 |
-| linear   | 1106 (1206) | 1.39\times (1.28\times) | 83.55 | -1.99 |
-| poly     |        1040 | 1.48\times              | 84.57 | -0.97 |
+| Parser      | Time (s) |              |   F_1 |       |
+|-------------+----------+--------------+-------+-------|
+| baseline    |     1538 |              | 85.54 |  0.00 |
+| linear      |     1106 | 1.39\times   | 83.55 | -1.99 |
+| (w/ class.) |   (1206) | (1.28\times) |       |       |
+| poly        |     1040 | 1.48\times   | 84.57 | -0.97 |
 
 As a point of comparison, Roark et al. (2012) reported speedups of 1.6-2x with
 no loss of accuracy. These results are not directly comparable due to
@@ -630,16 +641,15 @@ sequence model.
 
 * Conclusions
 
-We have proposed a property of *independence* between words in a
-sentence, and shown how to use this property to create top-down
-constraints which can be used to reduce the computation done by the
-CKY algorithm. We demonstrated two classifiers for identifying
-boundaries between independent words given a sentence with only
-surface features, a linear classifier which is fast but less accurate,
-and a classifier with a polynomial kernel which is much more accurate
-but very slow. We then showed that a widely-used CKY parser can be
-made faster by using the output of these classifiers to create
-top-down constraints at the cost of some accuracy.
+We have proposed a property of *independence* between words in a sentence, and
+shown how to use this property to create top-down constraints which can be used
+to reduce the computation done by the CKY algorithm. We demonstrated two
+classifiers for identifying boundaries between independent words given a
+sentence with only surface features, a linear classifier which is fast but less
+accurate, and a classifier with a polynomial kernel which is much more accurate
+but very slow. We then showed a significant improvement in speed over a strong
+baseline CKY parser by using the output of these classifiers to create top-down
+constraints at the cost of some accuracy.
 
 Although the loss of accuracy when using the linear classifier is currently
 uncomfortably large, there are several possible avenues for improvement. The
