@@ -406,8 +406,6 @@ levels, as intended. Finally, combining all POS levels together actually reduces
 accuracy, possibly because the features are highly correlated (although see the
 discussion of the kernel classifier).
 
-** Results
-
 #+BEGIN_LaTeX
 \begin{table*}[htbp]
 %\resizebox{12cm}{!}{
@@ -428,15 +426,6 @@ discussion of the kernel classifier).
 \end{table*}
 #+END_LaTeX
 
-\label{sec:linear-classifier}
-For use as input to the parser, we select the $p,P_{1},P_{3}$
-feature configuration, and show more detailed results in
-Table \ref{tbl:classifier-results-linear}. We used a threshold on the
-score output by the classifier to reverse some of the classifier's
-decisions in a post-process step. Although it doesn't improve on the
-classifier in accuracy, the =precision= threshold did slightly improve in
-F_{0.5}, a measure which favors precision over recall.
-
 #+BEGIN_LaTeX
 \begin{table*}[htbp]
 %\resizebox{12cm}{!}{
@@ -456,6 +445,17 @@ F_{0.5}, a measure which favors precision over recall.
 \label{tbl:classifier-results-poly}
 \end{table*}
 #+END_LaTeX
+
+** Results
+
+\label{sec:linear-classifier}
+For use as input to the parser, we select the $p,P_{1},P_{3}$
+feature configuration, and show more detailed results in
+Table \ref{tbl:classifier-results-linear}. We used a threshold on the
+score output by the classifier to reverse some of the classifier's
+decisions in a post-process step. Although it doesn't improve on the
+classifier in accuracy, the =precision= threshold did slightly improve in
+F_{0.5}, a measure which favors precision over recall.
 
 ** Efficiency of the Classifier
 
@@ -505,28 +505,6 @@ are:
 - output the total number of times entering the inner loop as well as the
   number of times the parser failed
 
-** Experimental Setup
-\label{sec:setup}
-
-We used the modified Stanford Parser described above, with an unlexicalized
-grammar[fn:gram] extracted from the WSJ sections 02-21, and evaluated its performance
-on section 22 using output from the clasifier as constraints. For the baseline,
-the parser was given null constraints.
-
-All experiments were run on a DELL Precision 690, with 8 cores and 32G
-of RAM. Unless otherwise noted multiple processes were run in
-parallel, and times reported were not averaged over multiple runs.
-Since we saw significant variation of up to 10%, the times should be
-taken with a grain of salt. The computation done in the CKY algorithm
-is measured in the number of binary edges visited in the inner loop. A
-binary edge is a tuple of a span (begin & end), a binary rule $A \rightarrow BC$,
-and a split point (the position where $B$ and $C$ meet).
-
-[fn:gram] The grammar was extracted using the Stanford Parser with command-line options =-acl03pcfg -noRebinarization -compactGrammar 1=
-
-** Results
-\label{sec:parse-results}
-
 #+BEGIN_LaTeX
 \begin{table*}[tbp]
 %\resizebox{12cm}{!}{
@@ -547,6 +525,29 @@ for the gold independent span boundaries. The times in parentheses are the class
 \label{tbl:parse-results}
 \end{table*}
 #+END_LaTeX
+
+** Experimental Setup
+\label{sec:setup}
+
+We used the modified Stanford Parser described above, with an unlexicalized
+grammar[fn:gram] extracted from the WSJ sections 02-21, and evaluated its performance
+on section 22 using output from the clasifier as constraints. For the baseline,
+the parser was given null constraints.
+
+All experiments were run on a DELL Precision 690, with 8 cores and 32G
+of RAM. Unless otherwise noted multiple processes were run in
+parallel, and times reported were not averaged over multiple runs.
+Since we saw significant variation of up to 10%, the times should be
+taken with a grain of salt. The computation done in the CKY algorithm
+is measured in the number of binary edges visited in the inner loop. A
+binary edge is a tuple of a span (begin & end), a binary rule $A \rightarrow BC$,
+and a split point (the position where $B$ and $C$ meet).
+
+[fn:gram] The grammar was extracted using the Stanford Parser with command-line options =-acl03pcfg -noRebinarization -compactGrammar 1=
+
+
+** Results
+\label{sec:parse-results}
 
 The results of running the parser on section 22 using the linear classifier from
 Section \ref{sec:linear-classifier} are shown in Table
