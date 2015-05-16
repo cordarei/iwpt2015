@@ -180,7 +180,7 @@ implications for e.g. parallelization, we do not explore this idea further here.
 
 #+BEGIN_LaTeX
 \begin{algorithm}[t]
-  \caption{The CKY algorithm.\label{alg:cky}}
+  \caption{The CKY algorithm. $T_{i,j}$ is the cell corresponding to words $w_i \dots w_{j-1}$.\label{alg:cky}}
   \DontPrintSemicolon
   \For {$1 \le i \le n$}{
     $T_{i,i+1} \gets \{A|A\rightarrow a \in G \wedge w_i = a\}$
