@@ -235,7 +235,7 @@ estimate, giving us about 44\%. Thus we can guess that a parser will be
 able to save around 35-45\% of the work it does in the CKY algorithm
 loop by using independence constraints.
 
-The derivations of Equations 1-3 are shown in the appendix.
+The derivations of Equations 1-3 are shown in Appendix~\ref{sec:derivation-equations}.
 
 \section{Classifying Independent Span Boundaries}
 \label{sec-4}
@@ -688,11 +688,12 @@ syntactic structures into a single model. It is possible that training
 multiple models on different types of sentences would result in a
 better classifier.
 
-\section{Appendix}
+\appendix
+%% \section{Appendix}
 \label{sec-8}
 
-\subsection{Derivation of equations in section \ref{sec:comp-saved}}
-\label{sec-8-1}
+\section{Derivation of equations in section \ref{sec:comp-saved}}
+\label{sec:derivation-equations}
 
 The amount of computation done in lines 4-10 of Algorithm \ref{alg:cky} can be calculated as follows:
 
@@ -764,7 +765,7 @@ and the proportion of the original work saved is approximately
 \end{equation*}
 
 
-\subsection{Detailed parse results}
+\section{Detailed parse results}
 \label{sec-8-2}
 
 We experimented with a post-processing step to adjust the recall and precision of the classifier, as well as
