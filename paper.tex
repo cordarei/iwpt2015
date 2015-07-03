@@ -566,14 +566,15 @@ and a split point (the position where $B$ and $C$ meet).
 \label{sec:parse-results}
 
 The results of running the parser on section 22 using the linear classifier from
-Section \ref{sec:linear-classifier} are shown in Table
-\ref{tbl:parse-results}. The table shows the total time taken, the total
-times entering the inner loop, the F$_{\text{1}}$ and difference from the baseline, and the
-number of times the parse failed using the constraints. The parser with
-independence constraints saves 38\% of the computation inside the CKY loop over
-the baseline, corresponding to about 20\% reduction in total parse time (12\% if
-the running time of the classifier is included), at the cost of a 2-point drop
-in F-score.
+Section \ref{sec:linear-classifier} are shown in Table \ref{tbl:parse-results}.
+The table shows the total time taken, the total times entering the inner loop,
+the F$_{\text{1}}$ and difference from the baseline, and the number of times the
+parse failed using the constraints. The parser with independence constraints
+saves 38\% of the computation inside the CKY loop over the baseline,
+corresponding to about 20\% reduction in total parse time (12\% if the running
+time of the classifier is included), at the cost of a 2-point drop in F-score.
+Detailed results of further experiments with various thresholds on sentence
+length and classifier score are shown in Appendix~\ref{sec:parse-results-full}.
 
 \subsection{Polynomial Kernel}
 \label{sec-5-3}
@@ -782,6 +783,7 @@ and the proportion of the original work saved is approximately
 
 
 \section{Detailed parse results}
+\label{sec:parse-results-full}
 \label{sec-8-2}
 
 We experimented with a post-processing step to adjust the recall and precision of the classifier, as well as
