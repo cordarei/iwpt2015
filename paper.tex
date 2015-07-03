@@ -22,6 +22,7 @@
 \DeclareMathOperator*{\argmin}{arg\,min}
 \DeclareMathOperator*{\argmax}{arg\,max}
 \newcommand{\BigO}[1]{\ensuremath{\operatorname{O}\bigl(#1\bigr)}}
+\newcommand{\Dag}{\ensuremath{^{\dagger}}}
 
 \title{CKY Parsing With Independence Constraints}
 \author{Joseph Irwin \\
@@ -269,7 +270,7 @@ recall.
 %\resizebox{12cm}{!}{
 
 \begin{tabular}{lrrrrrrrrrr}
-Features & \#feats & Acc & Prec & Rec & F$_{\text{1}}$ & F$_{\text{0.5}}$ & TP & FP & FN & TN\\
+{\bf Features} & {\bf \#feats} & {\bf Acc} & {\bf Prec} & {\bf Rec} & {\bf F$_{\text{1}}$} & {\bf F$_{\text{0.5}}$} & {\bf TP} & {\bf FP} & {\bf FN} & {\bf TN} \\
 \hline
 p & 37001 & 93.71 & 80.73 & 70.49 & 75.27 & 78.45 & 3679 & 878 & 1540 & 32320\\
 P$_{\text{0}}$ & 33167 & 87.16 & 51.69 & 83.98 & 63.99 & 55.99 & 4383 & 4097 & 836 & 29101\\
@@ -279,18 +280,19 @@ p,P$_{\text{1}}$ & 37055 & 94.81 & 78.38 & 85.38 & 81.73 & 79.69 & 4456 & 1229 &
 p,P$_{\text{2}}$ & 39336 & 95.34 & 84.25 & 80.76 & 82.47 & 83.53 & 4215 & 788 & 1004 & 32410\\
 p,P$_{\text{3}}$ & 46861 & 95.04 & 89.47 & 71.95 & 79.76 & 85.31 & 3755 & 442 & 1464 & 32756\\
 \hline
-p,P$_{\text{0}}$,P$_{\text{1}}$ & 70222 & 95.48 & 88.95 & 76.16 & 82.06 & 86.06 & 3975 & 494 & 1244 & 32704\\
+p,P$_{\text{0}}$,P$_{\text{1}}$ & 70222 & {\bf 95.48} & {\bf 88.95} & 76.16 & 82.06 & {\bf 86.06} & 3975 & 494 & 1244 & 32704\\
 p,P$_{\text{0}}$,P$_{\text{2}}$ & 72503 & 95.09 & 88.28 & 73.60 & 80.27 & 84.89 & 3841 & 510 & 1378 & 32688\\
 p,P$_{\text{0}}$,P$_{\text{3}}$ & 80028 & 94.84 & 88.81 & 70.99 & 78.91 & 84.56 & 3705 & 467 & 1514 & 32731\\
 \hline
-p,P$_{\text{1}}$,P$_{\text{2}}$ & 39390 & 95.27 & 80.99 & 85.21 & 83.04 & 81.80 & 4447 & 1044 & 772 & 32154\\
-p,P$_{\text{1}}$,P$_{\text{3}}$ & 41553 & 95.44 & 89.05 & 75.74 & 81.86 & 86.03 & 3953 & 486 & 1266 & 32712\\
+p,P$_{\text{1}}$,P$_{\text{2}}$ & 39390 & 95.27 & 80.99 & 85.21 & {\bf 83.04} & 81.80 & 4447 & 1044 & 772 & 32154\\
+p,P$_{\text{1}}$,P$_{\text{3}}$$^{*}$ & 41553 & {\bf 95.44} & {\bf 89.05} & 75.74 & 81.86 & {\bf 86.03} & 3953 & 486 & 1266 & 32712\\
 \hline
 p,P$_{\text{0}}$,P$_{\text{1}}$,P$_{\text{2}}$,P$_{\text{3}}$ & 82417 & 95.35 & 86.89 & 77.49 & 81.92 & 84.83 & 4044 & 610 & 1175 & 32588\\
 \end{tabular}
 
 %}
-\caption{Results of classifier using different combinations of features.}
+\caption{Results of classifier using different combinations of features.
+($^{*}$Final feature configuration.)}
 \label{tbl:feature-evaluation}
 \end{table*}
 
