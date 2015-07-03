@@ -721,6 +721,7 @@ better classifier.
 
 The amount of computation done in lines 4-10 of Algorithm \ref{alg:cky} can be calculated as follows:
 
+{\small
 \begin{align*}
 %% \begin{equation*}
 %% \begin{split}
@@ -735,6 +736,7 @@ The amount of computation done in lines 4-10 of Algorithm \ref{alg:cky} can be c
 %% \end{split}
 %% \end{equation*}
 \end{align*}
+}
 
 This is the number of binary edges evaluated by the CKY algorithm. Using
 independence constraints, the algorithm avoids doing any computation for
@@ -743,6 +745,7 @@ the number of complete binary edges in the entire chart minus the number of
 complete edges that are actually processed in cells that satisfy the
 constraints. For a single independent boundary at $\frac{n}{K}$, we get:
 
+{\small
 \begin{equation*}
 \begin{split}
 & |G_{comp}|[\frac{1}{6}n^3 - \frac{1}{6}n]\\& - |G_{comp}|[\frac{1}{6}(\frac{n}{K})^3 - \frac{1}{6}\frac{n}{K}]\\& - |G_{comp}|[\frac{1}{6}(\frac{(K-1)n}{K})^3 - \frac{1}{6}\frac{(K-1)n}{K}]\\
@@ -751,25 +754,31 @@ constraints. For a single independent boundary at $\frac{n}{K}$, we get:
 =& |G_{comp}|\frac{3K^2 - 3K}{6K^3}n^3
 \end{split}
 \end{equation*}
+}
 
 The proportion of work saved relative to the original algorithm is then
 
+{\small
 \begin{equation*}
 \frac{|G_{comp}|\frac{3K^2 - 3K}{6K^3}n^3}{|G|(\frac{1}{6}n^3 - \frac{1}{6}n)}
 \end{equation*}
+}
 
 which depends on $n$ as well as $K$; however, we can approximate this as the limit
 as $n$ goes to infinity:
 
+{\small
 \begin{equation*}
 \begin{split}
 & \lim_{n \to \infty}\frac{|G_{comp}|\frac{3K^2 - 3K}{6K^3}n^3}{|G|(\frac{1}{6}n^3 - \frac{1}{6}n)}\\
 =& \frac{|G_{comp}|}{|G|}[\frac{3}{K} - \frac{3}{K^2}]
 \end{split}
 \end{equation*}
+}
 
 Similarly, the work saved with $K$ evenly-spaced boundaries is
 
+{\small
 \begin{equation*}
 \begin{split}
 & |G_{comp}|[\frac{1}{6}n^3 - \frac{1}{6}n]\\
@@ -778,15 +787,18 @@ Similarly, the work saved with $K$ evenly-spaced boundaries is
 =& |G_{comp}|\frac{1}{6}\frac{K^2-1}{K^2}n^3
 \end{split}
 \end{equation*}
+}
 
 and the proportion of the original work saved is approximately
 
+{\small
 \begin{equation*}
 \begin{split}
 & \lim_{n \to \infty}\frac{|G_{comp}|\frac{1}{6}\frac{K^2-1}{K^2}n^3}{|G|(\frac{1}{6}n^3 - \frac{1}{6}n)}\\
 =& \frac{|G_{comp}|}{|G|}\frac{K^2-1}{K^2}
 \end{split}
 \end{equation*}
+}
 
 
 \begin{table*}[tbp]
