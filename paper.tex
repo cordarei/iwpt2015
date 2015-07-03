@@ -523,7 +523,7 @@ number of times the parser failed
 %\resizebox{12cm}{!}{
 
 \begin{tabular}{lllllr}
-Parser & Time (s) & Speedup & \# Binary Edges & F$_{\text{1}}$ & Parse Failures\\
+{\bf Parser} & {\bf Time (s)} & {\bf Speedup} & {\bf \# Binary Edges} & {\bf F$_{\text{1}}$} & {\bf Parse Failures}\\
 \hline
 baseline & 1558 & - & 1.75\texttimes{}10$^{\text{10}}$ (100\%) & 85.85 & 0\\
 linear & 1283 (+100) & 1.21\texttimes{} (1.12\texttimes{}) & 1.08\texttimes{}10$^{\text{10}}$ (62\%) & 83.71 (-2.14) & 15\\
@@ -611,13 +611,13 @@ process was run at a time. The results parallel those shown on the development
 data.
 
 \begin{center}
-\begin{tabular}{lrlrr}
-Parser & Time (s) &  & F$_{\text{1}}$ & \\
-\hline
-baseline & 1538 &  & 85.54 & 0.00\\
-linear & 1106 & 1.39\texttimes{} & 83.55 & -1.99\\
-(w/ class.) & (1206) & (1.28\texttimes{}) &  & \\
-poly & 1040 & 1.48\texttimes{} & 84.57 & -0.97\\
+\begin{tabular}{llll}
+{\bf Parser} & {\bf Time} (s) & {\bf Speedup} & {\bf F$_{\text{1}}$} \\
+%\hline
+baseline & 1538 & & 85.54 \\
+linear & 1106 & 1.39\texttimes{} & 83.55 (-1.99)\\
+ & (+100) & (1.28\texttimes{}) &  \\
+poly & 1040 & 1.48\texttimes{} & 84.57 (-0.97)\\
 \end{tabular}
 \end{center}
 
@@ -794,7 +794,7 @@ by 42\% while losing less than half a point in F$_{\text{1}}$ score.
 %\resizebox{12cm}{!}{
 
 \begin{tabular}{lrlrllr}
-Classifier & MinSentLen & Constraints & Time (s) & \# Edges & F$_{\text{1}}$ & Parse Failures\\
+{\bf Classifier} & {\bf MinSentLen} & {\bf Constraints} & {\bf Time (s)} & {\bf \# Edges} & {\bf F$_{\text{1}}$} & {\bf Parse Failures}\\
 \hline
 - & - & baseline & 1558 & 1.75\texttimes{}10$^{\text{10}}$ (100\%) & 85.85 & 0\\
 \hline
@@ -831,7 +831,7 @@ poly & 40 & default & 1465 & 1.49\texttimes{}10$^{\text{10}}$ (85\%) & 85.72 (-0
 poly & 40 & precision & 1353 & 1.49\texttimes{}10$^{\text{10}}$ (85\%) & 85.75 (-0.10) & 0\\
 poly & 40 & max precision & 1570 & 1.50\texttimes{}10$^{\text{10}}$ (86\%) & 85.78 (-0.07) & 0\\
 poly & 40 & recall & 1489 & 1.47\texttimes{}10$^{\text{10}}$ (84\%) & 85.69 (-0.16) & 1\\
-\hline
+%\hline
 \end{tabular}
 
 %}
