@@ -60,7 +60,7 @@ The CKY algorithm is an \BigO{|G|n^3} dynamic programming
 algorithm for finding all of the possible derivations of a sentence in
 a context-free language. Its complexity depends on both the sentence
 length $n$ and the size of the grammar $|G|$. Methods for improving
-parse accuracy typically increase the size of the grammar 
+parsing accuracy typically increase the size of the grammar 
 \cite{Klein2003,Petrov2007} or even the exponent of $n$ \cite{Eisner1999}. 
 More powerful “deep” grammar formalisms multiply the computational
 complexity even more \cite{Bangalore1999}.
@@ -594,7 +594,7 @@ computation even further, by 44\%, while losing less accuracy.
 For another comparison, we tested the parser using the gold independent span
 boundaries. The results for section 22 are shown in Table
 \ref{tbl:parse-results}. The number of binary edges visited is cut in half, and
-parse accuracy is improved by almost 1 point. It is interesting to note that the
+parsing accuracy is improved by almost 1 point. It is interesting to note that the
 parser was unable to parse 4 sentences with the gold constraints (the grammar
 only allowed a parse that violated the gold boundaries).
 
@@ -786,7 +786,7 @@ the parser in Table \ref{tbl:parse-results-full}, using both the linear and poly
 shorter than \texttt{MinSentLen} were parsed without constraints.
 
 The results are largely as expected. Sentences less than 20 words do not affect the results much. The \texttt{recall} threshold
-predictably results in a large loss in classifier precision and thus parse accuracy. We note the results in
+predictably results in a large loss in classifier precision and thus parsing accuracy. We note the results in
 boldface: with a high precision threshold, the polynomial classifier is able to reduce the computation in the CKY loop
 by 42\% while losing less than half a point in F$_{\text{1}}$ score.
 
