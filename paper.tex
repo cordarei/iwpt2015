@@ -789,21 +789,6 @@ and the proportion of the original work saved is approximately
 \end{equation*}
 
 
-\section{Detailed parse results}
-\label{sec:parse-results-full}
-\label{sec-8-2}
-
-We experimented with a post-processing step to adjust the recall and precision of the classifier, as well as
-adding a threshold on the minimum length of a sentence to apply constraints to in the parser (on the hypothesis
-that longer sentences are likely to gain a proportionally larger advantage). We show the detailed results from
-the parser in Table \ref{tbl:parse-results-full}, using both the linear and polynomial classifiers. Sentences
-shorter than \texttt{MinSentLen} were parsed without constraints.
-
-The results are largely as expected. Sentences less than 20 words do not affect the results much. The \texttt{recall} threshold
-predictably results in a large loss in classifier precision and thus parsing accuracy. We note the results in
-boldface: with a high precision threshold, the polynomial classifier is able to reduce the computation in the CKY loop
-by 42\% while losing less than half a point in F$_{\text{1}}$ score.
-
 \begin{table*}[tbp]
 %\resizebox{12cm}{!}{
 
@@ -854,6 +839,22 @@ polynomial classifiers, varying minimum sentence length and classifier
 probability threshold. }
 \label{tbl:parse-results-full}
 \end{table*}
+
+\section{Detailed parse results}
+\label{sec:parse-results-full}
+\label{sec-8-2}
+
+We experimented with a post-processing step to adjust the recall and precision of the classifier, as well as
+adding a threshold on the minimum length of a sentence to apply constraints to in the parser (on the hypothesis
+that longer sentences are likely to gain a proportionally larger advantage). We show the detailed results from
+the parser in Table \ref{tbl:parse-results-full}, using both the linear and polynomial classifiers. Sentences
+shorter than \texttt{MinSentLen} were parsed without constraints.
+
+The results are largely as expected. Sentences less than 20 words do not affect the results much. The \texttt{recall} threshold
+predictably results in a large loss in classifier precision and thus parsing accuracy. We note the results in
+boldface: with a high precision threshold, the polynomial classifier is able to reduce the computation in the CKY loop
+by 42\% while losing less than half a point in F$_{\text{1}}$ score.
+
 
 \bibliographystyle{acl}
 \bibliography{references}
