@@ -456,15 +456,19 @@ p,P$_{\text{0}}$,P$_{\text{1}}$,P$_{\text{2}}$,P$_{\text{3}}$ & recall & 97.15 &
 
 \subsection{Results}
 \label{sec-4-4}
-
 \label{sec:linear-classifier}
-For use as input to the parser, we select the $p,P_{1},P_{3}$
-feature configuration, and show more detailed results in
-Table \ref{tbl:classifier-results-linear}. We used a threshold on the
-score output by the classifier to reverse some of the classifier's
-decisions in a post-process step. Although it doesn't improve on the
-classifier in accuracy, the \texttt{precision} threshold did slightly improve in
-F$_{\text{0.5}}$, a measure which favors precision over recall.
+
+To avoid degrading the accuracy of the parser as much as possible, we selected
+the feature configuration based on F$_{\text{0.5}}$ score, a measure which
+favors precision over recall. We chose $p,P_{1},P_{3}$ over $p,P_{0},P_{1}$
+because the former had a slight edge in precision and fewer features.
+
+More
+detailed results are shown in Table \ref{tbl:classifier-results-linear}. We used
+a threshold on the score output by the classifier to reverse some of the
+classifier's decisions in a post-process step. Although it doesn't improve on
+the classifier in accuracy, the \texttt{precision} threshold did slightly
+improve in F$_{\text{0.5}}$.
 
 \subsection{Efficiency of the Classifier}
 \label{sec-4-5}
@@ -544,7 +548,8 @@ for the gold independent span boundaries. The times in parentheses are the class
 We used the modified Stanford Parser described above, with an unlexicalized
 grammar\footnote{The grammar was extracted using the Stanford Parser with command-line options \texttt{-acl03pcfg -noRebinarization -compactGrammar 1}} extracted from the WSJ sections 02-21, and evaluated its performance
 on section 22 using output from the classifier as constraints. For the baseline,
-the parser was given null constraints.
+the parser was given null constraints. The accuracies and times shown are those reported
+by the Stanford Parser.
 
 All experiments were run on a DELL Precision 690, with 8 cores and 32G
 of RAM. Unless otherwise noted multiple processes were run in
