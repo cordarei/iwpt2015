@@ -1,0 +1,24 @@
+(
+  (S
+    (NP-SBJ (DT These) (JJ high-yielding) (NNS loans))
+    (ADVP (IN in) (NN effect))
+    (VP (VBD replaced)
+      (NP
+        (NP (DT some) (JJ low-yielding) (NNS assets))
+        (PP (JJ such) (IN as)
+          (NP
+            (NP (JJ inter-bank) (NNS loans))
+            (, ,)
+            (SBAR
+              (WHNP-1 (WDT which))
+              (S
+                (NP-SBJ-2 (-NONE- *T*-1))
+                (VP (VBD were)
+                  (VP (VBN allowed)
+                    (S
+                      (NP-SBJ (-NONE- *-2))
+                      (VP (TO to)
+                        (VP (VB decrease))))))))))))
+    (. .)))
+
+
