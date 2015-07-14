@@ -267,6 +267,31 @@ recall.
 \subsection{Features}
 \label{sec-4-1}
 
+\begin{table}[t]
+  \centering
+\begin{tabular}{ll}
+ \multicolumn{2}{c}{\bf Local Features} \\
+ \hline
+ $t_{k-1}$                 & $t_{k}$                 \\
+ $t_{k-2},t_{k-1}$         & $t_{k},t_{k+1}$         \\
+ $t_{k-3},t_{k-2},t_{k-1}$ & $t_{k},t_{k+1},t_{k+2}$ \\
+\end{tabular}
+
+\begin{tabular}{ll}
+ \multicolumn{2}{c}{\bf Global Features} \\
+ \hline
+  $t^l_{i}$                     & $1 \le i < k - 1$ \\
+  $t^l_{i},t^l_{i+1}$           & $1 \le i < k - 2$ \\
+  $t^l_{i},t^l_{i+1},t^l_{i+2}$ & $1 \le i < k - 3$ \\
+  $t^l_{i}$                     & $k \le i < n - 1$ \\
+  $t^l_{i},t^l_{i+1}$           & $k \le i < n - 2$ \\
+  $t^l_{i},t^l_{i+1},t^l_{i+2}$ & $k \le i < n - 3$ \\
+\end{tabular}
+
+\caption{Feature templates. $k$ is the boundary position, $t_k$ is the $k$ th POS tag (level 0), and $t^{l}_{i}$ is the $i$ th POS tag in the $l$-level POS tag sequence.}
+\label{tbl:features}
+\end{table}
+
 \begin{table*}[tbp]
 %\resizebox{12cm}{!}{
 
@@ -302,51 +327,8 @@ We use only part-of-speech tags to create features for the classifier
 property of independence between two words is inherently global, as it
 can be affected by structure arbitrarily far away. Thus we have both
 local and global features. The global features are furthermore
-distinguished by \textbf{POS level}, explained in detail later. The specific
-feature templates are shown below:
-
-\subsubsection{Local Features}
-\label{sec-4-1-1}
-\begin{enumerate}
-\item Left
-\label{sec-4-1-1-1}
-\begin{itemize}
-\item $t_{k-1}$
-\item $t_{k-2},t_{k-1}$
-\item $t_{k-3},t_{k-2},t_{k-1}$
-\end{itemize}
-
-\item Right
-\label{sec-4-1-1-2}
-\begin{itemize}
-\item $t_{k}$
-\item $t_{k},t_{k+1}$
-\item $t_{k},t_{k+1},t_{k+2}$
-\end{itemize}
-\end{enumerate}
-
-\subsubsection{Global Features}
-\label{sec-4-1-2}
-
-Below, $t^{l}_{i}$ is the $i$ th POS tag in the $l$-level POS tag sequence.
-
-\begin{enumerate}
-\item Left
-\label{sec-4-1-2-1}
-\begin{itemize}
-\item $t^l_{i}$ for $1 \le i < k - 1$, $l \in {0,1,2,3}$
-\item $t^l_{i},t^l_{i+1}$ for $1 \le i < k - 2$, $l \in {0,1,2,3}$
-\item $t^l_{i},t^l_{i+1},t^l_{i+2}$ for $1 \le i < k - 3$, $l \in {0,1,2,3}$
-\end{itemize}
-
-\item Right
-\label{sec-4-1-2-2}
-\begin{itemize}
-\item $t^l_{i}$ for $k \le i < n - 1$, $l \in {0,1,2,3}$
-\item $t^l_{i},t^l_{i+1}$ for $k \le i < n - 2$, $l \in {0,1,2,3}$
-\item $t^l_{i},t^l_{i+1},t^l_{i+2}$ for $k \le i < n - 3$, $l \in {0,1,2,3}$
-\end{itemize}
-\end{enumerate}
+distinguished by \textbf{POS level}, explained in detail in the next section. The specific
+feature templates are shown in Table~\ref{tbl:features}.
 
 \subsection{POS Level}
 \label{sec-4-2}
@@ -611,22 +593,25 @@ only allowed a parse that violated the gold boundaries).
 
 To compare with previous work on parsing using the Penn Treebank, we show the
 time and accuracy for parsing section 23, using both linear and kernel
-classifier output, along with the baseline parser, below. The times reported are
+classifier output along with the baseline parser in Table~\ref{tbl:wsj23}. The times reported are
 the average of three runs each. Because there was significant variation in parse
 time when multiple processes were run in parallel, for these results only one
 process was run at a time. The results parallel those shown on the development
 data.
 
-\begin{center}
+\begin{table}
+  \centering
 \begin{tabular}{llll}
 {\bf Parser} & {\bf Time} (s) & {\bf Speedup} & {\bf F$_{\text{1}}$} \\
-%\hline
+\hline
 baseline & 1538 & & 85.54 \\
 linear & 1106 & 1.39\texttimes{} & 83.55 (-1.99)\\
  & (+100) & (1.28\texttimes{}) &  \\
 poly & 1040 & 1.48\texttimes{} & 84.57 (-0.97)\\
 \end{tabular}
-\end{center}
+\caption{Results of parsing WSJ section 23.}
+\label{tbl:wsj23}
+\end{table}
 
 As a point of comparison, Roark et al. (2012) reported speedups of 1.6-2x with
 no loss of accuracy. These results are not directly comparable due to
