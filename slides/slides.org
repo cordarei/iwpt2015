@@ -36,3 +36,83 @@
 ** Overview
 
 - CKY Parsing With Independence Constraints
+
+* Independence Constraints
+
+** Independence Constraints
+
+#+BEGIN_LaTeX
+\resizebox{\textwidth}{!}{
+\begin{forest}
+[ROOT
+  [S
+    [NP-SBJ [DT [These]] [JJ [high-yielding]] [NNS [loans]]]
+    [ADVP [IN [in]] [NN [effect]]]
+    [VP [VBD [replaced]]
+      [NP
+        [NP [DT [some]] [JJ [low-yielding]] [NNS [assets]]]
+        [PP [JJ [such]] [IN [as]]
+          [NP
+            [NP [JJ [inter-bank]] [NNS [loans]]]
+            [{,} [{,}]]
+            [SBAR
+              [WHNP-1 [WDT [which]]]
+              [S
+                [VP [VBD [were]]
+                  [VP [VBN [allowed]]
+                    [S
+                      [VP [TO [to]]
+                        [VP [VB [decrease]]]]]]]]]]]]]
+    [. [.]]]]
+\end{forest}
+}
+#+END_LaTeX
+
+** Independence Constraints
+
+#+BEGIN_LaTeX
+\resizebox{\textwidth}{!}{
+\begin{tabular}{cccc}
+\begin{forest}
+    [NP-SBJ [DT [These]] [JJ [high-yielding]] [NNS [loans]]]
+\end{forest}
+&
+\begin{forest}
+    [ADVP [IN [in]] [NN [effect]]]
+\end{forest}
+&
+\begin{forest}
+    [VP [VBD [replaced]]
+      [NP
+        [NP [DT [some]] [JJ [low-yielding]] [NNS [assets]]]
+        [PP [JJ [such]] [IN [as]]
+          [NP
+            [NP [JJ [inter-bank]] [NNS [loans]]]
+            [{,} [{,}]]
+            [SBAR
+              [WHNP-1 [WDT [which]]]
+              [S
+                [VP [VBD [were]]
+                  [VP [VBN [allowed]]
+                    [S
+                      [VP [TO [to]]
+                        [VP [VB [decrease]]]]]]]]]]]]]
+\end{forest}
+&
+\begin{forest}
+    [. [.]]
+\end{forest}
+\\
+\end{tabular}
+}
+#+END_LaTeX
+
+
+* Classifying Independent Span Boundaries
+
+** Classifying Independent Span Boundaries
+
+* Parsing With Independence Constraints
+
+** Parsing With Independence Constraints
+  
