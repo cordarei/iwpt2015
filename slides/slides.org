@@ -13,6 +13,7 @@
 #+LATEX_HEADER: \usepackage{fontspec}
 #+LATEX_HEADER: \usepackage{xunicode}
 #+LATEX_HEADER: \usepackage{forest}
+#+LATEX_HEADER: \usepackage[linesnumbered]{algorithm2e}
 #+LATEX_HEADER: \setbeamertemplate{navigation symbols}{}
 #+LATEX_HEADER: \setromanfont{Source Sans Pro}
 #+LATEX_HEADER: \newcommand{\deja}[1]{{\fontspec{DejaVu Sans}#1}}
@@ -31,11 +32,6 @@
 
 # file:slides.pdf
 
-* 
-
-** Overview
-
-- CKY Parsing With Independence Constraints
 
 * Independence Constraints
 
@@ -72,16 +68,11 @@
 
 #+BEGIN_LaTeX
 \resizebox{\textwidth}{!}{
-\begin{tabular}{cccc}
 \begin{forest}
+[ROOT ,phantom
+  [S ,phantom
     [NP-SBJ [DT [These]] [JJ [high-yielding]] [NNS [loans]]]
-\end{forest}
-&
-\begin{forest}
     [ADVP [IN [in]] [NN [effect]]]
-\end{forest}
-&
-\begin{forest}
     [VP [VBD [replaced]]
       [NP
         [NP [DT [some]] [JJ [low-yielding]] [NNS [assets]]]
@@ -97,22 +88,200 @@
                     [S
                       [VP [TO [to]]
                         [VP [VB [decrease]]]]]]]]]]]]]
+    [. [.]]]]
 \end{forest}
-&
-\begin{forest}
-    [. [.]]
-\end{forest}
-\\
-\end{tabular}
 }
 #+END_LaTeX
 
+** Independent Words
+
+Given a sentence $s = w_1 w_2 \dots w_n$ and a context-free derivation (parse
+tree) $t$ of $s$, words $w_i$ and $w_{i+1}$ are \textbf{independent} if every
+node in $t$ that dominates both $w_i$ and $w_{i+1}$ also dominates $w_1$ and
+$w_n$. Furthermore, if $w_i$ and $w_{i+1}$ are independent, then $\forall j,k$
+s.t. $j \leq i$ and $k > i$, $w_j$ and $w_k$ are independent.
+
+** Parsing: Ideal
+
+#+BEGIN_LaTeX
+\resizebox{\textwidth}{!}{
+\begin{forest}
+  top/.style={edge=red, for children={edge=red}, color=red}
+[ROOT ,top
+  [S ,top
+    [NP-SBJ [DT [These]] [JJ [high-yielding]] [NNS [loans]]]
+    [ADVP [IN [in]] [NN [effect]]]
+    [VP [VBD [replaced]]
+      [NP
+        [NP [DT [some]] [JJ [low-yielding]] [NNS [assets]]]
+        [PP [JJ [such]] [IN [as]]
+          [NP
+            [NP [JJ [inter-bank]] [NNS [loans]]]
+            [{,} [{,}]]
+            [SBAR
+              [WHNP-1 [WDT [which]]]
+              [S
+                [VP [VBD [were]]
+                  [VP [VBN [allowed]]
+                    [S
+                      [VP [TO [to]]
+                        [VP [VB [decrease]]]]]]]]]]]]]
+    [. [.]]]]
+\end{forest}
+}
+#+END_LaTeX
+
+** Parsing: Reality
+
+- independent boundaries must be identified automatically
+- classifier will make errors
+  - compensate for false negative by doing extra computation
+- grammar binarization
+
+** Parsing: Reality
+
+file:../paper/chart-constraints.pdf
 
 * Classifying Independent Span Boundaries
 
 ** Classifying Independent Span Boundaries
 
+- binary classifier: is $k$ an independent span boundary?
+- instance for every $1 \le k < n$
+
+** Features
+
+#+BEGIN_LaTeX
+  \centering
+\begin{tabular}{ll}
+ \multicolumn{2}{c}{\bf Local Features} \\
+ \hline
+ $t_{k-1}$                 & $t_{k}$                 \\
+ $t_{k-2},t_{k-1}$         & $t_{k},t_{k+1}$         \\
+ $t_{k-3},t_{k-2},t_{k-1}$ & $t_{k},t_{k+1},t_{k+2}$ \\
+\end{tabular}
+
+\begin{tabular}{ll}
+ \multicolumn{2}{c}{\bf Global Features} \\
+ \hline
+  $t^l_{i}$                     & $1 \le i < k - 1$ \\
+  $t^l_{i},t^l_{i+1}$           & $1 \le i < k - 2$ \\
+  $t^l_{i},t^l_{i+1},t^l_{i+2}$ & $1 \le i < k - 3$ \\
+  $t^l_{i}$                     & $k \le i < n - 1$ \\
+  $t^l_{i},t^l_{i+1}$           & $k \le i < n - 2$ \\
+  $t^l_{i},t^l_{i+1},t^l_{i+2}$ & $k \le i < n - 3$ \\
+\end{tabular}
+
+#+END_LaTeX
+
+** POS Levels
+
+#+BEGIN_LaTeX
+\centering
+\scriptsize
+
+\begin{tabular}{llllllll}
+Lvl0 & Lvl1 & Lvl2 & Lvl3 & Lvl0 & Lvl1 & Lvl2 & Lvl3\\
+\hline
+NN & N & N & N & CD & X & X & \#\\
+NNP & N & N & N & -LRB- & X & X & B\\
+NNPS & N & N & N & -RRB- & X & X & B\\
+NNS & N & N & N & DT & X & X & D\\
+PRP & N & N & N & PDT & X & X & D\\
+VB & V & V & V & PRP\$ & X & X & D\\
+VBD & V & V & V & WP\$ & X & X & D\\
+VBG & V & V & V & JJ & X & X & J\\
+VBN & V & V & V & JJR & X & X & J\\
+VBP & V & V & V & JJS & X & X & J\\
+VBZ & V & V & V & -RQ- & X & X & Q\\
+, & X & , & , & -LQ- & X & X & Q\\
+. & X & . & . & RB & X & X & R\\
+: & X & : & : & RBR & X & X & R\\
+CC & X & C & C & RBS & X & X & R\\
+IN & X & I & I & EX & X & X & X\\
+RP & X & I & I & FW & X & X & X\\
+TO & X & T & T & LS & X & X & X\\
+WDT & X & W & W & MD & X & X & X\\
+WP & X & W & W & POS & X & X & X\\
+WRB & X & W & W & SYM & X & X & X\\
+\# & X & X & \# & UH & X & X & X\\
+\$ & X & X & \# &  &  &  & \\
+\end{tabular}
+
+#+END_LaTeX
+
+** Results
+
+#+BEGIN_LaTeX
+\begin{tabular}{llrrrrrrrrr}
+{\bf Features} & {\bf Threshold} & {\bf Acc} & {\bf Prec} & {\bf Rec} & {\bf F$_{\text{1}}$} & {\bf F$_{\text{0.5}}$} & {\bf TP} & {\bf FP} & {\bf FN} & {\bf TN} \\
+\hline
+p,P$_{\text{0}}$,P$_{\text{1}}$,P$_{\text{2}}$,P$_{\text{3}}$ & default & 97.47 & 92.17 & 88.91 & 90.51 & 91.50 & 4640 & 394 & 579 & 32804\\
+p,P$_{\text{0}}$,P$_{\text{1}}$,P$_{\text{2}}$,P$_{\text{3}}$ & precision & 97.27 & 92.95 & 86.43 & 89.58 & 91.57 & 4511 & 342 & 708 & 32856\\
+p,P$_{\text{0}}$,P$_{\text{1}}$,P$_{\text{2}}$,P$_{\text{3}}$ & max precision & 96.57 & 94.22 & 79.63 & 86.31 & 90.89 & 4156 & 255 & 1063 & 32943\\
+p,P$_{\text{0}}$,P$_{\text{1}}$,P$_{\text{2}}$,P$_{\text{3}}$ & recall & 97.15 & 88.16 & 91.32 & 89.71 & 88.78 & 4766 & 640 & 453 & 32558\\
+\end{tabular}
+
+#+END_LaTeX
+
 * Parsing With Independence Constraints
 
 ** Parsing With Independence Constraints
   
+** CKY Algorithm
+
+#+BEGIN_LaTeX
+\begin{algorithm}[H]
+  \caption{The CKY algorithm. $T_{i,j}$ is the cell corresponding to words $w_i \dots w_{j-1}$.\label{alg:cky}}
+  \DontPrintSemicolon
+  \For {$1 \le i \le n$}{
+    $T_{i,i+1} \gets \{A|A\rightarrow a \in G \wedge w_i = a\}$
+  }
+  \For {$2 \le j \le n$}{
+    \For {$1 \le i \le n-j+1$}{
+      \For {$i < k < i+j$}{
+        $T_{i,i+j} \gets \{A|A\rightarrow BC \in G \wedge B \in T_{i,k} \wedge C \in T_{k,i+j} \}$\;
+      }
+    }
+  }
+\end{algorithm}
+
+#+END_LaTeX
+
+** Revised CKY Algorithm
+
+#+BEGIN_LaTeX
+\begin{algorithm}[H]
+  \caption{The CKY algorithm. $T_{i,j}$ is the cell corresponding to words $w_i \dots w_{j-1}$.\label{alg:cky}}
+  \DontPrintSemicolon
+  \For {$1 \le i \le n$}{
+    $T_{i,i+1} \gets \{A|A\rightarrow a \in G \wedge w_i = a\}$
+  }
+  \For {$2 \le j \le n$}{
+    \For {$1 \le i \le n-j+1$}{
+      \For {$i < k < i+j$}{
+        \If {$w_i$ and $w_{i+j}$ independent}{
+          $T_{i,i+j} \gets \{A|A\rightarrow BC \in G\setminus{}G_{comp} \wedge B \in T_{i,k} \wedge C \in T_{k,i+j} \}$\;
+        } \Else {
+          $T_{i,i+j} \gets \{A|A\rightarrow BC \in G \wedge B \in T_{i,k} \wedge C \in T_{k,i+j} \}$\;
+        }
+      }
+    }
+  }
+\end{algorithm}
+
+#+END_LaTeX
+
+** Results of parsing WSJ section 23
+
+#+BEGIN_LaTeX
+  \centering
+\begin{tabular}{llll}
+{\bf Parser} & {\bf Time} (s) & {\bf Speedup} & {\bf F$_{\text{1}}$} \\
+\hline
+baseline & 1538 & & 85.54 \\
+linear & 1106 & 1.39\texttimes{} & 83.55 (-1.99)\\
+ & (+100) & (1.28\texttimes{}) &  \\
+poly & 1040 & 1.48\texttimes{} & 84.57 (-0.97)\\
+\end{tabular}
+#+END_LaTeX
