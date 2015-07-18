@@ -43,9 +43,18 @@
 
 ** Motivation
 
+[example?]
+
+** Motivation
+
 - current parsing techniques are generally \BigO{n^2}~\BigO{n^3}
   - possible speed gains by parsing smaller chunks at a time
   - $\left(\frac{n}{2}\right)^2+\left(\frac{n}{2}\right)^2 = \frac{n^2}{2} < n^2$
+    
+# file:./parser-time-complexity.pdf
+#+BEGIN_LaTeX
+\includegraphics[width=.9\textwidth,height=.5\textheight]{./parser-time-complexity.pdf}
+#+END_LaTeX
 
 ** Motivation
 
@@ -264,7 +273,11 @@ WRB & X & W & W & SYM & X & X & X\\
 
 ** Results
 
-[graph feature conf on prec-rec plain]
+\centering
+# file:./feature-conf-plot.pdf
+#+BEGIN_LaTeX
+\includegraphics[width=.75\textwidth]{./feature-conf-plot.pdf}
+#+END_LaTeX
 
 ** Results
 
