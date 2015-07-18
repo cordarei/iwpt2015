@@ -1,6 +1,6 @@
 #+TITLE: CKY Parsing With Independence Constraints
-#+AUTHOR: Joseph Irwin
-#+DATE:
+#+AUTHOR: Joseph Irwin and Yuji Matsumoto
+#+DATE: IWPT2015
 #+STARTUP: beamer
 #+LaTeX_CLASS: beamer
 #+LaTeX_CLASS_OPTIONS: [presentation,bigger]
@@ -12,6 +12,7 @@
 #+LATEX_HEADER: \usepackage{amssymb}
 #+LATEX_HEADER: \usepackage{fontspec}
 #+LATEX_HEADER: \usepackage{xunicode}
+#+LATEX_HEADER: \usepackage{multirow}
 #+LATEX_HEADER: \usepackage{forest}
 #+LATEX_HEADER: \usepackage[linesnumbered]{algorithm2e}
 #+LATEX_HEADER: \setbeamertemplate{navigation symbols}{}
@@ -19,6 +20,8 @@
 #+LATEX_HEADER: \newcommand{\deja}[1]{{\fontspec{DejaVu Sans}#1}}
 #+LATEX_HEADER: \DeclareMathOperator*{\argmin}{arg\,min}
 #+LATEX_HEADER: \DeclareMathOperator*{\argmax}{arg\,max}
+#+LATEX_HEADER: \newcommand{\BigO}[1]{\ensuremath{\operatorname{O}\bigl(#1\bigr)}}
+#+LATEX_HEADER: \newcommand{\Dag}{\ensuremath{^{\dagger}}}
 #+LATEX_HEADER: \AtBeginSection[]{
 #+LATEX_HEADER:   \begin{frame}
 #+LATEX_HEADER:   \vfill
@@ -31,6 +34,29 @@
 #+LATEX_HEADER: }
 
 # file:slides.pdf
+
+* Motivation
+
+** Motivation
+
+- it would be elegant if we could divide (a significant proportion of) long sentences in a linguistically-motivated way
+
+** Motivation
+
+- current parsing techniques are generally \BigO{n^2}~\BigO{n^3}
+  - possible speed gains by parsing smaller chunks at a time
+  - $\left(\frac{n}{2}\right)^2+\left(\frac{n}{2}\right)^2 = \frac{n^2}{2} < n^2$
+
+** Motivation
+
+- bottom-up techniques:
+  - chunking
+  - clause boundary identification
+  - constituent boundary identification (TK Roark et al)
+
+** Motivation
+
+- top-down techniques?
 
 
 * Independence Constraints
@@ -137,10 +163,15 @@ s.t. $j \leq i$ and $k > i$, $w_j$ and $w_k$ are independent.
 - classifier will make errors
   - compensate for false negative by doing extra computation
 - grammar binarization
+  - the span of an incomplete constituent differs from the span of its eventual complete constituent (possibly arbitrarily)
 
 ** Parsing: Reality
 
+\centering
+
 file:../paper/chart-constraints.pdf
+
+CKY Chart
 
 * Classifying Independent Span Boundaries
 
@@ -148,6 +179,10 @@ file:../paper/chart-constraints.pdf
 
 - binary classifier: is $k$ an independent span boundary?
 - instance for every $1 \le k < n$
+- pointwise model
+- POS features
+  - global features
+  - heuristic transformations of POS sequence (POS /level/ )
 
 ** Features
 
@@ -210,29 +245,38 @@ WRB & X & W & W & SYM & X & X & X\\
 
 #+END_LaTeX
 
+** POS Levels
+
+- Level 0: Original tags
+- Level 1: Noun+Verb+Other tags (clause nuclei)
+- Level 2: Noun+Verb+Punct+Conj+Prep+Other (clause boundaries)
+- Level 3: Merge related tags (reduce features, smoothing)
+
+** POS Levels: Example
+
+[example]
+
+** Experimental Setup
+
+- =opal= online classifier
+- trained on WSJ sections 01-21
+- development on WSJ section 22
+
 ** Results
 
-#+BEGIN_LaTeX
-\begin{tabular}{llrrrrrrrrr}
-{\bf Features} & {\bf Threshold} & {\bf Acc} & {\bf Prec} & {\bf Rec} & {\bf F$_{\text{1}}$} & {\bf F$_{\text{0.5}}$} & {\bf TP} & {\bf FP} & {\bf FN} & {\bf TN} \\
-\hline
-p,P$_{\text{0}}$,P$_{\text{1}}$,P$_{\text{2}}$,P$_{\text{3}}$ & default & 97.47 & 92.17 & 88.91 & 90.51 & 91.50 & 4640 & 394 & 579 & 32804\\
-p,P$_{\text{0}}$,P$_{\text{1}}$,P$_{\text{2}}$,P$_{\text{3}}$ & precision & 97.27 & 92.95 & 86.43 & 89.58 & 91.57 & 4511 & 342 & 708 & 32856\\
-p,P$_{\text{0}}$,P$_{\text{1}}$,P$_{\text{2}}$,P$_{\text{3}}$ & max precision & 96.57 & 94.22 & 79.63 & 86.31 & 90.89 & 4156 & 255 & 1063 & 32943\\
-p,P$_{\text{0}}$,P$_{\text{1}}$,P$_{\text{2}}$,P$_{\text{3}}$ & recall & 97.15 & 88.16 & 91.32 & 89.71 & 88.78 & 4766 & 640 & 453 & 32558\\
-\end{tabular}
+[graph feature conf on prec-rec plain]
 
-#+END_LaTeX
+** Results
+
 
 * Parsing With Independence Constraints
-
-** Parsing With Independence Constraints
   
 ** CKY Algorithm
 
+\small
 #+BEGIN_LaTeX
 \begin{algorithm}[H]
-  \caption{The CKY algorithm. $T_{i,j}$ is the cell corresponding to words $w_i \dots w_{j-1}$.\label{alg:cky}}
+  % \caption{The CKY algorithm. $T_{i,j}$ is the cell corresponding to words $w_i \dots w_{j-1}$.\label{alg:cky}}
   \DontPrintSemicolon
   \For {$1 \le i \le n$}{
     $T_{i,i+1} \gets \{A|A\rightarrow a \in G \wedge w_i = a\}$
@@ -250,9 +294,10 @@ p,P$_{\text{0}}$,P$_{\text{1}}$,P$_{\text{2}}$,P$_{\text{3}}$ & recall & 97.15 &
 
 ** Revised CKY Algorithm
 
+\small
 #+BEGIN_LaTeX
 \begin{algorithm}[H]
-  \caption{The CKY algorithm. $T_{i,j}$ is the cell corresponding to words $w_i \dots w_{j-1}$.\label{alg:cky}}
+  % \caption{The CKY algorithm. $T_{i,j}$ is the cell corresponding to words $w_i \dots w_{j-1}$.\label{alg:cky2}}
   \DontPrintSemicolon
   \For {$1 \le i \le n$}{
     $T_{i,i+1} \gets \{A|A\rightarrow a \in G \wedge w_i = a\}$
@@ -260,7 +305,7 @@ p,P$_{\text{0}}$,P$_{\text{1}}$,P$_{\text{2}}$,P$_{\text{3}}$ & recall & 97.15 &
   \For {$2 \le j \le n$}{
     \For {$1 \le i \le n-j+1$}{
       \For {$i < k < i+j$}{
-        \If {$w_i$ and $w_{i+j}$ independent}{
+        \If {$w_i$ and $w_{i+j-1}$ independent}{
           $T_{i,i+j} \gets \{A|A\rightarrow BC \in G\setminus{}G_{comp} \wedge B \in T_{i,k} \wedge C \in T_{k,i+j} \}$\;
         } \Else {
           $T_{i,i+j} \gets \{A|A\rightarrow BC \in G \wedge B \in T_{i,k} \wedge C \in T_{k,i+j} \}$\;
@@ -272,16 +317,46 @@ p,P$_{\text{0}}$,P$_{\text{1}}$,P$_{\text{2}}$,P$_{\text{3}}$ & recall & 97.15 &
 
 #+END_LaTeX
 
+** Experimental Setup
+
+- implemented constraints into Stanford Parser
+  - ExhaustiveCYKParser
+- unlexicalized grammar extracted using Stanford Parser from WSJ 01-21
+- tested on WSJ section 23
+
 ** Results of parsing WSJ section 23
 
 #+BEGIN_LaTeX
   \centering
-\begin{tabular}{llll}
-{\bf Parser} & {\bf Time} (s) & {\bf Speedup} & {\bf F$_{\text{1}}$} \\
+\begin{tabular}{lclll}
+{\bf Parser}           & {\bf Constraints\hspace{-.5em}} & {\bf Time} (s) & {\bf Speedup}      & {\bf F$_{\text{1}}$} \\
 \hline
-baseline & 1538 & & 85.54 \\
-linear & 1106 & 1.39\texttimes{} & 83.55 (-1.99)\\
- & (+100) & (1.28\texttimes{}) &  \\
-poly & 1040 & 1.48\texttimes{} & 84.57 (-0.97)\\
+baseline               &                   & 1538           &                    & 85.54                \\
+\multirow{3}{1.75cm}{+constraints} & \multirow{2}{*}{linear}            & 1106           & 1.39\texttimes{}   & 83.55 (-1.99)        \\
+                       &                   & {\small{}+100\Dag}         & {\small{}(1.28\texttimes{})} &                      \\
+                       & poly              & 1040           & 1.48\texttimes{}   & 84.57 (-0.97)        \\
 \end{tabular}
 #+END_LaTeX
+
+\Dag Time taken by Python script
+
+# 1.28 speedup == time reduced by 22%
+# 1.39 speedup == 28%
+
+* Wrap-up
+
+** Summary
+
+- proposed constraints for parsing based on independent span boundaries
+- demonstrated a classifier for recognizing independent span boundaries
+- integrated constraints into CKY parser
+
+# for a speedup of let's say 30% at cost of 2 F1 score
+
+** Future Work
+
+- improve  model
+- pipeline vs joint architecture
+- apply constraints to other parser technologies
+
+* Questions

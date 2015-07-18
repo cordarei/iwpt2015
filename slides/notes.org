@@ -1,0 +1,15 @@
+* CKY Parsing With Independence Constraints
+
+Good Morning.
+
+The paper I am presenting is titled "CKY Parsing with Independence Constraints";
+I am the first author.
+
+I will start by talking a bit about the motivation behind this research.
+
+It started with a feeling I had, the it would be elegant if there were a way to
+divide up a long sentence in some linguistically motivated fashion before fully
+parsing bottom-up to avoid analyzing "obviously-wrong" spans.
+
+
+-- we're way past the time when parsers could report results on sentences < 40 tokens long --
