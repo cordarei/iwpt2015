@@ -337,6 +337,124 @@ WRB & X & W & W & SYM & X & X & X\\
 - unlexicalized grammar extracted using Stanford Parser from WSJ 01-21
 - tested on WSJ section 23
 
+** Head-Outward Binarization
+
+#+BEGIN_LaTeX
+\resizebox{.9\textwidth}{!}{
+\begin{forest}
+  head/.style={edge=red, color=red}
+[{ROOT}
+  [{SINV-v},head [{``-SINV} [{``}]]
+    [{@SINV-v|-VP-SINV-VBF-v*-...-,-SINV<-S-v<},head
+      [{S-v}
+        [{NP-S-B} [{EX-NP} [{There}]]]
+        [{VP-S-VBF-v} [{VBZ-VP-BE} [{'s}]]
+          [{NP-VP-R-v}
+            [{NP-NP-B} [{DT-NP} [{a}]] [{NN-NP} [{price}]]]
+            [{SBAR-v}
+              [{WHPP} [{IN-WHPP} [{above}]]
+                [{WHNP} [{WDT-WHNP} [{which}]]]]
+              [{S-SBAR-v}
+                [{NP-S-B} [{PRP-NP} [{I}]]]
+                [{VP-S-VBF-v} [{VBP-VP-BE} [{'m}]]
+                  [{ADJP-v} [{JJ-ADJP} [{positive}]]
+                    [{SBAR-U-v}
+                      [{S-SBAR-v}
+                        [{NP-S-B} [{NNP-NP} [{Marshall}]]]
+                        [{VP-S-VBF-v} [{VBZ-VP-HV} [{has}]]
+                          [{NP-VP-v}
+                            [{NP-NP-B} [{DT-NP} [{the}]] [{NN-NP} [{courage}]]]
+                            [{SBAR-U-v}
+                              [{S-SBAR-v-G} [{RB-S} [{not}]]
+                                [{VP-S-TO-v} [{TO-VP} [{to}]]
+                                  [{VP-VP-VB-v} [{VB-VP} [{pay}]]]]]]]]]]]]]]]]]
+      [{@SINV-v|-VP-SINV-VBF-v*-...-''-SINV<-,-SINV<-},head [{,-SINV} [{,}]]
+        [{@SINV-v|-VP-SINV-VBF-v*-...-.-SINV>-''-SINV<-},head [{''-SINV} [{''}]]
+          [{@SINV-v|-VP-SINV-VBF-v*-NP-R>-.-SINV>},head
+            [{@SINV-v|-VP-SINV-VBF-v*-NP-R>},head
+              [{@SINV-v|-VP-SINV-VBF-v-},head
+                [{VP-SINV-VBF-v},head [{VBZ-VP},head [{says},head]]]]
+              [{NP-R}
+                [{@NP-R|-NP-NP-B*-,-NP>}
+                  [{@NP-R|-NP-NP-B-}
+                    [{NP-NP-B} [{NNP-NP} [{A.D.}]] [{NNP-NP} [{Correll}]]]]
+                  [{,-NP} [{,}]]]
+                [{NP-NP-R}
+                  [{NP-NP}
+                    [{NP-NP-P-B} [{NNP-NP} [{Georgia-Pacific}]] [{POS-NP} [{'s}]]]
+                    [{@NP-NP|-NN-NP*-...-JJ-NP<-} [{JJ-NP} [{executive}]]
+                      [{@NP-NP|-NN-NP*-NN-NP<-} [{NN-NP} [{vice}]]
+                        [{@NP-NP|-NN-NP*-} [{NN-NP} [{president}]]]]]]
+                  [{PP} [{IN-PP-N} [{for}]]
+                    [{NP-PP-B}
+                      [{@NP-PP-B|-NN-NP*-CC-NP>}
+                        [{@NP-PP-B|-NN-NP*-} [{NN-NP} [{pulp}]]]
+                        [{CC-NP} [{and}]]]
+                      [{NN-NP} [{paper}]]]]]]]
+            [{.-SINV} [{.}]]]]]]]
+  [{<EOS>} [{<EOS>}]]]
+\end{forest}
+}
+#+END_LaTeX
+
+# orig
+#+BEGIN_LaTeX
+%% \resizebox{.9\textwidth}{!}{
+%% \begin{forest}
+%% [{ROOT}
+%%   [{SINV-v} [{``^SINV} [{``}]]
+%%     [{@SINV-v|_VP^SINV-VBF-v*_..._,^SINV<_S-v<}
+%%       [{S-v}
+%%         [{NP^S-B} [{EX^NP} [{There}]]]
+%%         [{VP^S-VBF-v} [{VBZ^VP-BE} [{'s}]]
+%%           [{NP^VP-R-v}
+%%             [{NP^NP-B} [{DT^NP} [{a}]] [{NN^NP} [{price}]]]
+%%             [{SBAR-v}
+%%               [{WHPP} [{IN^WHPP} [{above}]]
+%%                 [{WHNP} [{WDT^WHNP} [{which}]]]]
+%%               [{S^SBAR-v}
+%%                 [{NP^S-B} [{PRP^NP} [{I}]]]
+%%                 [{VP^S-VBF-v} [{VBP^VP-BE} [{'m}]]
+%%                   [{ADJP-v} [{JJ^ADJP} [{positive}]]
+%%                     [{SBAR-U-v}
+%%                       [{S^SBAR-v}
+%%                         [{NP^S-B} [{NNP^NP} [{Marshall}]]]
+%%                         [{VP^S-VBF-v} [{VBZ^VP-HV} [{has}]]
+%%                           [{NP^VP-v}
+%%                             [{NP^NP-B} [{DT^NP} [{the}]] [{NN^NP} [{courage}]]]
+%%                             [{SBAR-U-v}
+%%                               [{S^SBAR-v-G} [{RB^S} [{not}]]
+%%                                 [{VP^S-TO-v} [{TO^VP} [{to}]]
+%%                                   [{VP^VP-VB-v} [{VB^VP} [{pay}]]]]]]]]]]]]]]]]]
+%%       [{@SINV-v|_VP^SINV-VBF-v*_..._''^SINV<_,^SINV<_} [{,^SINV} [{,}]]
+%%         [{@SINV-v|_VP^SINV-VBF-v*_..._.^SINV>_''^SINV<_} [{''^SINV} [{''}]]
+%%           [{@SINV-v|_VP^SINV-VBF-v*_NP-R>_.^SINV>}
+%%             [{@SINV-v|_VP^SINV-VBF-v*_NP-R>}
+%%               [{@SINV-v|_VP^SINV-VBF-v_}
+%%                 [{VP^SINV-VBF-v} [{VBZ^VP} [{says}]]]]
+%%               [{NP-R}
+%%                 [{@NP-R|_NP^NP-B*_,^NP>}
+%%                   [{@NP-R|_NP^NP-B_}
+%%                     [{NP^NP-B} [{NNP^NP} [{A.D.}]] [{NNP^NP} [{Correll}]]]]
+%%                   [{,^NP} [{,}]]]
+%%                 [{NP^NP-R}
+%%                   [{NP^NP}
+%%                     [{NP^NP-P-B} [{NNP^NP} [{Georgia-Pacific}]] [{POS^NP} [{'s}]]]
+%%                     [{@NP^NP|_NN^NP*_..._JJ^NP<_} [{JJ^NP} [{executive}]]
+%%                       [{@NP^NP|_NN^NP*_NN^NP<_} [{NN^NP} [{vice}]]
+%%                         [{@NP^NP|_NN^NP*_} [{NN^NP} [{president}]]]]]]
+%%                   [{PP} [{IN^PP-N} [{for}]]
+%%                     [{NP^PP-B}
+%%                       [{@NP^PP-B|_NN^NP*_CC^NP>}
+%%                         [{@NP^PP-B|_NN^NP*_} [{NN^NP} [{pulp}]]]
+%%                         [{CC^NP} [{and}]]]
+%%                       [{NN^NP} [{paper}]]]]]]]
+%%             [{.^SINV} [{.}]]]]]]]
+%%   [{<EOS>} [{<EOS>}]]]
+%% \end{forest}
+%% }
+#+END_LaTeX
+
 ** Results of parsing WSJ section 23
 
 #+BEGIN_LaTeX
