@@ -258,7 +258,7 @@ WRB & X & W & W & SYM & X & X & X\\
 
 ** Experimental Setup
 
-- =opal= online classifier
+- =opal= online classifier, PA updates
 - trained on WSJ sections 01-21
 - development on WSJ section 22
 
@@ -272,6 +272,20 @@ WRB & X & W & W & SYM & X & X & X\\
 
 ** Results
 
+TODO: fix
+#+BEGIN_LaTeX
+\resizebox{\textwidth}{!}{
+
+\begin{tabular}{llrrrrrrrrr}
+{\bf Features} & {\bf Threshold} & {\bf Acc} & {\bf Prec} & {\bf Rec} & {\bf F$_{\text{1}}$} & {\bf F$_{\text{0.5}}$} & {\bf TP} & {\bf FP} & {\bf FN} & {\bf TN} \\
+\hline
+p,P$_{\text{1}}$,P$_{\text{3}}$ & default & 95.44 & 89.05 & 75.74 & 81.86 & 86.03 & 3953 & 486 & 1266 & 32712\\
+p,P$_{\text{1}}$,P$_{\text{3}}$ & precision & 94.99 & 91.65 & 69.44 & 79.01 & 86.14 & 3624 & 330 & 1595 & 32868\\
+p,P$_{\text{1}}$,P$_{\text{3}}$ & max precision & 92.10 & 95.80 & 43.74 & 60.06 & 77.38 & 2283 & 100 & 2936 & 33098\\
+p,P$_{\text{1}}$,P$_{\text{3}}$ & recall & 94.28 & 73.82 & 89.65 & 80.97 & 76.53 & 4679 & 1659 & 540 & 31539\\
+\end{tabular}
+}
+#+END_LaTeX
 
 * Parsing With Independence Constraints
   
@@ -293,7 +307,6 @@ WRB & X & W & W & SYM & X & X & X\\
     }
   }
 \end{algorithm}
-
 #+END_LaTeX
 
 ** Revised CKY Algorithm
@@ -318,7 +331,6 @@ WRB & X & W & W & SYM & X & X & X\\
     }
   }
 \end{algorithm}
-
 #+END_LaTeX
 
 ** Experimental Setup
