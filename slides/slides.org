@@ -58,15 +58,8 @@
 
 ** Motivation
 
-- bottom-up techniques:
-  - chunking
-  - clause boundary identification
-  - constituent boundary identification (TK Roark et al)
-
-** Motivation
-
-- top-down techniques?
-
+- Chunking: bottom-up, replace $k$ tokens with 1
+- Our method: top-down, only parse $k$ tokens at once
 
 * Independence Constraints
 
@@ -215,7 +208,6 @@ CKY Chart
   $t^l_{i},t^l_{i+1}$           & $k \le i < n - 2$ \\
   $t^l_{i},t^l_{i+1},t^l_{i+2}$ & $k \le i < n - 3$ \\
 \end{tabular}
-
 #+END_LaTeX
 
 ** POS Levels
@@ -224,7 +216,7 @@ CKY Chart
 \centering
 \scriptsize
 
-\begin{tabular}{llllllll}
+\begin{tabular}{llll|llll}
 Lvl0 & Lvl1 & Lvl2 & Lvl3 & Lvl0 & Lvl1 & Lvl2 & Lvl3\\
 \hline
 NN & N & N & N & CD & X & X & \#\\
@@ -251,7 +243,6 @@ WRB & X & W & W & SYM & X & X & X\\
 \# & X & X & \# & UH & X & X & X\\
 \$ & X & X & \# &  &  &  & \\
 \end{tabular}
-
 #+END_LaTeX
 
 ** POS Levels
