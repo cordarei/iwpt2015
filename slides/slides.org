@@ -39,11 +39,20 @@
 
 ** Motivation
 
-- it would be elegant if we could divide (a significant proportion of) long sentences in a linguistically-motivated way
+- it would be elegant if we could divide (a significant proportion of) long sentences in a linguistically-motivated way *before* parsing
 
 ** Motivation
 
-[example?]
+#+BEGIN_LaTeX
+\def\divider{|\\ }
+\textbf{But cosmetics firms still have one big marketing edge : They motivate sales people with commissions .}\\
+{But cosmetics firms still have one big marketing edge} \divider {:} \divider {They motivate sales people with commissions} \divider {.}
+
+\vspace{1em}
+
+\textbf{The dispute over that issue , according to one U.S. official , is a `` potential treaty stopper , '' and only President Bush and Soviet leader Mikhail Gorbachev may be able *-1 to resolve it .}\\
+{The dispute over that issue , according to one U.S. official , is a `` potential treaty stopper} \divider , \divider '' \divider {and only President Bush and Soviet leader Mikhail Gorbachev may be able *-1 to resolve it} \divider .
+#+END_LaTeX
 
 ** Motivation
 

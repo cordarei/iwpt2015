@@ -7,9 +7,10 @@ I am the first author.
 
 I will start by talking a bit about the motivation behind this research.
 
-It started with a feeling I had, the it would be elegant if there were a way to
+It started with a feeling, that it would be elegant if there were a way to
 divide up a long sentence in some linguistically motivated fashion before fully
 parsing bottom-up to avoid analyzing "obviously-wrong" spans.
 
 
+-- one sentence 118 tokens in WSJ22, parse time ~40s when virt all other sent < 10s --
 -- we're way past the time when parsers could report results on sentences < 40 tokens long --
