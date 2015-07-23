@@ -163,6 +163,35 @@ We also say that $i$ is an \textbf{independent span boundary}.
 #+BEGIN_LaTeX
 \resizebox{\textwidth}{!}{
 \begin{forest}
+[ROOT ,phantom
+  [S ,phantom
+    [NP-SBJ [DT [These]] [JJ [high-yielding]] [NNS [loans]]]
+    [ADVP [IN [in]] [NN [effect]]]
+    [VP [VBD [replaced]]
+      [NP
+        [NP [DT [some]] [JJ [low-yielding]] [NNS [assets]]]
+        [PP [JJ [such]] [IN [as]]
+          [NP
+            [NP [JJ [inter-bank]] [NNS [loans]]]
+            [{,} [{,}]]
+            [SBAR
+              [WHNP-1 [WDT [which]]]
+              [S
+                [VP [VBD [were]]
+                  [VP [VBN [allowed]]
+                    [S
+                      [VP [TO [to]]
+                        [VP [VB [decrease]]]]]]]]]]]]]
+    [. [.]]]]
+\end{forest}
+}
+#+END_LaTeX
+
+** Parsing: Ideal
+
+#+BEGIN_LaTeX
+\resizebox{\textwidth}{!}{
+\begin{forest}
   top/.style={edge=red, for children={edge=red}, color=red}
 [ROOT ,top
   [S ,top
@@ -209,7 +238,7 @@ CKY Chart
 ** Classifying Independent Span Boundaries
 
 - binary classifier: is $k$ an independent span boundary?
-- instance for every $1 \le k < n$
+- instance for every $1 \le k < n$ \pause
 - pointwise model \pause
 - POS features \pause
   - global features \pause
@@ -368,7 +397,7 @@ $^\ddagger$ p,P$_{\text{0}}$,P$_{\text{1}}$,P$_{\text{2}}$,P$_{\text{3}}$
 
 ** Experimental Setup
 
-- implemented constraints into Stanford Parser
+- implemented constraints in Stanford Parser
   - ExhaustivePCFGParser
   - https://github.com/cordarei/CoreNLP
 - unlexicalized grammar extracted using Stanford Parser from WSJ 01-21
