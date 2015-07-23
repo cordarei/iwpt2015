@@ -22,6 +22,7 @@
 #+LATEX_HEADER: \DeclareMathOperator*{\argmax}{arg\,max}
 #+LATEX_HEADER: \newcommand{\BigO}[1]{\ensuremath{\operatorname{O}\bigl(#1\bigr)}}
 #+LATEX_HEADER: \newcommand{\Dag}{\ensuremath{^{\dagger}}}
+#+LATEX_HEADER: \newcommand\examplesize{\scriptsize}
 #+LATEX_HEADER: \AtBeginSection[]{
 #+LATEX_HEADER:   \begin{frame}
 #+LATEX_HEADER:   \vfill
@@ -314,10 +315,6 @@ WRB & X & W & W & SYM & X & X & X\\
 # need more rigor!!
 
 ** POS Levels Example: Level 1
-
-#+BEGIN_LaTeX
-\newcommand\examplesize{\scriptsize}
-#+END_LaTeX
 
 #+BEGIN_LaTeX
 \examplesize
