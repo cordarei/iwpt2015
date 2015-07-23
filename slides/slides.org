@@ -44,14 +44,31 @@
 ** Motivation
 
 #+BEGIN_LaTeX
-\def\divider{|\\ }
-%% \textbf{But cosmetics firms still have one big marketing edge : They motivate sales people with commissions .}\\
+%% \def\divider{|\\ }
+\textbf{But cosmetics firms still have one big marketing edge : They motivate sales people with commissions .}\\
 %% {But cosmetics firms still have one big marketing edge} \divider {:} \divider {They motivate sales people with commissions} \divider {.}
 
 %% \vspace{1em}
 
-\textbf{The dispute over that issue , according to one U.S. official , is a `` potential treaty stopper , '' and only President Bush and Soviet leader Mikhail Gorbachev may be able to resolve it .}\\
-{The dispute over that issue , according to one U.S. official , is a `` potential treaty stopper} \divider , \divider '' \divider {and only President Bush and Soviet leader Mikhail Gorbachev may be able to resolve it} \divider .
+%% \textbf{The dispute over that issue , according to one U.S. official , is a `` potential treaty stopper , '' and only President Bush and Soviet leader Mikhail Gorbachev may be able to resolve it .}\\
+%% {The dispute over that issue , according to one U.S. official , is a `` potential treaty stopper} \divider , \divider '' \divider {and only President Bush and Soviet leader Mikhail Gorbachev may be able to resolve it} \divider .
+#+END_LaTeX
+
+** Motivation
+
+#+BEGIN_LaTeX
+%% \def\divider{|\\ }
+\textbf{But cosmetics firms still have one big marketing edge :}
+
+\vspace{1em}
+
+\textbf{They motivate sales people with commissions .}\\
+%% {But cosmetics firms still have one big marketing edge} \divider {:} \divider {They motivate sales people with commissions} \divider {.}
+
+%% \vspace{1em}
+
+%% \textbf{The dispute over that issue , according to one U.S. official , is a `` potential treaty stopper , '' and only President Bush and Soviet leader Mikhail Gorbachev may be able to resolve it .}\\
+%% {The dispute over that issue , according to one U.S. official , is a `` potential treaty stopper} \divider , \divider '' \divider {and only President Bush and Soviet leader Mikhail Gorbachev may be able to resolve it} \divider .
 #+END_LaTeX
 
 ** Motivation
@@ -138,6 +155,9 @@ node in $t$ that dominates both $w_i$ and $w_{i+1}$ also dominates $w_1$ and
 $w_n$. Furthermore, if $w_i$ and $w_{i+1}$ are independent, then $\forall j,k$
 s.t. $j \leq i$ and $k > i$, $w_j$ and $w_k$ are independent.
 
+
+We also say that $i$ is an \textbf{independent span boundary}.
+
 ** Parsing: Ideal
 
 #+BEGIN_LaTeX
@@ -170,10 +190,10 @@ s.t. $j \leq i$ and $k > i$, $w_j$ and $w_k$ are independent.
 
 ** Parsing: Reality
 
-- independent boundaries must be identified automatically
-- classifier will make errors
-  - compensate for false negative by doing extra computation
-- grammar binarization
+- independent boundaries must be identified automatically \pause
+- classifier will make errors \pause
+  - compensate for false negative by doing extra computation \pause
+- grammar binarization \pause
   - the span of an incomplete constituent differs from the span of its eventual complete constituent (possibly arbitrarily)
 
 ** Parsing: Reality
@@ -190,15 +210,16 @@ CKY Chart
 
 - binary classifier: is $k$ an independent span boundary?
 - instance for every $1 \le k < n$
-- pointwise model
-- POS features
-  - global features
-  - heuristic transformations of POS sequence (POS /level/ )
+- pointwise model \pause
+- POS features \pause
+  - global features \pause
+  - heuristic transformations of POS sequence (POS /level/)
 
 ** Features
 
 #+BEGIN_LaTeX
   \centering
+\large
 \begin{tabular}{ll}
  \multicolumn{2}{c}{\bf Local Features} \\
  \hline
@@ -281,19 +302,22 @@ WRB & X & W & W & SYM & X & X & X\\
 
 ** Results
 
-TODO: fix
 #+BEGIN_LaTeX
-\resizebox{\textwidth}{!}{
-
+%% \resizebox{\textwidth}{!}{
+\large
 \begin{tabular}{llrrrrrrrrr}
-{\bf Features} & {\bf Threshold} & {\bf Acc} & {\bf Prec} & {\bf Rec} & {\bf F$_{\text{1}}$} & {\bf F$_{\text{0.5}}$} & {\bf TP} & {\bf FP} & {\bf FN} & {\bf TN} \\
+{\bf Classifier} & {\bf Acc} & {\bf Prec} & {\bf Rec} & {\bf F$_{\text{1}}$} & {\bf F$_{\text{0.5}}$}\\
 \hline
-p,P$_{\text{1}}$,P$_{\text{3}}$ & default & 95.44 & 89.05 & 75.74 & 81.86 & 86.03 & 3953 & 486 & 1266 & 32712\\
-p,P$_{\text{1}}$,P$_{\text{3}}$ & precision & 94.99 & 91.65 & 69.44 & 79.01 & 86.14 & 3624 & 330 & 1595 & 32868\\
-p,P$_{\text{1}}$,P$_{\text{3}}$ & max precision & 92.10 & 95.80 & 43.74 & 60.06 & 77.38 & 2283 & 100 & 2936 & 33098\\
-p,P$_{\text{1}}$,P$_{\text{3}}$ & recall & 94.28 & 73.82 & 89.65 & 80.97 & 76.53 & 4679 & 1659 & 540 & 31539\\
+ linear$^\dagger$ & 95.44 & 89.05 & 75.74 & 81.86 & 86.03\\
+ polynomial$^\ddagger$ & 97.47 & 92.17 & 88.91 & 90.51 & 91.50\\
 \end{tabular}
-}
+%% }
+\footnotesize
+\vfill
+
+$^\dagger$ p,P$_{\text{1}}$,P$_{\text{3}}$
+
+$^\ddagger$ p,P$_{\text{0}}$,P$_{\text{1}}$,P$_{\text{2}}$,P$_{\text{3}}$
 #+END_LaTeX
 
 * Parsing With Independence Constraints
@@ -345,14 +369,16 @@ p,P$_{\text{1}}$,P$_{\text{3}}$ & recall & 94.28 & 73.82 & 89.65 & 80.97 & 76.53
 ** Experimental Setup
 
 - implemented constraints into Stanford Parser
-  - ExhaustiveCYKParser
+  - ExhaustivePCFGParser
+  - https://github.com/cordarei/CoreNLP
 - unlexicalized grammar extracted using Stanford Parser from WSJ 01-21
 - tested on WSJ section 23
 
 ** Head-Outward Binarization
 
 #+BEGIN_LaTeX
-\resizebox{.9\textwidth}{!}{
+\centering
+\resizebox{\textwidth}{!}{
 \begin{forest}
   head/.style={edge=red, color=red}
 [{ROOT}
@@ -385,7 +411,7 @@ p,P$_{\text{1}}$,P$_{\text{3}}$ & recall & 94.28 & 73.82 & 89.65 & 80.97 & 76.53
           [{@SINV-v|-VP-SINV-VBF-v*-NP-R>-.-SINV>},head
             [{@SINV-v|-VP-SINV-VBF-v*-NP-R>},head
               [{@SINV-v|-VP-SINV-VBF-v-},head
-                [{VP-SINV-VBF-v},head [{VBZ-VP},head [{says},head]]]]
+                [{VP-SINV-VBF-v} [{VBZ-VP} [{says}]]]]
               [{NP-R}
                 [{@NP-R|-NP-NP-B*-,-NP>}
                   [{@NP-R|-NP-NP-B-}
@@ -464,6 +490,41 @@ p,P$_{\text{1}}$,P$_{\text{3}}$ & recall & 94.28 & 73.82 & 89.65 & 80.97 & 76.53
 %%             [{.^SINV} [{.}]]]]]]]
 %%   [{<EOS>} [{<EOS>}]]]
 %% \end{forest}
+%% }
+#+END_LaTeX
+
+** Results on WSJ section 22
+
+#+BEGIN_LaTeX
+%% \centering
+%% \resizebox{\textwidth}{!}{
+%% \begin{tabular}{llllllr}
+%% {\bf Parser}              & {\bf Constr.} & {\bf Time (s)} & {\bf Speedup}                       & {\bf \# Binary Edges}                    & {\bf F$_{\text{1}}$} & {\bf \#fail} \\
+%% \hline
+%% baseline                  &               & 1558           & -                                   & 1.75\texttimes{}10$^{\text{10}}$ (100\%) & 85.85                & 0            \\
+%% \multirow{3}{*}{+constr.} & linear        & 1283 (+100)    & 1.21\texttimes{} (1.12\texttimes{}) & 1.08\texttimes{}10$^{\text{10}}$ (62\%)  & 83.71 (-2.14)        & 15           \\
+%%                           & poly          & 1106 (+2h)     & 1.41\texttimes{} (.19\texttimes{})  & 9.74\texttimes{}10$^{\text{09}}$ (56\%)  & 84.85 (-1.00)        & 6            \\
+%%                           & oracle        & 1016           & 1.53\texttimes{}                    & 8.47\texttimes{}10$^{\text{09}}$ (48\%)  & 86.71 (+0.86)        & 4            \\
+%% \end{tabular}
+\begin{tabular}{llllllr}
+{\bf Parser}                  & {\bf Constr.} & {\bf Time (s)} & {\bf Speedup}                       \\
+\hline
+baseline                      &                   & 1558           &                                     \\
+\multirow{3}{*}{+constr.} & linear            & 1283 (+100)    & 1.21\texttimes{} (1.12\texttimes{}) \\
+                              & poly              & 1106 (+2h)     & 1.41\texttimes{} (.19\texttimes{})  \\
+                              & oracle            & 1016           & 1.53\texttimes{}                    \\
+\end{tabular}
+
+\vfill
+
+\begin{tabular}{llllllr}
+{\bf Parser}              & {\bf Constr.} & {\bf \# Binary Edges}                    & {\bf F$_{\text{1}}$} & {\bf \#fail} \\
+\hline
+baseline                  &               & 1.75\texttimes{}10$^{\text{10}}$ (100\%) & 85.85                & 0            \\
+\multirow{3}{*}{+constr.} & linear        & 1.08\texttimes{}10$^{\text{10}}$ (62\%)  & 83.71 (-2.14)        & 15           \\
+                          & poly          & 9.74\texttimes{}10$^{\text{09}}$ (56\%)  & 84.85 (-1.00)        & 6            \\
+                          & oracle        & 8.47\texttimes{}10$^{\text{09}}$ (48\%)  & 86.71 (+0.86)        & 4            \\
+\end{tabular}
 %% }
 #+END_LaTeX
 

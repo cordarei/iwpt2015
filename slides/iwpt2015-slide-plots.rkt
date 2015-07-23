@@ -39,7 +39,8 @@
 (define (make-feature-conf-plot)
   (parameterize ([plot-x-ticks (linear-ticks)])
    (plot (append (map feat-to-point-label features)
-                 (list #;(x-axis 70 #:ticks? #t #:labels? #t)))
+                 (list #;(x-axis 70 #:ticks? #t #:labels? #t)
+                       (point-label (vector 89.05  75.74 ) "p,P1,P3" #:color "red")))
         #:x-min 50 #:x-max 100
         #:y-min 65 #:y-max 100
         #:x-label "Precision" #:y-label "Recall"
