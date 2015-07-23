@@ -237,7 +237,7 @@ CKY Chart
 
 ** Classifying Independent Span Boundaries
 
-- binary classifier: is $k$ an independent span boundary?
+- binary classifier: is $k$ an independent span boundary? \pause
 - instance for every $1 \le k < n$ \pause
 - pointwise model \pause
 - POS features \pause
@@ -310,10 +310,67 @@ WRB & X & W & W & SYM & X & X & X\\
 - Level 1: Noun+Verb+Other tags (clause nuclei)
 - Level 2: Noun+Verb+Punct+Conj+Prep+Other (clause boundaries)
 - Level 3: Merge related tags (reduce features, smoothing)
+  
+# need more rigor!!
 
-** POS Levels: Example
+** POS Levels Example: Level 1
 
-[example]
+#+BEGIN_LaTeX
+\newcommand\examplesize{\scriptsize}
+#+END_LaTeX
+
+#+BEGIN_LaTeX
+\examplesize
+\begin{tabular}{cccccccccccccccccccc}
+These & high-yielding & loans & in & effect & replaced & some & low-yielding & assets & such & as & inter-bank & loans & , & which & were & allowed & to & decrease & .
+\\
+DT & JJ & NNS & IN & NN & VBD & DT & JJ & NNS & JJ & IN & JJ & NNS & , & WDT & VBD & VBN & TO & VB & .
+\\ \pause
+X & X & N & X & N & V & X & X & N & X & X & X & N & X & X & V & V & X & V & X
+\\ \pause
+  & X & N & X & N & V &   & X & N &   &   & X & N &   & X &   & V & X & V & X
+\\ \pause
+  &   & N &   & N & V &   &   & N &   &   &   & N &   &   &   & V &   & V &  
+\\
+\end{tabular}
+#+END_LaTeX
+
+** POS Levels Example: Level 2
+
+#+BEGIN_LaTeX
+\examplesize
+\begin{tabular}{cccccccccccccccccccc}
+These & high-yielding & loans & in & effect & replaced & some & low-yielding & assets & such & as & inter-bank & loans & , & which & were & allowed & to & decrease & .
+\\
+DT & JJ & NNS & IN & NN & VBD & DT & JJ & NNS & JJ & IN & JJ & NNS & , & WDT & VBD & VBN & TO & VB & .
+\\ \pause
+X & X & N & I & N & V & X & X & N & X & I & X & N & , & W & V & V & T & V & .
+\\ \pause
+  & X & N & I & N & V &   & X & N & X & I & X & N & , & W &   & V & T & V & .
+\\ \pause
+  &   & N & I & N & V &   &   & N &   & I &   & N & , & W &   & V & T & V & .
+\\
+\end{tabular}
+#+END_LaTeX
+
+
+** POS Levels Example: Level 3
+
+#+BEGIN_LaTeX
+\examplesize
+\begin{tabular}{cccccccccccccccccccc}
+These & high-yielding & loans & in & effect & replaced & some & low-yielding & assets & such & as & inter-bank & loans & , & which & were & allowed & to & decrease & .
+\\
+DT & JJ & NNS & IN & NN & VBD & DT & JJ & NNS & JJ & IN & JJ & NNS & , & WDT & VBD & VBN & TO & VB & .
+\\ \pause
+D & J & N & I & N & V & D & J & N & J & I & J & N & , & W & V & V & T & V & .
+\\ \pause
+D & J & N & I & N & V & D & J & N & J & I & J & N & , & W &   & V & T & V & .
+\\ \pause
+D & J & N & I & N & V & D & J & N & J & I & J & N & , & W &   & V & T & V & .
+\\
+\end{tabular}
+#+END_LaTeX
 
 ** Experimental Setup
 
