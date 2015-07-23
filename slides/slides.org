@@ -1,5 +1,5 @@
 #+TITLE: CKY Parsing With Independence Constraints
-#+AUTHOR: Joseph Irwin and Yuji Matsumoto
+#+AUTHOR: Joseph Irwin and Yuji Matsumoto @@latex:\\Nara Institute of Science and Technology@@
 #+DATE: IWPT2015
 #+STARTUP: beamer
 #+LaTeX_CLASS: beamer
