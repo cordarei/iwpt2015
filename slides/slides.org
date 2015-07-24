@@ -3,7 +3,7 @@
 #+DATE: IWPT2015
 #+STARTUP: beamer
 #+LaTeX_CLASS: beamer
-#+LaTeX_CLASS_OPTIONS: [presentation,bigger]
+#+LaTeX_CLASS_OPTIONS: [presentation,bigger,aspectratio=1610]
 #+BEAMER_THEME: default
 #+OPTIONS: h:2 toc:nil
 #+COLUMNS: %45ITEM %10BEAMER_env(Env) %10BEAMER_act(Act) %4BEAMER_col(Col) %8BEAMER_opt(Opt)
@@ -380,7 +380,7 @@ D & J & N & I & N & V & D & J & N & J & I & J & N & , & W &   & V & T & V & .
 \centering
 # file:./feature-conf-plot.pdf
 #+BEGIN_LaTeX
-\includegraphics[width=.75\textwidth]{./feature-conf-plot.pdf}
+\includegraphics[width=.5\textwidth]{./feature-conf-plot.pdf}
 #+END_LaTeX
 
 ** Results
